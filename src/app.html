@@ -748,7 +748,7 @@ const AUTH_ERR = {
   "auth/wrong-password":"كلمة المرور غلط","auth/user-not-found":"مفيش حساب بالإيميل ده — اختار «حساب جديد»","auth/too-many-requests":"محاولات كتير — استنى شوية وجرب تاني",
   "auth/invalid-phone-number":"رقم الجوال غلط","auth/invalid-verification-code":"الكود غلط","auth/code-expired":"الكود انتهى — ابعت كود جديد",
   "auth/billing-not-enabled":"الدخول بالجوال محتاج تفعيل خطة Blaze في Firebase","auth/operation-not-allowed":"طريقة الدخول دي مش مفعّلة في Firebase (أو منطقة السعودية مش مسموحة لرسائل SMS)",
-  "auth/network-request-failed":"مفيش اتصال بالإنترنت","auth/unauthorized-domain":"الموقع ده مش مضاف في Authorized domains في Firebase"
+  "auth/network-request-failed":"مفيش اتصال بالإنترنت","auth/unauthorized-domain":"الموقع ده مش مضاف في Authorized domains في Firebase","auth/internal-error":"حصل خطأ في جوجل — جرّب تاني أو ادخل بالإيميل"
 };
 const authMsg = e => AUTH_ERR[e.code] || ("حصل خطأ: "+(e.code||e.message));
 function lmsg(t, ok){ $("#loginMsg").textContent=t||""; $("#loginMsg").style.color= ok?"#c8ffd9":""; }
@@ -795,10 +795,23 @@ function openAcct(){
     $("#aIn").onclick=()=>{ closeSheet(); showLogin(); };
   }
 }
-async function doSignIn(){
-  showLogin(); busy("جاري فتح جوجل…");
-  try{ const C=await cloudReady; await C.signIn(); }
-  catch(e){ showLogin(e.code==="auth/popup-closed-by-user" ? "" : "تعذّر تسجيل الدخول: "+(e.code||e.message)); }
+let gTimer=null;
+function doSignIn(){
+  if(!window.Cloud){ showLogin("لحظة… خدمة الدخول لسه بتتحمّل، جرّب تاني بعد ثواني"); return; }
+  let pr;
+  try{ pr = window.Cloud.signIn(); }            // opened synchronously inside the tap
+  catch(e){ showLogin(authMsg(e)); return; }
+  showLogin(); busy("كمّل تسجيل الدخول في نافذة جوجل…");
+  $("#loginBusy").insertAdjacentHTML("beforeend",`<div><button class="lguest" id="gCancel">إلغاء</button></div>`);
+  $("#gCancel").onclick=()=>{ clearTimeout(gTimer); showLogin("لو نافذة جوجل مش بتفتح، جرّب الدخول بالإيميل"); };
+  clearTimeout(gTimer);
+  gTimer=setTimeout(()=>{ if(!USER) showLogin("الدخول بجوجل اتأخر. لو بتستخدم آيفون: الإعدادات ← Safari ← اقفل «حظر النوافذ المنبثقة»، أو ادخل بالإيميل"); },60000);
+  pr.then(()=>{ clearTimeout(gTimer); busy("جاري الدخول…"); })
+    .catch(e=>{ clearTimeout(gTimer);
+      const m = e.code==="auth/popup-closed-by-user"||e.code==="auth/cancelled-popup-request" ? ""
+              : e.code==="auth/popup-blocked" ? "المتصفح منع نافذة جوجل. اسمح بالنوافذ المنبثقة، أو ادخل بالإيميل"
+              : authMsg(e);
+      showLogin(m); });
 }
 
 $("#gBtn").onclick=()=>{ ac(); doSignIn(); };

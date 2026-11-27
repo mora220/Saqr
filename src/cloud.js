@@ -28,13 +28,11 @@ const strip = c => { const { owner, updatedAt, ...rest } = c; return rest; };
 const Cloud = {
   user: () => auth.currentUser,
   onAuth(cb) { getRedirectResult(auth).catch(() => {}); return onAuthStateChanged(auth, u => { uid = u ? u.uid : null; cb(u); }); },
-  async signIn() {
+  // must be called synchronously from the click handler (iOS Safari only allows popups inside the tap)
+  // redirect is not used: it breaks on Safari when the site is not on Firebase Hosting
+  signIn() {
     const p = new GoogleAuthProvider(); p.setCustomParameters({ prompt: "select_account" });
-    try { return await signInWithPopup(auth, p); }
-    catch (e) {
-      if (["auth/popup-blocked", "auth/operation-not-supported-in-this-environment", "auth/cancelled-popup-request"].includes(e.code)) return signInWithRedirect(auth, p);
-      throw e;
-    }
+    return signInWithPopup(auth, p);
   },
   emailIn: (email, pass) => signInWithEmailAndPassword(auth, email, pass),
   async emailUp(name, email, pass) { const r = await createUserWithEmailAndPassword(auth, email, pass); if (name) await updateProfile(r.user, { displayName: name }); return r; },
