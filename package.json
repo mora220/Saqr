@@ -1,0 +1,7 @@
+{
+  "name": "saqr",
+  "private": true,
+  "description": "صقر – إدارة الفصل",
+  "scripts": { "build": "python3 build.py && cp dist/index.html dist/cloud.js ." },
+  "dependencies": { "@fontsource/baloo-bhaijaan-2": "^5.2.0", "esbuild": "^0.25.0", "firebase": "13.4.0", "gsap": "^3.15.1" }
+}
