@@ -244,6 +244,23 @@ table.rep th{color:var(--muted);font-weight:700}table.rep td:first-child,table.r
 .sw2{width:52px;height:30px;border-radius:20px;background:#d5dbe8;position:relative;transition:.2s;flex:0 0 auto}
 .sw2::after{content:"";position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
 .sw2.on{background:#22b573}.sw2.on::after{right:25px}
+/* ---------- reports ---------- */
+.rtiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;margin:10px 0}
+.rt{background:#f6f8fd;border-radius:16px;padding:10px 12px}.rt small{color:var(--muted);font-weight:700;display:block}.rt b{font-size:1.6rem;line-height:1.2}
+.rsec{margin-top:16px}.rsec h3{margin:0 0 8px;font-size:1.1rem}
+.days{display:flex;gap:8px;align-items:flex-end;height:150px;padding:6px 4px 0;border-bottom:2px solid #eef1f8}
+.day{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:2px;min-width:0}
+.day .bp{width:70%;max-width:38px;background:#22b573;border-radius:8px 8px 0 0;min-height:2px}
+.day .bn{width:70%;max-width:38px;background:#ff5d5d;border-radius:0 0 8px 8px}
+.day .v{font-size:.75rem;font-weight:800;color:#14935b}
+.dlab{display:flex;gap:8px;padding:4px}.dlab span{flex:1;text-align:center;font-size:.78rem;font-weight:700;color:var(--muted);min-width:0;overflow:hidden;white-space:nowrap}
+.hb{display:flex;align-items:center;gap:8px;margin:5px 0;font-weight:700}
+.hb .l{width:118px;flex:0 0 auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hb .t{flex:1;height:22px;background:#f1f4fa;border-radius:8px;overflow:hidden}.hb .t i{display:block;height:100%;border-radius:8px}
+.hb .n{width:34px;text-align:center}
+.pill2{display:inline-flex;align-items:center;gap:6px;background:#f6f8fd;border-radius:14px;padding:4px 10px 4px 6px;margin:3px;font-weight:700}
+.pill2 .av{width:30px;height:30px}
+.stusel{width:100%;padding:10px;border-radius:14px;border:2px solid #e3e8f3;font-weight:700;background:#fafbff}
 /* ---------- fx ---------- */
 #fx{position:fixed;inset:0;pointer-events:none;z-index:80}
 .float{direction:ltr;position:fixed;font-weight:800;font-size:2.2rem;z-index:90;pointer-events:none;text-shadow:0 3px 0 rgba(0,0,0,.12)}
@@ -302,7 +319,7 @@ table.rep th{color:var(--muted);font-weight:700}table.rep td:first-child,table.r
   <button class="tool" data-tool="timer"><span class="ic">⏱️</span>المؤقت</button>
   <button class="tool" data-tool="groups"><span class="ic">🪶</span>الأسراب</button>
   <button class="tool" data-tool="noise"><span class="ic">🤫</span>مقياس الهدوء</button>
-  <button class="tool" data-tool="report"><span class="ic">🏆</span>الترتيب والتقرير</button>
+  <button class="tool" data-tool="report"><span class="ic">📊</span>التقارير</button>
   <button class="tool" data-tool="select" id="selTool"><span class="ic">☑️</span>تحديد عدة طلاب</button>
 </div>
 
@@ -648,7 +665,7 @@ function award(ids, skill){
   ids.forEach(id=>{ const s=stu(id); if(!s) return; before[id]=levelOf(s.points).idx;
     s.points+=skill.v; skill.v>0 ? s.pos++ : s.neg++; c.log.push({sid:id,k:skill.k,v:skill.v,t});
     if(levelOf(s.points).idx>before[id]) leveled.push(id); });
-  if(c.log.length>2000) c.log=c.log.slice(-2000);
+  if(c.log.length>5000) c.log=c.log.slice(-5000);
   save();
   ids.forEach(id=>{ refreshCard(id); animateCard(id, skill); });
   skill.v>0 ? SFX.pos() : SFX.neg();
@@ -701,7 +718,7 @@ function openEdit(id){
     <div style="flex:1"><input class="field" id="eName" value="${esc(name)}" maxlength="30"></div></div>
     <b>اللون</b><div class="swatches">${BODY.map(c=>`<button class="sw ${c===look.body?"on":""}" style="background:${c}" data-c="${c}"></button>`).join("")}</div>
     <b>الإكسسوار</b><div class="accs">${ACCS.map(a=>`<button class="acc ${a===look.acc?"on":""}" data-a="${a}" title="${ACC_NAMES[a]}">${falconSVG({level:1,body:look.body,acc:a})}</button>`).join("")}</div>
-    ${MODE==="cloud"?`<b style="display:block;margin-top:12px">📝 رسالة لولي الأمر</b><textarea class="field" id="eNote" style="min-height:70px" placeholder="مثلاً: عبدالله شارك بتميّز النهارده 👏" maxlength="300">${esc(s.note||"")}</textarea>`:""}
+    ${MODE==="cloud"?`<b style="display:block;margin-top:12px">📝 رسالة لولي الأمر</b><textarea class="field" id="eNote" style="min-height:70px" placeholder="مثلاً: عبدالله شارك بتميّز النهارده 👏" maxlength="500">${esc(s.note||"")}</textarea>`:""}
     ${MODE==="cloud"&&s.code?`<div class="li" style="margin-top:10px"><div class="grow"><b>🎒 كود دخول الطالب</b><small>يدخل بيه من «أنا طالب»</small></div><b dir="ltr" style="font-size:1.3rem;letter-spacing:2px">${s.code}</b><button class="btn" id="eCopy">نسخ الرابط</button></div>`:""}
     <div class="row" style="margin-top:12px"><button class="btn pri" id="eSave">حفظ</button><button class="btn" id="eReset">تصفير النقاط</button><span class="spacer"></span><button class="btn red" id="eDel">حذف الطالب</button></div>`);
     gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
@@ -918,14 +935,130 @@ function attReport(month){
   $("#aCopy").onclick=async()=>{ try{ await navigator.clipboard.writeText(matrix().map(r=>r.join("\t")).join("\n")); toast("📋 اتنسخ! الصقه في Excel"); }catch(e){ toast("النسخ غير متاح هنا"); } };
 }
 
+/* ---------- reports: class period + student ---------- */
+const WD=["الأحد","الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت"];
+function weekStart(d){ const x=new Date(d); x.setHours(0,0,0,0); x.setDate(x.getDate()-x.getDay()); return x; }   // Sunday
+let RP={kind:"week",off:0};
+function periodOf(rp){
+  const now=new Date();
+  if(rp.kind==="month"){ const a=new Date(now.getFullYear(),now.getMonth()+rp.off,1), b=new Date(a.getFullYear(),a.getMonth()+1,1);
+    let n=""; try{ n=a.toLocaleDateString("ar-EG",{month:"long",year:"numeric"}); }catch(e){}
+    return {a,b,label:n,sub:rp.off===0?"الشهر الحالي":""}; }
+  const a=weekStart(now); a.setDate(a.getDate()+7*rp.off); const b=new Date(a); b.setDate(b.getDate()+7);
+  const e=new Date(b); e.setDate(e.getDate()-1); const f=d=>{ try{ return d.toLocaleDateString("ar-EG",{day:"numeric",month:"short"}) }catch(x){ return "" } };
+  return {a,b,label:`${f(a)} – ${f(e)}`,sub:rp.off===0?"الأسبوع الحالي":rp.off===-1?"الأسبوع اللي فات":""};
+}
+function statsFor(c,a,b){
+  const logs=c.log.filter(l=>l.t>=+a&&l.t<+b), per={}, skills={}, days={};
+  c.students.forEach(s=>per[s.id]={s,pos:0,neg:0,ab:0,late:0,ex:0,days:0});
+  logs.forEach(l=>{ const r=per[l.sid]; if(!r) return; l.v>0?r.pos+=l.v:r.neg-=l.v; skills[l.k]=(skills[l.k]||0)+1;
+    const dk=dkey(new Date(l.t)); days[dk]=days[dk]||{p:0,n:0}; l.v>0?days[dk].p+=l.v:days[dk].n-=l.v; });
+  const attDays=Object.keys(c.att||{}).filter(k=>{ const d=fromKey(k); return d>=a&&d<b; });
+  attDays.forEach(k=>c.students.forEach(s=>{ const st=attOf(c,k,s.id), r=per[s.id]; r.days++; if(st==="a") r.ab++; else if(st==="l") r.late++; else if(st==="x") r.ex++; }));
+  const rows=Object.values(per); const tot={pos:0,neg:0,ab:0,late:0,slots:0};
+  rows.forEach(r=>{ tot.pos+=r.pos; tot.neg+=r.neg; tot.ab+=r.ab; tot.late+=r.late; tot.slots+=r.days; });
+  tot.rate = tot.slots ? Math.round(100*(tot.slots-tot.ab-rows.reduce((x,r)=>x+r.ex,0))/tot.slots) : null;
+  return {logs,rows,skills,days,attDays,tot};
+}
+function repTabs(on){ return `<div class="tabs"><button class="tab ${on==="period"?"p on":""}" data-rt="period">📅 تقرير الفترة</button><button class="tab ${on==="stu"?"p on":""}" data-rt="stu">👤 تقرير طالب</button><button class="tab ${on==="rank"?"p on":""}" data-rt="rank">🏆 الترتيب</button></div>`; }
+function bindRepTabs(){ document.querySelectorAll("[data-rt]").forEach(b=>b.onclick=()=>{ const t=b.dataset.rt; t==="period"?openPeriod():t==="stu"?openStuRep():openReport(); }); }
+const skillOf=k=>POS.concat(NEG).find(x=>x.k===k)||{e:"⭐",t:k,v:1};
+const hbars=(items,color)=>{ /* color may be per-item */ const mx=Math.max(1,...items.map(i=>i.n)); return items.map(i=>`<div class="hb"><span class="l">${i.label}</span><span class="t"><i style="width:${100*i.n/mx}%;background:${i.c||color}"></i></span><span class="n">${i.n}</span></div>`).join(""); };
+
+function openPeriod(){
+  const c=cls(), P=periodOf(RP), st=statsFor(c,P.a,P.b), T=st.tot;
+  const daysArr=[]; if(RP.kind==="week"){ for(let i=0;i<5;i++){ const d=new Date(P.a); d.setDate(d.getDate()+i); daysArr.push(d); } }
+  else { for(let d=new Date(P.a); d<P.b; d.setDate(d.getDate()+1)){ if(d.getDay()<5) daysArr.push(new Date(d)); } }
+  const mxDay=Math.max(1,...daysArr.map(d=>{ const x=st.days[dkey(d)]||{p:0,n:0}; return x.p+x.n; }));
+  const pos=POS.map(k=>({label:k.e+" "+k.t,n:st.logs.filter(l=>l.k===k.k).length})).filter(x=>x.n).sort((a,b)=>b.n-a.n);
+  const neg=NEG.map(k=>({label:k.e+" "+k.t,n:st.logs.filter(l=>l.k===k.k).length})).filter(x=>x.n).sort((a,b)=>b.n-a.n);
+  const stars=[...st.rows].filter(r=>r.pos>0).sort((a,b)=>b.pos-a.pos).slice(0,3);
+  const watch=[...st.rows].filter(r=>r.neg>0||r.ab>1).sort((a,b)=>(b.neg+2*b.ab)-(a.neg+2*a.ab)).slice(0,5);
+  const zero=st.rows.filter(r=>r.pos===0 && (r.days===0 || r.ab<r.days));
+  const who=r=>`<span class="pill2"><span class="av">${avatar(r.s)}</span>${esc(r.s.name)}</span>`;
+  openSheet(`<h2>📊 التقارير</h2>${repTabs("period")}
+    <div class="row" style="margin-bottom:8px"><button class="btn ${RP.kind==="week"?"vio":""}" data-k="week">أسبوعي</button><button class="btn ${RP.kind==="month"?"vio":""}" data-k="month">شهري</button></div>
+    <div class="dnav"><button id="pPrev">›</button><div class="dt"><b>${esc(P.label)}</b><small>${P.sub}</small></div><button id="pNext" ${RP.off>=0?"disabled style='opacity:.3'":""}>‹</button></div>
+    <div class="rtiles">
+      <div class="rt"><small>⭐ نقاط إيجابية</small><b style="color:#14935b">${sgn(T.pos)}</b></div>
+      <div class="rt"><small>✋ نقاط سلبية</small><b style="color:#d63e3e">${sgn(-T.neg)}</b></div>
+      <div class="rt"><small>📋 نسبة الحضور</small><b>${T.rate===null?"—":T.rate+"%"}</b><small>${st.attDays.length} يوم محضّر</small></div>
+      <div class="rt"><small>❌ غياب / ⏰ تأخير</small><b>${T.ab} / ${T.late}</b></div>
+    </div>
+    ${st.logs.length||st.attDays.length?`
+    <div class="rsec"><h3>📈 النقاط يوم بيوم</h3>
+      <div class="days">${daysArr.map(d=>{ const x=st.days[dkey(d)]||{p:0,n:0}; return `<div class="day">${x.p?`<span class="v">${x.p}</span>`:""}<i class="bp" style="height:${110*x.p/mxDay}px"></i><i class="bn" style="height:${110*x.n/mxDay}px"></i></div>`; }).join("")}</div>
+      <div class="dlab">${daysArr.map(d=>`<span>${RP.kind==="week"?WD[d.getDay()]:d.getDate()}</span>`).join("")}</div></div>
+    ${stars.length?`<div class="rsec"><h3>🏆 نجوم ${RP.kind==="week"?"الأسبوع":"الشهر"}</h3>${stars.map((r,i)=>`<span class="pill2">${["🥇","🥈","🥉"][i]}<span class="av">${avatar(r.s)}</span>${esc(r.s.name)} <b style="color:#14935b">${sgn(r.pos)}</b></span>`).join("")}</div>`:""}
+    ${pos.length?`<div class="rsec"><h3>👍 أكتر السلوكيات الإيجابية</h3>${hbars(pos,"#22b573")}</div>`:""}
+    ${neg.length?`<div class="rsec"><h3>✋ السلوكيات اللي محتاجة متابعة</h3>${hbars(neg,"#ff5d5d")}</div>`:""}
+    ${watch.length?`<div class="rsec"><h3>👀 طلاب محتاجين متابعة</h3>${watch.map(r=>`<div class="li"><span class="av">${avatar(r.s)}</span><div class="grow"><b>${esc(r.s.name)}</b><small>${r.neg?`سلبي ${sgn(-r.neg)}`:""}${r.neg&&r.ab?" · ":""}${r.ab?`غياب ${r.ab}`:""}${r.late?` · تأخير ${r.late}`:""}</small></div><button class="btn" data-sr="${r.s.id}">التفاصيل</button></div>`).join("")}</div>`:""}
+    ${zero.length&&st.logs.length?`<div class="rsec"><h3>🤲 ماخدوش ولا نقطة إيجابية</h3><p class="hint" style="margin-top:0">فرصة تشجّعهم الأسبوع الجاي</p>${zero.map(who).join("")}</div>`:""}
+    <div class="rsec"><h3>📋 كل الطلاب</h3><table class="rep"><thead><tr><th>الطالب</th><th>+</th><th>−</th><th>الصافي</th><th>غياب</th><th>تأخير</th></tr></thead><tbody>
+      ${[...st.rows].sort((a,b)=>(b.pos-b.neg)-(a.pos-a.neg)).map(r=>`<tr data-sr="${r.s.id}" style="cursor:pointer"><td><b>${esc(r.s.name)}</b></td><td style="color:#14935b;font-weight:800">${r.pos}</td><td style="color:#d63e3e;font-weight:800">${r.neg}</td><td><b>${r.pos-r.neg}</b></td><td>${r.ab}</td><td>${r.late}</td></tr>`).join("")}</tbody></table></div>`
+    :`<p class="hint" style="text-align:center;padding:24px">مفيش نقاط ولا تحضير في الفترة دي</p>`}
+    <div class="row" style="margin-top:14px"><button class="btn pri" id="pCopy">📋 نسخ ملخص (واتساب)</button><button class="btn" id="pCsv">⬇️ Excel</button></div>`);
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); bindRepTabs();
+  gsap.from(".day i",{scaleY:0,transformOrigin:"bottom",stagger:.03,duration:.5,ease:"back.out(1.5)"});
+  document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{ RP={kind:b.dataset.k,off:0}; openPeriod(); });
+  $("#pPrev").onclick=()=>{ RP.off--; openPeriod(); }; $("#pNext").onclick=()=>{ if(RP.off<0){ RP.off++; openPeriod(); } };
+  document.querySelectorAll("[data-sr]").forEach(b=>b.onclick=()=>openStuRep(b.dataset.sr));
+  $("#pCopy").onclick=()=>{ const L=[`📊 تقرير ${RP.kind==="week"?"أسبوع":"شهر"} ${P.label} — ${c.name}`,`⭐ إيجابي: +${T.pos}   ✋ سلبي: −${T.neg}`,
+      `📋 الحضور: ${T.rate===null?"لم يُسجَّل":T.rate+"%"} (غياب ${T.ab}، تأخير ${T.late})`];
+    if(stars.length) L.push("🏆 النجوم: "+stars.map(r=>`${r.s.name} (+${r.pos})`).join("، "));
+    if(pos.length) L.push("👍 أكتر سلوك إيجابي: "+pos[0].label);
+    if(neg.length) L.push("✋ أكتر سلوك محتاج متابعة: "+neg[0].label);
+    if(watch.length) L.push("👀 متابعة: "+watch.map(r=>r.s.name).join("، "));
+    L.push("\n🦅 من تطبيق صقر"); copyText(L.join("\n"),"📋 اتنسخ الملخص"); };
+  $("#pCsv").onclick=()=>{ const rows=[["الطالب","إيجابي","سلبي","الصافي","غياب","تأخير","استئذان"]].concat(st.rows.map(r=>[r.s.name,r.pos,r.neg,r.pos-r.neg,r.ab,r.late,r.ex]));
+    const csv="\ufeff"+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\r\n");
+    try{ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([csv],{type:"text/csv;charset=utf-8"})); a.download=`تقرير-${c.name}-${dkey(P.a)}.csv`; a.click(); }catch(e){ toast("التنزيل غير متاح هنا"); } };
+}
+
+function openStuRep(sid){
+  const c=cls(); if(!c.students.length){ toast("ضيف طلاب الأول"); return; }
+  const s=stu(sid)||c.students[0], P=periodOf(RP), st=statsFor(c,P.a,P.b), r=st.rows.find(x=>x.s===s);
+  const mine=st.logs.filter(l=>l.sid===s.id);
+  const sk=POS.concat(NEG).map(k=>({k,n:mine.filter(l=>l.k===k.k).length})).filter(x=>x.n).sort((a,b)=>b.n-a.n);
+  const weeks=[]; for(let i=7;i>=0;i--){ const a=weekStart(new Date()); a.setDate(a.getDate()-7*i); const b=new Date(a); b.setDate(b.getDate()+7);
+    const l=c.log.filter(x=>x.sid===s.id&&x.t>=+a&&x.t<+b); weeks.push({a,p:l.filter(x=>x.v>0).reduce((t,x)=>t+x.v,0),n:-l.filter(x=>x.v<0).reduce((t,x)=>t+x.v,0)}); }
+  const mx=Math.max(1,...weeks.map(w=>w.p+w.n));
+  const attList=st.attDays.sort().map(k=>({k,st:attOf(c,k,s.id)})).filter(x=>x.st!=="p");
+  const best=sk.find(x=>x.k.v>0), worst=sk.find(x=>x.k.v<0);
+  const draft=`السلام عليكم، تقرير ${s.name} ${RP.kind==="week"?"الأسبوع ده":"الشهر ده"}: `+
+    (r.pos?`خد ${r.pos} نقطة إيجابية${best?` وأكتر حاجة اتميّز فيها «${best.k.t}»`:""} 👏. `:"محتاج تشجيع أكتر في المشاركة. ")+
+    (r.neg?`وعنده ${r.neg} ملاحظة${worst?` أغلبها «${worst.k.t}»`:""}، نتمنى نتعاون عليها. `:"")+
+    (r.ab?`غاب ${r.ab} ${r.ab>1?"أيام":"يوم"}. `:"")+`مستواه الحالي «${levelOf(s.points).name}» 🦅`;
+  openSheet(`<h2>📊 التقارير</h2>${repTabs("stu")}
+    <select class="stusel" id="srSel">${c.students.map(x=>`<option value="${x.id}" ${x.id===s.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select>
+    <div class="dnav" style="margin-top:8px"><button id="sPrev">›</button><div class="dt"><b>${esc(P.label)}</b><small>${P.sub}</small></div><button id="sNext" ${RP.off>=0?"disabled style='opacity:.3'":""}>‹</button></div>
+    <div class="who" style="margin-top:10px"><div class="av">${avatar(s)}</div><div class="info"><b>${esc(s.name)}</b><span>${levelOf(s.points).name} · ${s.points} نقطة إجمالي</span></div></div>
+    <div class="rtiles"><div class="rt"><small>⭐ إيجابي</small><b style="color:#14935b">${sgn(r.pos)}</b></div><div class="rt"><small>✋ سلبي</small><b style="color:#d63e3e">${sgn(-r.neg)}</b></div>
+      <div class="rt"><small>❌ غياب</small><b>${r.ab}</b><small>من ${r.days} يوم</small></div><div class="rt"><small>⏰ تأخير</small><b>${r.late}</b></div></div>
+    <div class="rsec"><h3>📈 آخر 8 أسابيع</h3><div class="days">${weeks.map(w=>`<div class="day">${w.p?`<span class="v">${w.p}</span>`:""}<i class="bp" style="height:${110*w.p/mx}px"></i><i class="bn" style="height:${110*w.n/mx}px"></i></div>`).join("")}</div>
+      <div class="dlab">${weeks.map((w,i)=>`<span>${i===7?"الحالي":(()=>{ try{ return w.a.toLocaleDateString("ar-EG",{day:"numeric",month:"numeric"}) }catch(e){ return "" } })()}</span>`).join("")}</div></div>
+    ${sk.length?`<div class="rsec"><h3>🧩 السلوكيات</h3>${hbars(sk.map(x=>({label:x.k.e+" "+x.k.t,n:x.n,c:x.k.v>0?"#22b573":"#ff5d5d"})),"#7b5cd6")}</div>`:`<p class="hint">مفيش نقاط في الفترة دي</p>`}
+    ${attList.length?`<div class="rsec"><h3>📋 أيام الغياب والتأخير</h3>${attList.map(x=>`<span class="pill2" style="background:${ATT[x.st].c};color:#fff">${ATT[x.st].e} ${esc(fmtDay(x.k).g)}</span>`).join("")}</div>`:""}
+    <div class="rsec"><h3>✉️ رسالة لولي الأمر</h3><textarea class="field" id="srMsg" style="min-height:110px">${esc(draft)}</textarea>
+      <div class="row" style="margin-top:8px"><button class="btn" id="srCopy">📋 نسخ</button>${MODE==="cloud"?`<button class="btn pri" id="srSend">📝 ابعتها في صقر</button>`:""}</div>
+      ${MODE==="cloud"?`<p class="hint">«ابعتها في صقر» بتظهر لولي الأمر في صفحته كرسالة من المعلم</p>`:""}</div>`);
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); bindRepTabs();
+  gsap.from(".day i",{scaleY:0,transformOrigin:"bottom",stagger:.03,duration:.5,ease:"back.out(1.5)"});
+  $("#srSel").onchange=e=>openStuRep(e.target.value);
+  $("#sPrev").onclick=()=>{ RP.off--; openStuRep(s.id); }; $("#sNext").onclick=()=>{ if(RP.off<0){ RP.off++; openStuRep(s.id); } };
+  $("#srCopy").onclick=()=>copyText($("#srMsg").value,"📋 اتنسخت الرسالة");
+  if($("#srSend")) $("#srSend").onclick=()=>{ s.note=$("#srMsg").value.trim().slice(0,500); s.noteAt=Date.now(); save(); toast("📝 اتبعتت لولي الأمر"); };
+}
+
 /* ---------- report ---------- */
 function openReport(){
   const c=cls(); const arr=[...c.students].sort((a,b)=>b.points-a.points);
   const medal=i=>["🥇","🥈","🥉"][i]||(i+1);
-  openSheet(`<h2>🏆 ترتيب «${esc(c.name)}»</h2>
+  openSheet(`<h2>📊 التقارير</h2>${repTabs("rank")}
     <div class="row" style="margin-bottom:10px"><button class="btn pri" id="rCsv">⬇️ تصدير Excel (CSV)</button><button class="btn" id="rCopy">📋 نسخ الجدول</button><button class="btn" id="rPrint">🖨️ طباعة</button></div>
     <div class="list">${arr.map((s,i)=>`<div class="li"><span class="rk">${medal(i)}</span><span class="av">${avatar(s)}</span><div class="grow"><b>${esc(s.name)}</b><small>${levelOf(s.points).name}</small></div>
       <span class="chip p">+${s.pos}</span><span class="chip n">−${s.neg}</span><b style="min-width:34px;text-align:center;font-size:1.2rem">${s.points}</b></div>`).join("")||"<p class='hint'>لا يوجد طلاب</p>"}</div>`);
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); bindRepTabs();
   gsap.from(".li",{x:40,opacity:0,stagger:.04,duration:.35});
   $("#rCsv").onclick=()=>{ const rows=[["الترتيب","الاسم","النقاط","إيجابي","سلبي","المستوى"]].concat(arr.map((s,i)=>[i+1,s.name,s.points,s.pos,s.neg,levelOf(s.points).name]));
     const csv="﻿"+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\r\n");
@@ -952,7 +1085,7 @@ $("#classMenu").onclick=openClassMenu;
 $("#addStudentsBtn").onclick=openAdd;
 $("#soundBtn").onclick=()=>{ S.sound=!S.sound; save(); $("#soundBtn").textContent=S.sound?"🔊":"🔇"; if(S.sound) SFX.pos(); };
 document.querySelectorAll(".tool").forEach(b=>b.onclick=()=>{ ac(); const t=b.dataset.tool;
-  if(t==="random") randomPick(); else if(t==="timer") openTimer(); else if(t==="groups") openGroups(); else if(t==="noise") openNoise(); else if(t==="report") openReport(); else if(t==="select") toggleSel(!selMode); else if(t==="att") openAttendance(); });
+  if(t==="random") randomPick(); else if(t==="timer") openTimer(); else if(t==="groups") openGroups(); else if(t==="noise") openNoise(); else if(t==="report") openPeriod(); else if(t==="select") toggleSel(!selMode); else if(t==="att") openAttendance(); });
 
 /* ---------- boot ---------- */
 const cloudReady = new Promise((res,rej)=>{ if(window.Cloud) return res(window.Cloud);
