@@ -150,6 +150,17 @@ textarea.field{min-height:150px;resize:vertical;line-height:1.7}
 #login .tag{opacity:.85;font-size:1.1rem;margin:6px 0 24px;line-height:1.6}
 .gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#1f2a44;font-weight:800;font-size:1.1rem;padding:15px;border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .lguest{margin-top:12px;background:transparent;color:#fff;opacity:.8;font-weight:600;font-size:1rem;text-decoration:underline;padding:10px}
+.lalt{display:flex;gap:10px;margin-top:10px}
+.obtn{flex:1;background:rgba(255,255,255,.14);color:#fff;font-weight:700;font-size:1rem;padding:13px;border-radius:16px;border:1.5px solid rgba(255,255,255,.25)}
+.lform{display:flex;flex-direction:column;gap:10px}
+.lform[hidden],#pStep1[hidden],#pStep2[hidden],.lin[hidden]{display:none}
+#pStep1,#pStep2{display:flex;flex-direction:column;gap:10px}
+.lin{width:100%;padding:14px 16px;border-radius:16px;border:0;font-size:1.05rem;background:#fff;color:#1f2a44;outline:3px solid transparent}
+.lin:focus{outline-color:#ffc93c}
+.seg{display:flex;background:rgba(255,255,255,.12);border-radius:16px;padding:4px}
+.seg button{flex:1;padding:10px;border-radius:12px;background:transparent;color:#fff;font-weight:700;font-size:1rem}
+.seg button.on{background:#fff;color:#1f2a44}
+.lrow{display:flex;justify-content:space-between}
 .lbusy{font-size:1.2rem;font-weight:700;padding:18px}
 .lmsg{color:#ffd0d0;min-height:1.4em}
 /* ---------- fx ---------- */
@@ -227,8 +238,25 @@ textarea.field{min-height:150px;resize:vertical;line-height:1.7}
     <div id="loginFal"></div>
     <h1>صقر</h1><p class="tag">إدارة الفصل بروح الصقور 🦅<br>نقاط، مستويات، ومتابعة لكل طالب</p>
     <div id="loginBtns"><button class="gbtn" id="gBtn"><svg viewBox="0 0 48 48" width="24" height="24"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>الدخول بحساب جوجل</button>
+      <div class="lalt"><button class="obtn" id="emailBtn">✉️ بالإيميل</button><button class="obtn" id="phoneBtn">📱 برقم الجوال</button></div>
       <button class="lguest" id="guestBtn">جرّب بدون حساب (على هذا الجهاز فقط)</button></div>
-    <div id="loginBusy" class="lbusy" hidden></div>
+    <form id="emailForm" class="lform" hidden>
+      <div class="seg"><button type="button" class="on" data-m="in">دخول</button><button type="button" data-m="up">حساب جديد</button></div>
+      <input class="lin" id="eNm" placeholder="اسمك (يظهر للطلاب)" autocomplete="name" hidden>
+      <input class="lin" id="eEm" type="email" placeholder="الإيميل" autocomplete="email" dir="ltr" required>
+      <input class="lin" id="ePw" type="password" placeholder="كلمة المرور (6 أحرف على الأقل)" autocomplete="current-password" dir="ltr" required minlength="6">
+      <button class="gbtn" type="submit" id="eGo">دخول</button>
+      <div class="lrow"><button type="button" class="lguest" id="eForgot">نسيت كلمة المرور؟</button><button type="button" class="lguest lback">↩ رجوع</button></div>
+    </form>
+    <form id="phoneForm" class="lform" hidden>
+      <div id="pStep1"><input class="lin" id="pNum" type="tel" inputmode="tel" placeholder="05xxxxxxxx" dir="ltr" autocomplete="tel">
+        <button class="gbtn" type="submit" id="pSend">إرسال كود التحقق</button></div>
+      <div id="pStep2" hidden><p style="margin:0 0 8px;opacity:.85">اكتب الكود اللي وصلك في رسالة</p>
+        <input class="lin" id="pCode" inputmode="numeric" maxlength="6" placeholder="••••••" dir="ltr" autocomplete="one-time-code" style="letter-spacing:8px;text-align:center;font-size:1.4rem">
+        <button class="gbtn" type="button" id="pVerify">تأكيد</button></div>
+      <div class="lrow"><button type="button" class="lguest lback">↩ رجوع</button></div>
+    </form>
+    <div id="recap"></div><div id="loginBusy" class="lbusy" hidden></div>
     <p id="loginMsg" class="lmsg"></p>
   </div>
 </div>
@@ -708,11 +736,22 @@ const cloudReady = new Promise((res,rej)=>{ if(window.Cloud) return res(window.C
   addEventListener("cloud-ready",()=>res(window.Cloud)); setTimeout(()=>rej(new Error("timeout")),15000); });
 addEventListener("cloud-error", e=>toast("⚠️ تعذّر الحفظ في السحابة — هيتحفظ لما النت يرجع"));
 
-function showLogin(msg){ $("#login").classList.add("show"); $("#loginMsg").textContent=msg||""; $("#loginBusy").hidden=true; $("#loginBtns").hidden=false;
+function showLogin(msg){ $("#login").classList.add("show"); $("#loginMsg").textContent=msg||""; $("#loginBusy").hidden=true; showPane("loginBtns");
   $("#loginFal").innerHTML=falconSVG({level:2,body:"#f2b01e",mood:"happy"}); $("#loginFal .fal").classList.add("flap");
   gsap.fromTo("#loginFal",{y:30},{y:-10,duration:1.4,yoyo:true,repeat:-1,ease:"sine.inOut"}); }
 function hideLogin(){ $("#login").classList.remove("show"); }
-function busy(t){ $("#loginBusy").hidden=false; $("#loginBusy").textContent=t; $("#loginBtns").hidden=true; }
+function showPane(id){ ["loginBtns","emailForm","phoneForm"].forEach(k=>$("#"+k).hidden = k!==id); }
+function busy(t){ $("#loginBusy").hidden=false; $("#loginBusy").textContent=t; showPane(null); }
+const AUTH_ERR = {
+  "auth/invalid-email":"الإيميل مكتوب غلط","auth/missing-password":"اكتب كلمة المرور","auth/weak-password":"كلمة المرور لازم 6 أحرف على الأقل",
+  "auth/email-already-in-use":"الإيميل ده مسجّل قبل كده — اختار «دخول»","auth/invalid-credential":"الإيميل أو كلمة المرور غلط",
+  "auth/wrong-password":"كلمة المرور غلط","auth/user-not-found":"مفيش حساب بالإيميل ده — اختار «حساب جديد»","auth/too-many-requests":"محاولات كتير — استنى شوية وجرب تاني",
+  "auth/invalid-phone-number":"رقم الجوال غلط","auth/invalid-verification-code":"الكود غلط","auth/code-expired":"الكود انتهى — ابعت كود جديد",
+  "auth/billing-not-enabled":"الدخول بالجوال محتاج تفعيل خطة Blaze في Firebase","auth/operation-not-allowed":"طريقة الدخول دي مش مفعّلة في Firebase (أو منطقة السعودية مش مسموحة لرسائل SMS)",
+  "auth/network-request-failed":"مفيش اتصال بالإنترنت","auth/unauthorized-domain":"الموقع ده مش مضاف في Authorized domains في Firebase"
+};
+const authMsg = e => AUTH_ERR[e.code] || ("حصل خطأ: "+(e.code||e.message));
+function lmsg(t, ok){ $("#loginMsg").textContent=t||""; $("#loginMsg").style.color= ok?"#c8ffd9":""; }
 function firstRender(){ hideLogin(); fixCur(); $("#soundBtn").textContent=S.sound?"🔊":"🔇"; render(); updateAcct();
   gsap.from(".card",{y:30,opacity:0,scale:.9,stagger:.035,duration:.45,ease:"back.out(1.6)"});
   gsap.from(".brand .logo",{y:-60,rotate:-30,duration:1,ease:"bounce.out"}); }
@@ -742,18 +781,18 @@ function startCloud(user){
 }
 
 function updateAcct(){ const b=$("#acctBtn"); if(!b) return;
-  if(MODE==="cloud" && USER){ const n=(USER.displayName||USER.email||"؟").trim(); b.textContent=n[0]; b.title=n; b.style.fontWeight="800"; }
+  if(MODE==="cloud" && USER){ const n=(USER.displayName||USER.email||USER.phoneNumber||"؟").trim(); b.textContent=n[0]; b.title=n; b.style.fontWeight="800"; }
   else { b.textContent="👤"; b.title="حساب"; } }
 function openAcct(){
   if(MODE==="cloud" && USER){
-    openSheet(`<h2>👤 حسابك</h2><div class="li"><div class="grow"><b>${esc(USER.displayName||"")}</b><small>${esc(USER.email||"")}</small></div><span class="chip p">☁️ متزامن</span></div>
+    openSheet(`<h2>👤 حسابك</h2><div class="li"><div class="grow"><b>${esc(USER.displayName||"معلم صقر")}</b><small dir="ltr">${esc(USER.email||USER.phoneNumber||"")}</small></div><span class="chip p">☁️ متزامن</span></div>
       <p class="hint">فصولك محفوظة في السحابة، وتقدر تفتحها من أي جهاز بنفس الحساب. وبتشتغل كمان من غير نت وتتزامن لما يرجع.</p>
       <button class="btn red" id="aOut">تسجيل الخروج</button>`);
     $("#aOut").onclick=async()=>{ closeSheet(); await Cloud.signOut(); USER=null; MODE=null; lsSet(MODE_KEY,null); S.classes=[]; showLogin(); };
   } else {
-    openSheet(`<h2>👤 وضع التجربة</h2><p class="hint">البيانات محفوظة على هذا الجهاز بس. سجّل بحساب جوجل عشان تتحفظ في السحابة وتفتحها من أي جهاز — وهننقل فصولك الحالية معاك (ما عدا الفصل التجريبي).</p>
-      <button class="btn pri" id="aIn">الدخول بحساب جوجل</button>`);
-    $("#aIn").onclick=()=>{ closeSheet(); doSignIn(); };
+    openSheet(`<h2>👤 وضع التجربة</h2><p class="hint">البيانات محفوظة على هذا الجهاز بس. سجّل دخول عشان تتحفظ في السحابة وتفتحها من أي جهاز — وهننقل فصولك الحالية معاك (ما عدا الفصل التجريبي).</p>
+      <button class="btn pri" id="aIn">تسجيل الدخول</button>`);
+    $("#aIn").onclick=()=>{ closeSheet(); showLogin(); };
   }
 }
 async function doSignIn(){
@@ -763,17 +802,41 @@ async function doSignIn(){
 }
 
 $("#gBtn").onclick=()=>{ ac(); doSignIn(); };
+// ---- email ----
+let eMode="in";
+$("#emailBtn").onclick=()=>{ lmsg(""); showPane("emailForm"); setTimeout(()=>$("#eEm").focus(),50); };
+document.querySelectorAll(".seg button").forEach(b=>b.onclick=()=>{ eMode=b.dataset.m; document.querySelectorAll(".seg button").forEach(x=>x.classList.toggle("on",x===b));
+  $("#eNm").hidden=eMode!=="up"; $("#eGo").textContent=eMode==="up"?"إنشاء الحساب":"دخول"; $("#ePw").autocomplete=eMode==="up"?"new-password":"current-password"; lmsg(""); });
+$("#emailForm").onsubmit=async e=>{ e.preventDefault(); ac(); const em=$("#eEm").value.trim(), pw=$("#ePw").value, nm=$("#eNm").value.trim();
+  $("#eGo").disabled=true; lmsg("");
+  try{ const C=await cloudReady; eMode==="up" ? await C.emailUp(nm,em,pw) : await C.emailIn(em,pw); busy("جاري الدخول…"); }
+  catch(err){ lmsg(authMsg(err)); } finally{ $("#eGo").disabled=false; } };
+$("#eForgot").onclick=async()=>{ const em=$("#eEm").value.trim(); if(!em){ lmsg("اكتب إيميلك الأول"); return; }
+  try{ const C=await cloudReady; await C.resetPass(em); lmsg("📩 بعتنالك رابط تغيير كلمة المرور على الإيميل",true); }catch(err){ lmsg(authMsg(err)); } };
+// ---- phone ----
+$("#phoneBtn").onclick=()=>{ lmsg(""); showPane("phoneForm"); $("#pStep1").hidden=false; $("#pStep2").hidden=true; setTimeout(()=>$("#pNum").focus(),50); };
+function normPhone(v){ v=v.replace(/[\s\-()]/g,"").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d));
+  if(v.startsWith("00")) v="+"+v.slice(2);
+  if(/^05\d{8}$/.test(v)) v="+966"+v.slice(1); else if(/^5\d{8}$/.test(v)) v="+966"+v;
+  return v; }
+$("#phoneForm").onsubmit=async e=>{ e.preventDefault(); ac(); const ph=normPhone($("#pNum").value);
+  if(!/^\+\d{8,15}$/.test(ph)){ lmsg("اكتب رقم الجوال صح، مثلاً 0512345678"); return; }
+  $("#pSend").disabled=true; lmsg("");
+  try{ const C=await cloudReady; await C.phoneSend(ph,"recap"); $("#pStep1").hidden=true; $("#pStep2").hidden=false; lmsg("📩 بعتنا كود على "+ph,true); setTimeout(()=>$("#pCode").focus(),50); }
+  catch(err){ lmsg(authMsg(err)); } finally{ $("#pSend").disabled=false; } };
+$("#pVerify").onclick=async()=>{ const code=$("#pCode").value.trim(); if(code.length<6){ lmsg("الكود 6 أرقام"); return; }
+  $("#pVerify").disabled=true;
+  try{ await Cloud.phoneVerify(code); busy("جاري الدخول…"); }catch(err){ lmsg(authMsg(err)); } finally{ $("#pVerify").disabled=false; } };
+document.querySelectorAll(".lback").forEach(b=>b.onclick=()=>{ lmsg(""); showPane("loginBtns"); });
 $("#guestBtn").onclick=()=>{ ac(); startGuest(); };
 $("#acctBtn").onclick=openAcct;
 const _close=closeSheet; closeSheet=function(){ _close(); if(S._pending){ S.classes=S._pending; delete S._pending; fixCur(); render(); } };
 
 // ---- start ----
 if(MODE==="guest") startGuest();
-else {
-  showLogin(); if(MODE==="cloud") busy("جاري الدخول…");
-  cloudReady.then(C=>C.onAuth(u=>{ if(u){ if(!USER || USER.uid!==u.uid) startCloud(u); } else if(MODE!=="guest"){ USER=null; showLogin(); } }))
-    .catch(()=>{ showLogin("تعذّر تحميل خدمة السحابة. تأكد من الإنترنت، أو جرّب بدون حساب."); });
-}
+else { showLogin(); if(MODE==="cloud") busy("جاري الدخول…"); }
+cloudReady.then(C=>C.onAuth(u=>{ if(u){ if(!USER || USER.uid!==u.uid) startCloud(u); } else if(MODE!=="guest"){ USER=null; showLogin(); } }))
+  .catch(()=>{ if(MODE!=="guest") showLogin("تعذّر تحميل خدمة السحابة. تأكد من الإنترنت، أو جرّب بدون حساب."); });
 </script>
 <script type="module" src="cloud.js"></script>
 </body>

@@ -1,6 +1,7 @@
 // صقر – cloud layer (Firebase Auth + Firestore). Bundled into cloud.js by build.py
 import { initializeApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut,
+  signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, setDoc, deleteDoc, onSnapshot, query, where, serverTimestamp } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -14,6 +15,8 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+auth.languageCode = "ar";
+let recaptcha = null, confirmation = null;
 let db;
 try { db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) }); }
 catch (e) { db = initializeFirestore(app, {}); }
@@ -33,6 +36,15 @@ const Cloud = {
       throw e;
     }
   },
+  emailIn: (email, pass) => signInWithEmailAndPassword(auth, email, pass),
+  async emailUp(name, email, pass) { const r = await createUserWithEmailAndPassword(auth, email, pass); if (name) await updateProfile(r.user, { displayName: name }); return r; },
+  resetPass: email => sendPasswordResetEmail(auth, email),
+  async phoneSend(phone, buttonId) {
+    if (!recaptcha) recaptcha = new RecaptchaVerifier(auth, buttonId, { size: "invisible" });
+    try { confirmation = await signInWithPhoneNumber(auth, phone, recaptcha); }
+    catch (e) { try { recaptcha.clear(); } catch (_) {} recaptcha = null; throw e; }
+  },
+  phoneVerify: code => confirmation.confirm(code),
   async signOut() { if (unsub) unsub(); unsub = null; last.clear(); await signOut(auth); },
   // live list of this teacher's classes; cb(classes, hasLocalPendingWrites)
   listen(cb, onErr) {
