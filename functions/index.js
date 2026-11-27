@@ -19,7 +19,7 @@ const levelIdx = p => LEVELS.reduce((i, l, k) => (p >= l[0] ? k : i), 0);
 
 function buildMessages(b, a) {
   const out = [], name = a.name || "ابنك", pa = a.points || 0, pb = b.points || 0;
-  const last = (a.recent || [])[0], sk = last && SKILLS[last.k];
+  const last = (a.recent || [])[0], sk = last && (last.e ? [last.e, last.nm || ""] : SKILLS[last.k]);
   if (pa > pb) {
     out.push({ type: "pos", title: `⭐ ${name} خد نقطة!`, body: `${sk ? sk[0] + " " + sk[1] + " " : ""}(+${pa - pb}) — مجموعه ${pa} نقطة` });
     if (levelIdx(pa) > levelIdx(pb)) out.push({ type: "pos", title: `🎉 ${name} ترقّى!`, body: `بقى «${LEVELS[levelIdx(pa)][1]}» 🦅` });
