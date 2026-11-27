@@ -10,6 +10,16 @@ service cloud.firestore {
                     && request.resource.data.owner == request.auth.uid;
     }
 
+    // دور المستخدم (معلم / ولي أمر)
+    match /users/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // أبناء ولي الأمر
+    match /parents/{uid} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
     // صفحة الطالب: اللي معاه الكود يقدر يقرأها، ومحدش يقدر يعرض القائمة كلها غير المعلم
     match /kids/{code} {
       allow get: if true;
@@ -25,7 +35,12 @@ service cloud.firestore {
           && request.resource.data.look.keys().hasOnly(['body', 'acc'])
           && request.resource.data.look.body is string && request.resource.data.look.body.size() <= 9
           && request.resource.data.look.acc is string && request.resource.data.look.acc.size() <= 12
-          && request.resource.data.lookAt is int);
+          && request.resource.data.lookAt is int)
+        ||
+        // ولي الأمر يربط / يفك حسابه بالطالب
+        (request.auth != null
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['parents'])
+          && request.resource.data.get('parents', {}).diff(resource.data.get('parents', {})).affectedKeys().hasOnly([request.auth.uid]));
     }
   }
 }

@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut,
   signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, setDoc, updateDoc, deleteDoc, onSnapshot, query, where, serverTimestamp } from "firebase/firestore";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, onSnapshot, query, where, serverTimestamp, arrayUnion, arrayRemove } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAMilKT2UhU_o63bXq36gKXHPVPG40Mx3k",
@@ -21,7 +21,8 @@ let db;
 try { db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) }); }
 catch (e) { db = initializeFirestore(app, {}); }
 
-let uid = null, unsub = null, unsubKids = null, unsubKid = null;
+let uid = null, unsub = null, unsubKids = null, unsubKid = null, unsubParent = null;
+const kidWatch = new Map();         // parent side: code -> unsubscribe
 const lastKid = new Map();          // code -> JSON last written/seen (teacher side)
 const kidLookAt = new Map();        // code -> lookAt seen from the student doc
 const last = new Map();               // class id -> JSON last written/seen
@@ -45,7 +46,30 @@ const Cloud = {
     catch (e) { try { recaptcha.clear(); } catch (_) {} recaptcha = null; throw e; }
   },
   phoneVerify: code => confirmation.confirm(code),
-  async signOut() { if (unsub) unsub(); if (unsubKids) unsubKids(); unsub = unsubKids = null; last.clear(); lastKid.clear(); kidLookAt.clear(); await signOut(auth); },
+  // ---- roles ----
+  async getRole() { const d = await getDoc(doc(db, "users", uid)); return d.exists() ? d.data().role : null; },
+  setRole: (role, name) => setDoc(doc(db, "users", uid), { role, name: name || "", at: serverTimestamp() }, { merge: true }),
+  // ---- parent side ----
+  listenParent(cb) {
+    if (unsubParent) unsubParent();
+    unsubParent = onSnapshot(doc(db, "parents", uid), d => cb(d.exists() ? (d.data().kids || []) : []), () => cb([]));
+  },
+  async linkKid(code, name) {
+    const k = await getDoc(doc(db, "kids", code));
+    if (!k.exists()) { const e = new Error("no-kid"); e.code = "no-kid"; throw e; }
+    await setDoc(doc(db, "parents", uid), { kids: arrayUnion(code), name: name || "" }, { merge: true });
+    await updateDoc(doc(db, "kids", code), { ["parents." + uid]: name || "ولي أمر" }).catch(() => {});
+    return k.data();
+  },
+  async unlinkKid(code) {
+    await setDoc(doc(db, "parents", uid), { kids: arrayRemove(code) }, { merge: true });
+    await updateDoc(doc(db, "kids", code), { ["parents." + uid]: deleteField() }).catch(() => {});
+  },
+  watchMany(codes, cb) {
+    for (const [c, u] of kidWatch) if (!codes.includes(c)) { u(); kidWatch.delete(c); }
+    for (const c of codes) if (!kidWatch.has(c)) kidWatch.set(c, onSnapshot(doc(db, "kids", c), d => cb(c, d.exists() ? d.data() : null), () => cb(c, null)));
+  },
+  async signOut() { if (unsubParent) unsubParent(); unsubParent = null; for (const u of kidWatch.values()) u(); kidWatch.clear(); if (unsub) unsub(); if (unsubKids) unsubKids(); unsub = unsubKids = null; last.clear(); lastKid.clear(); kidLookAt.clear(); await signOut(auth); },
   // live list of this teacher's classes; cb(classes, hasLocalPendingWrites)
   listen(cb, onErr) {
     if (unsub) unsub();
