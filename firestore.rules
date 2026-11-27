@@ -1,12 +1,31 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // كل فصل يخص المعلم اللي أنشأه فقط
+
+    // فصول المعلم: يشوفها ويعدّلها صاحبها بس
     match /classes/{classId} {
       allow read, delete: if request.auth != null && resource.data.owner == request.auth.uid;
       allow create: if request.auth != null && request.resource.data.owner == request.auth.uid;
       allow update: if request.auth != null && resource.data.owner == request.auth.uid
                     && request.resource.data.owner == request.auth.uid;
+    }
+
+    // صفحة الطالب: اللي معاه الكود يقدر يقرأها، ومحدش يقدر يعرض القائمة كلها غير المعلم
+    match /kids/{code} {
+      allow get: if true;
+      allow list: if request.auth != null && resource.data.owner == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.owner == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.owner == request.auth.uid;
+      allow update: if
+        (request.auth != null && resource.data.owner == request.auth.uid
+          && request.resource.data.owner == request.auth.uid)
+        ||
+        // الطالب يغيّر شكل صقره بس
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['look', 'lookAt'])
+          && request.resource.data.look.keys().hasOnly(['body', 'acc'])
+          && request.resource.data.look.body is string && request.resource.data.look.body.size() <= 9
+          && request.resource.data.look.acc is string && request.resource.data.look.acc.size() <= 12
+          && request.resource.data.lookAt is int);
     }
   }
 }

@@ -196,6 +196,23 @@ textarea.field{min-height:150px;resize:vertical;line-height:1.7}
 table.rep{width:100%;border-collapse:collapse;font-size:.95rem}
 table.rep th,table.rep td{padding:8px 6px;border-bottom:1px solid #eef1f8;text-align:center}
 table.rep th{color:var(--muted);font-weight:700}table.rep td:first-child,table.rep th:first-child{text-align:right}
+/* ---------- student view ---------- */
+.kbtn{width:100%;margin-top:10px;background:linear-gradient(135deg,#ffc93c,#ff8a3d);color:#1f2a44;font-weight:800;font-size:1.1rem;padding:14px;border-radius:18px}
+#kid{position:fixed;inset:0;z-index:45;background:linear-gradient(180deg,#27407a 0,#27407a 300px,var(--bg) 300px);overflow:auto;display:none}
+#kid.show{display:block}
+.kh{display:flex;align-items:center;gap:10px;padding:12px 16px;color:#fff}
+.kh .logo{width:44px;height:44px}.kh h1{margin:0;font-size:1.6rem}
+.kbody{max-width:560px;margin:0 auto;padding:0 14px 40px}
+.khero{background:#fff;border-radius:28px;box-shadow:var(--shadow);text-align:center;padding:10px 16px 20px;margin-top:6px}
+.kfal{width:210px;height:210px;margin:-6px auto 0}
+.kname{font-size:2rem;font-weight:800;line-height:1.1}.kcls{color:var(--muted);font-weight:600}
+.kpts{margin-top:8px}.kpts b{font-size:3.2rem;font-weight:800;color:var(--accent);line-height:1}.kpts span{font-weight:700;color:var(--muted);margin-right:6px}
+.klv{font-weight:800;font-size:1.2rem;margin-top:4px}.kbar{height:12px;margin:8px 20px 4px}.knext{color:var(--muted);font-weight:600}
+.kcard{background:#fff;border-radius:24px;box-shadow:var(--shadow);padding:14px 16px;margin-top:14px}.kcard h3{margin:0 0 10px}
+.kpath{display:flex;justify-content:space-between;gap:6px}
+.kstep{flex:1;text-align:center;font-size:.8rem;font-weight:700;color:var(--muted)}.kstep .av{width:64px;height:64px;margin:0 auto}
+.kstep.lock .av{filter:grayscale(1) opacity(.35)}.kstep.now{color:var(--ink)}.kstep.now .av{transform:scale(1.15)}
+.acc.lock{opacity:.45;position:relative}.acc.lock::after{content:attr(data-need);position:absolute;inset:auto 0 4px 0;font-size:.72rem;font-weight:800;color:#1f2a44;background:#fff;border-radius:8px;margin:0 6px}
 /* ---------- fx ---------- */
 #fx{position:fixed;inset:0;pointer-events:none;z-index:80}
 .float{direction:ltr;position:fixed;font-weight:800;font-size:2.2rem;z-index:90;pointer-events:none;text-shadow:0 3px 0 rgba(0,0,0,.12)}
@@ -273,6 +290,7 @@ table.rep th{color:var(--muted);font-weight:700}table.rep td:first-child,table.r
     <h1>صقر</h1><p class="tag">إدارة الفصل بروح الصقور 🦅<br>نقاط، مستويات، ومتابعة لكل طالب</p>
     <div id="loginBtns"><button class="gbtn" id="gBtn"><svg viewBox="0 0 48 48" width="24" height="24"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>الدخول بحساب جوجل</button>
       <div class="lalt"><button class="obtn" id="emailBtn">✉️ بالإيميل</button><button class="obtn" id="phoneBtn">📱 برقم الجوال</button></div>
+      <button class="kbtn" id="kidBtn">🎒 أنا طالب</button>
       <button class="lguest" id="guestBtn">جرّب بدون حساب (على هذا الجهاز فقط)</button></div>
     <form id="emailForm" class="lform" hidden>
       <div class="seg"><button type="button" class="on" data-m="in">دخول</button><button type="button" data-m="up">حساب جديد</button></div>
@@ -281,6 +299,12 @@ table.rep th{color:var(--muted);font-weight:700}table.rep td:first-child,table.r
       <input class="lin" id="ePw" type="password" placeholder="كلمة المرور (6 أحرف على الأقل)" autocomplete="current-password" dir="ltr" required minlength="6">
       <button class="gbtn" type="submit" id="eGo">دخول</button>
       <div class="lrow"><button type="button" class="lguest" id="eForgot">نسيت كلمة المرور؟</button><button type="button" class="lguest lback">↩ رجوع</button></div>
+    </form>
+    <form id="kidForm" class="lform" hidden>
+      <p style="margin:0;opacity:.9">اكتب الكود اللي إداهولك المعلم</p>
+      <input class="lin" id="kCode" maxlength="6" placeholder="ABC123" dir="ltr" autocomplete="off" autocapitalize="characters" style="letter-spacing:6px;text-align:center;font-size:1.5rem;text-transform:uppercase">
+      <button class="gbtn" type="submit" id="kGo">ادخل لصقرك 🦅</button>
+      <div class="lrow"><button type="button" class="lguest lback">↩ رجوع</button></div>
     </form>
     <form id="phoneForm" class="lform" hidden>
       <div id="pStep1"><input class="lin" id="pNum" type="tel" inputmode="tel" placeholder="05xxxxxxxx" dir="ltr" autocomplete="tel">
@@ -292,6 +316,18 @@ table.rep th{color:var(--muted);font-weight:700}table.rep td:first-child,table.r
     </form>
     <div id="recap"></div><div id="loginBusy" class="lbusy" hidden></div>
     <p id="loginMsg" class="lmsg"></p>
+  </div>
+</div>
+<div id="kid">
+  <header class="kh"><div class="brand"><div class="logo" id="kLogo"></div><div><h1>صقر</h1></div></div><span class="spacer"></span><button class="icon-btn" id="kOut" title="خروج" style="width:auto;padding:0 14px;font-weight:700;font-size:.95rem">خروج</button></header>
+  <div class="kbody">
+    <div class="khero"><div class="kfal" id="kFal"></div><div class="kname" id="kName"></div><div class="kcls" id="kCls"></div>
+      <div class="kpts"><b id="kPts">0</b><span>نقطة</span></div>
+      <div class="klv" id="kLv"></div><div class="bar kbar"><i id="kBar"></i></div><div class="knext" id="kNext"></div>
+      <button class="btn pri" id="kStyle" style="margin-top:12px">🎨 غيّر شكل صقرك</button></div>
+    <div class="kcard"><h3>🪜 رحلة الصقر</h3><div class="kpath" id="kPath"></div></div>
+    <div class="kcard"><h3>⭐ آخر النقاط</h3><div class="list" id="kRecent"></div></div>
+    <div class="kcard"><h3>📋 حضورك الشهر ده</h3><div class="asum" id="kAtt"></div></div>
   </div>
 </div>
 <div class="ov" id="ov"><div class="sheet" id="sheet"></div></div>
@@ -447,10 +483,20 @@ function demo(){
   const students = names.map((n,i)=>({id:uid(),name:n,points:[3,5,1,8,0,12,2,4,6,1,9,3][i],pos:0,neg:0,look:{body:BODY[i%BODY.length],acc:ACCS[(i*5)%ACCS.length]}}));
   return {classes:[{id:uid(),name:"خامس أ (تجريبي)",demo:true,created:Date.now(),students,log:[]}], cur:null, sound:true};
 }
+const CODE_ABC="ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+function genCode(){ let c=""; const r=new Uint32Array(6); crypto.getRandomValues(r); r.forEach(v=>c+=CODE_ABC[v%CODE_ABC.length]); return c; }
+function ensureCodes(){ S.classes.forEach(c=>c.students.forEach(s=>{ if(!s.code) s.code=genCode(); })); }
+let kidsReady=false;
+function monthAtt(c,sid){ const m=todayKey().slice(0,7), r={days:0,a:0,l:0,x:0}; Object.keys(c.att||{}).forEach(d=>{ if(!d.startsWith(m)) return; r.days++; const st=attOf(c,d,sid); if(st!=="p") r[st]++; }); return r; }
+function kidPayloads(){ const m=new Map(), teacher=(USER&&USER.displayName)||"";
+  S.classes.forEach(c=>c.students.forEach(s=>{ if(!s.code) return;
+    m.set(s.code,{cid:c.id,className:c.name,teacher,name:s.name,points:s.points,pos:s.pos,neg:s.neg,look:s.look,lookAt:s.lookAt||0,
+      recent:c.log.filter(l=>l.sid===s.id).slice(-8).reverse().map(l=>({k:l.k,v:l.v,t:l.t})), att:monthAtt(c,s.id), today:attOf(c,todayKey(),s.id)||""}); }));
+  return m; }
 function fixCur(){ if(!S.cur || !S.classes.find(c=>c.id===S.cur)) S.cur = S.classes[0] && S.classes[0].id; }
 function save(){
   lsSet(PREF_KEY, JSON.stringify({cur:S.cur, sound:S.sound}));
-  if(MODE==="cloud"){ if(window.Cloud) Cloud.sync(S.classes); }
+  if(MODE==="cloud"){ if(window.Cloud){ ensureCodes(); Cloud.sync(S.classes); if(kidsReady) Cloud.syncKids(kidPayloads()); } }
   else store.save(S);
 }
 const cls = () => S.classes.find(c=>c.id===S.cur);
@@ -614,12 +660,14 @@ function openEdit(id){
     <div style="flex:1"><input class="field" id="eName" value="${esc(name)}" maxlength="30"></div></div>
     <b>اللون</b><div class="swatches">${BODY.map(c=>`<button class="sw ${c===look.body?"on":""}" style="background:${c}" data-c="${c}"></button>`).join("")}</div>
     <b>الإكسسوار</b><div class="accs">${ACCS.map(a=>`<button class="acc ${a===look.acc?"on":""}" data-a="${a}" title="${ACC_NAMES[a]}">${falconSVG({level:1,body:look.body,acc:a})}</button>`).join("")}</div>
+    ${MODE==="cloud"&&s.code?`<div class="li" style="margin-top:10px"><div class="grow"><b>🎒 كود دخول الطالب</b><small>يدخل بيه من «أنا طالب»</small></div><b dir="ltr" style="font-size:1.3rem;letter-spacing:2px">${s.code}</b><button class="btn" id="eCopy">نسخ الرابط</button></div>`:""}
     <div class="row" style="margin-top:12px"><button class="btn pri" id="eSave">حفظ</button><button class="btn" id="eReset">تصفير النقاط</button><span class="spacer"></span><button class="btn red" id="eDel">حذف الطالب</button></div>`);
     gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
     $("#eName").oninput=e=>name=e.target.value;
+    if($("#eCopy")) $("#eCopy").onclick=()=>copyText(kidMsg(s),"📋 اتنسخ — ابعته لولي الأمر");
     document.querySelectorAll(".sw").forEach(b=>b.onclick=()=>{look.body=b.dataset.c; draw()});
     document.querySelectorAll(".acc").forEach(b=>b.onclick=()=>{look.acc=b.dataset.a; draw()});
-    $("#eSave").onclick=()=>{ s.look=look; s.name=(name.trim()||s.name); save(); closeSheet(); render(); };
+    $("#eSave").onclick=()=>{ if(look.body!==s.look.body||look.acc!==s.look.acc) s.lookAt=Date.now(); s.look=look; s.name=(name.trim()||s.name); save(); closeSheet(); render(); };
     $("#eReset").onclick=()=>ask("تصفير نقاط "+s.name+"؟",()=>{ s.points=0; s.pos=0; s.neg=0; save(); closeSheet(); render(); });
     $("#eDel").onclick=()=>ask("حذف "+s.name+" من الفصل؟",()=>{ const c=cls(); c.students=c.students.filter(x=>x.id!==id); save(); closeSheet(); render(); });
   };
@@ -645,12 +693,29 @@ function openClassMenu(){
   openSheet(`<h2>⚙️ إدارة الفصول</h2>
     <b>اسم الفصل الحالي</b><div class="row" style="margin:6px 0 14px"><input class="field" id="cName" value="${esc(c.name)}" style="flex:1"><button class="btn pri" id="cRename">حفظ</button></div>
     <b>فصل جديد</b><div class="row" style="margin:6px 0 14px"><input class="field" id="cNew" placeholder="مثلاً: خامس ب" style="flex:1"><button class="btn vio" id="cAdd">إنشاء</button></div>
+    ${MODE==="cloud"?`<div class="row" style="margin-bottom:10px"><button class="btn vio" id="cCodes">🎒 أكواد دخول الطلاب</button></div>`:""}
     <div class="row"><button class="btn" id="cResetAll">تصفير نقاط الفصل</button><button class="btn red" id="cDel">حذف هذا الفصل</button></div>
     <p class="hint" style="margin-top:14px">${MODE==="cloud"?"☁️ فصولك محفوظة في السحابة على حسابك.":"📱 البيانات محفوظة على هذا الجهاز فقط — سجّل بجوجل من زر الحساب عشان تتحفظ في السحابة."}</p>`);
   $("#cRename").onclick=()=>{ c.demo=false; c.name=$("#cName").value.trim()||c.name; save(); closeSheet(); render(); };
+  if($("#cCodes")) $("#cCodes").onclick=openCodes;
   $("#cAdd").onclick=()=>{ const n=$("#cNew").value.trim(); if(!n) return; const nc={id:uid(),name:n,created:Date.now(),students:[],log:[]}; S.classes.push(nc); S.cur=nc.id; save(); closeSheet(); render(); };
   $("#cResetAll").onclick=()=>ask("تصفير نقاط كل طلاب "+c.name+"؟",()=>{ c.students.forEach(s=>{s.points=0;s.pos=0;s.neg=0}); c.log=[]; save(); closeSheet(); render(); });
   $("#cDel").onclick=()=>{ if(S.classes.length<2){ toast("لازم يفضل فصل واحد على الأقل"); return; } ask("حذف فصل "+c.name+" نهائياً؟",()=>{ S.classes=S.classes.filter(x=>x.id!==c.id); S.cur=S.classes[0].id; save(); closeSheet(); render(); }); };
+}
+
+/* ---------- student codes (teacher) ---------- */
+const kidLink=s=>location.origin+location.pathname+"?k="+s.code;
+const kidMsg=s=>`🦅 صقر — ${s.name}\nتابع نقاطك وصقرك من الرابط ده:\n${kidLink(s)}\nأو ادخل على الموقع واختار «أنا طالب» واكتب الكود: ${s.code}`;
+async function copyText(t,ok){ try{ await navigator.clipboard.writeText(t); toast(ok||"📋 اتنسخ"); }catch(e){ toast("النسخ غير متاح هنا"); } }
+function openCodes(){
+  const c=cls(); ensureCodes(); save();
+  openSheet(`<h2>🎒 أكواد دخول الطلاب</h2>
+    <p class="hint">كل طالب ليه كود خاص بيه. ابعت لكل ولي أمر الرسالة بتاعة ابنه، أو اطبع الكروت ووزّعها.</p>
+    <div class="row" style="margin-bottom:10px"><button class="btn pri" id="cdAll">📋 نسخ كل الأكواد</button></div>
+    <div class="list">${c.students.map(s=>`<div class="li"><span class="av">${avatar(s)}</span><div class="grow"><b>${esc(s.name)}</b></div>
+      <b dir="ltr" style="letter-spacing:2px">${s.code}</b><button class="btn" data-cp="${s.id}">📤</button></div>`).join("")}</div>`);
+  $("#cdAll").onclick=()=>copyText(`🦅 أكواد دخول صقر — ${c.name}\n${location.origin+location.pathname}\n\n`+c.students.map(s=>`${s.name}: ${s.code}`).join("\n"));
+  document.querySelectorAll("[data-cp]").forEach(b=>b.onclick=()=>copyText(kidMsg(stu(b.dataset.cp)),"📋 اتنسخ — ابعته لولي الأمر"));
 }
 
 /* ---------- random picker: falcon flies over the class ---------- */
@@ -854,7 +919,7 @@ function showLogin(msg){ $("#login").classList.add("show"); $("#loginMsg").textC
   $("#loginFal").innerHTML=falconSVG({level:2,body:"#f2b01e",mood:"happy"}); $("#loginFal .fal").classList.add("flap");
   gsap.fromTo("#loginFal",{y:30},{y:-10,duration:1.4,yoyo:true,repeat:-1,ease:"sine.inOut"}); }
 function hideLogin(){ $("#login").classList.remove("show"); }
-function showPane(id){ ["loginBtns","emailForm","phoneForm"].forEach(k=>$("#"+k).hidden = k!==id); }
+function showPane(id){ ["loginBtns","emailForm","phoneForm","kidForm"].forEach(k=>$("#"+k).hidden = k!==id); }
 function busy(t){ $("#loginBusy").hidden=false; $("#loginBusy").textContent=t; showPane(null); }
 const AUTH_ERR = {
   "auth/invalid-email":"الإيميل مكتوب غلط","auth/missing-password":"اكتب كلمة المرور","auth/weak-password":"كلمة المرور لازم 6 أحرف على الأقل",
@@ -886,7 +951,13 @@ function startCloud(user){
       if(carry.length){ list=list.concat(carry); toast(`☁️ تم رفع ${carry.length} فصل من هذا الجهاز للسحابة`);
         L.classes.forEach(c=>{ if(carry.includes(c)) c.migrated=true }); store.save(L); }
       if(!list.length) list=[{id:uid(),name:"فصلي الأول",created:Date.now(),students:[],log:[]}];
-      S.classes=list; fixCur(); save(); firstRender(); return;
+      S.classes=list; fixCur(); save(); firstRender();
+      Cloud.listenKids(kl=>{ kidsReady=true; let changed=false;
+        kl.forEach(k=>{ for(const c of S.classes){ const st=c.students.find(x=>x.code===k.code);
+          if(st && k.look && (k.lookAt||0)>(st.lookAt||0)){ st.look=k.look; st.lookAt=k.lookAt; changed=true; } } });
+        if(changed){ Cloud.sync(S.classes); if(!$("#ov").classList.contains("show")) render(); }
+        Cloud.syncKids(kidPayloads()); });
+      return;
     }
     if(local) return;                       // our own write: UI already up to date
     if($("#ov").classList.contains("show")) { S._pending=list; return; }  // don't yank data under an open sheet
@@ -959,10 +1030,71 @@ $("#guestBtn").onclick=()=>{ ac(); startGuest(); };
 $("#acctBtn").onclick=openAcct;
 const _close=closeSheet; closeSheet=function(){ _close(); if(S._pending){ S.classes=S._pending; delete S._pending; fixCur(); render(); } };
 
+// ---- student side ----
+const UNLOCK={none:0,cap:0,glasses:0,bow:5,headband:5,star:10,headphones:15,grad:25,shemagh:40};
+const SKILLS=Object.fromEntries(POS.concat(NEG).map(k=>[k.k,k]));
+let KID=null, KCODE=null;
+function startKid(code){
+  code=(code||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+  if(code.length!==6){ lmsg("الكود 6 حروف وأرقام"); return; }
+  busy("جاري فتح صقرك…");
+  cloudReady.then(C=>{ let first=true;
+    C.watchKid(code, k=>{
+      if(!k){ C.stopKid(); lsSet("saqr.kid",null); showLogin(); showPane("kidForm"); lmsg("الكود ده مش موجود — اتأكد منه مع المعلم"); return; }
+      const prev=KID; KID=k; KCODE=code; lsSet("saqr.kid",code);
+      if(first){ first=false; hideLogin(); $("#kid").classList.add("show"); }
+      drawKid(prev);
+    }, e=>{ showLogin(); showPane("kidForm"); lmsg("تعذّر الاتصال: "+(e.code||e.message)); });
+  }).catch(()=>showLogin("تعذّر تحميل الخدمة. تأكد من الإنترنت."));
+}
+function drawKid(prev){
+  const k=KID, s={points:k.points, look:k.look||{body:BODY[0],acc:"none"}}, L=levelOf(k.points);
+  $("#kLogo").innerHTML=falconSVG({level:1,body:"#9a6235"});
+  $("#kFal").innerHTML=avatar(s, prev&&k.points>prev.points?"happy":"idle");
+  $("#kName").textContent=k.name; $("#kCls").textContent=k.className+(k.teacher?" · أ. "+k.teacher:"");
+  $("#kPts").textContent=k.points; $("#kLv").textContent=L.name+(L.lv===2?" 👑":"");
+  $("#kBar").style.width=(L.prog*100)+"%"; $("#kNext").textContent=L.next?`باقي ${L.next.min-k.points} نقطة وتبقى «${L.next.name}»`:"وصلت لأعلى مستوى! 🏆";
+  $("#kPath").innerHTML=LEVELS.map((l,i)=>`<div class="kstep ${i>L.idx?"lock":""} ${i===L.idx?"now":""}"><span class="av">${falconSVG({level:l.lv,body:s.look.body,acc:i<=L.idx?s.look.acc:"none"})}</span>${l.name}<br><small>${l.min} نقطة</small></div>`).join("");
+  $("#kRecent").innerHTML=(k.recent||[]).map(r=>{ const sk=SKILLS[r.k]||{e:"⭐",t:""}; let when=""; try{ when=new Date(r.t).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"short"}); }catch(e){}
+    return `<div class="li"><span style="font-size:1.7rem">${sk.e}</span><div class="grow"><b>${esc(sk.t)}</b><small>${esc(when)}</small></div><span class="chip ${r.v>0?"p":"n"}">${sgn(r.v)}</span></div>`; }).join("")||`<p class="hint">لسه مفيش نقاط — شارك في الحصة وخد أول نقطة! 💪</p>`;
+  const a=k.att||{days:0,a:0,l:0,x:0};
+  $("#kAtt").innerHTML=a.days?`<span style="background:#22b573">✅ حاضر ${a.days-a.a-a.x}</span><span style="background:#ff5d5d">❌ غائب ${a.a}</span><span style="background:#f0a020">⏰ متأخر ${a.l}</span><span style="background:#3d8be0">📝 مستأذن ${a.x}</span>`:`<span style="background:#c3c9d8">لسه مفيش تحضير الشهر ده</span>`;
+  const f=$("#kFal .fal"); if(f) f.classList.add("flap");
+  if(prev){
+    if(k.points>prev.points){ SFX.pos(); const r=$("#kFal").getBoundingClientRect(); confetti(r.left+r.width/2,r.top+r.height/2,90); floatText(r.left+r.width/2,r.top+40,sgn(k.points-prev.points),"#22b573");
+      gsap.fromTo("#kFal",{y:0},{y:-30,duration:.3,yoyo:true,repeat:3,ease:"power2.out"});
+      if(levelOf(k.points).idx>levelOf(prev.points).idx) setTimeout(()=>{ SFX.level(); confetti(innerWidth/2,innerHeight/3,160); toast("🎉 مبروك! بقيت «"+L.name+"»"); },900); }
+    else if(k.points<prev.points){ SFX.neg(); gsap.fromTo(".khero",{x:-8},{x:0,duration:.5,ease:"elastic.out(1,.3)"}); }
+  } else gsap.from(".khero,.kcard",{y:30,opacity:0,stagger:.08,duration:.5,ease:"back.out(1.5)"});
+  setTimeout(()=>{ if(f) f.classList.remove("flap"); },1500);
+}
+function kidStyle(){
+  let look={...(KID.look||{body:BODY[0],acc:"none"})}; const pts=KID.points;
+  const draw=()=>{ openSheet(`<h2>🎨 صقرك</h2><div class="av" style="width:150px;height:150px;margin:0 auto">${falconSVG({level:levelOf(pts).lv,body:look.body,acc:look.acc,mood:"happy"})}</div>
+    <b>اللون</b><div class="swatches">${BODY.map(c=>`<button class="sw ${c===look.body?"on":""}" style="background:${c}" data-c="${c}"></button>`).join("")}</div>
+    <b>الإكسسوار</b> <small class="hint">— اجمع نقاط عشان تفتح الباقي 🔒</small><div class="accs">${ACCS.map(a=>{ const lock=pts<UNLOCK[a];
+      return `<button class="acc ${a===look.acc?"on":""} ${lock?"lock":""}" data-a="${a}" ${lock?`data-need="🔒 ${UNLOCK[a]} نقطة"`:""}>${falconSVG({level:1,body:look.body,acc:a})}</button>`; }).join("")}</div>
+    <div class="row" style="justify-content:center;margin-top:10px"><button class="btn pri" id="ksSave">حفظ ✔</button></div>`);
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    document.querySelectorAll(".sw").forEach(b=>b.onclick=()=>{ look.body=b.dataset.c; draw(); });
+    document.querySelectorAll(".acc").forEach(b=>b.onclick=()=>{ if(b.classList.contains("lock")){ SFX.neg(); toast(`محتاج ${UNLOCK[b.dataset.a]} نقطة عشان تفتحه 💪`); return; } look.acc=b.dataset.a; draw(); });
+    $("#ksSave").onclick=async()=>{ try{ await Cloud.setKidLook(KCODE,look); SFX.pos(); closeSheet(); toast("✨ صقرك اتغيّر!"); }catch(e){ toast("تعذّر الحفظ — جرّب تاني"); } };
+  };
+  draw();
+}
+$("#kidBtn").onclick=()=>{ ac(); lmsg(""); showPane("kidForm"); setTimeout(()=>$("#kCode").focus(),50); };
+$("#kidForm").onsubmit=e=>{ e.preventDefault(); ac(); startKid($("#kCode").value); };
+$("#kStyle").onclick=kidStyle;
+let kidLeft=false;
+$("#kOut").onclick=()=>{ kidLeft=true; history.replaceState(null,"",location.pathname); if(window.Cloud) Cloud.stopKid(); KID=null; KCODE=null; lsSet("saqr.kid",null); $("#kid").classList.remove("show"); showLogin(); };
+
 // ---- start ----
+const urlKid=new URLSearchParams(location.search).get("k");
+if(urlKid || (!MODE && lsGet("saqr.kid"))){ showLogin(); startKid(urlKid||lsGet("saqr.kid")); MODE=null; }
+else
 if(MODE==="guest") startGuest();
 else { showLogin(); if(MODE==="cloud") busy("جاري الدخول…"); }
-cloudReady.then(C=>C.onAuth(u=>{ if(u){ if(!USER || USER.uid!==u.uid) startCloud(u); } else if(MODE!=="guest"){ USER=null; showLogin(); } }))
+cloudReady.then(C=>C.onAuth(u=>{ if(KCODE || $("#kid").classList.contains("show") || (urlKid && !USER && !kidLeft)) return; if(u){ if(!USER || USER.uid!==u.uid) startCloud(u); } else if(MODE!=="guest"){ USER=null; showLogin(); } }))
   .catch(()=>{ if(MODE!=="guest") showLogin("تعذّر تحميل خدمة السحابة. تأكد من الإنترنت، أو جرّب بدون حساب."); });
 </script>
 <script type="module" src="cloud.js"></script>
