@@ -1,7 +1,7 @@
 // صقر – cloud layer (Firebase Auth + Firestore). Bundled into cloud.js by build.py
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut,
-  signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+  signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile , signInAnonymously } from "firebase/auth";
 import { getMessaging, getToken, isSupported as msgSupported, onMessage } from "firebase/messaging";
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, onSnapshot, query, where, serverTimestamp, arrayUnion, arrayRemove } from "firebase/firestore";
 
@@ -17,7 +17,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 auth.languageCode = "ar";
-let recaptcha = null, confirmation = null;
 let db;
 try { db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) }); }
 catch (e) { db = initializeFirestore(app, {}); }
@@ -41,12 +40,8 @@ const Cloud = {
   emailIn: (email, pass) => signInWithEmailAndPassword(auth, email, pass),
   async emailUp(name, email, pass) { const r = await createUserWithEmailAndPassword(auth, email, pass); if (name) await updateProfile(r.user, { displayName: name }); return r; },
   resetPass: email => sendPasswordResetEmail(auth, email),
-  async phoneSend(phone, buttonId) {
-    if (!recaptcha) recaptcha = new RecaptchaVerifier(auth, buttonId, { size: "invisible" });
-    try { confirmation = await signInWithPhoneNumber(auth, phone, recaptcha); }
-    catch (e) { try { recaptcha.clear(); } catch (_) {} recaptcha = null; throw e; }
-  },
-  phoneVerify: code => confirmation.confirm(code),
+  anon: () => signInAnonymously(auth),
+  async kidExists(code) { const d = await getDoc(doc(db, "kids", code)); return d.exists() ? d.data() : null; },
   // ---- roles ----
   async getRole() { const d = await getDoc(doc(db, "users", uid)); return d.exists() ? d.data().role : null; },
   setRole: (role, name) => setDoc(doc(db, "users", uid), { role, name: name || "", at: serverTimestamp() }, { merge: true }),

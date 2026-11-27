@@ -167,8 +167,7 @@ textarea.field{min-height:150px;resize:vertical;line-height:1.7}
 .lalt{display:flex;gap:10px;margin-top:10px}
 .obtn{flex:1;background:rgba(255,255,255,.14);color:#fff;font-weight:700;font-size:1rem;padding:13px;border-radius:16px;border:1.5px solid rgba(255,255,255,.25)}
 .lform{display:flex;flex-direction:column;gap:10px}
-.lform[hidden],#pStep1[hidden],#pStep2[hidden],.lin[hidden]{display:none}
-#pStep1,#pStep2{display:flex;flex-direction:column;gap:10px}
+.lform[hidden],.lin[hidden]{display:none}
 .lin{width:100%;padding:14px 16px;border-radius:16px;border:0;font-size:1.05rem;background:#fff;color:#1f2a44;outline:3px solid transparent}
 .lin:focus{outline-color:#ffc93c}
 .seg{display:flex;background:rgba(255,255,255,.12);border-radius:16px;padding:4px}
@@ -314,6 +313,28 @@ main{padding-bottom:130px}
 .emojis button.on{background:#e7e0ff;outline:2px solid var(--violet)}
 .stepper{display:flex;align-items:center;gap:8px}.stepper button{width:44px;height:44px;border-radius:14px;background:#eef1f8;font-size:1.3rem;font-weight:800}
 .stepper b{min-width:40px;text-align:center;font-size:1.5rem}
+.fe{width:1.25em;height:1.25em;display:inline-block;vertical-align:-.28em;user-select:none;-webkit-user-drag:none}
+.skill .em .fe{width:38px;height:38px}.skill .em .fet{font-size:1.9rem}
+.skrow .em2 .fe{width:30px;height:30px}
+.emojis button .fe{width:28px;height:28px}
+.gc .gi .fe{width:46px;height:46px;filter:drop-shadow(0 4px 6px rgba(0,0,0,.18))}
+.li .big-e .fe{width:34px;height:34px}
+.attb .fe,.asum .fe,.chips .fe,.pill2 .fe{width:1.1em;height:1.1em}
+/* ---------- polish ---------- */
+.avw{position:relative;width:104px;height:104px;margin:2px auto 0}
+.avw .av{position:absolute;inset:6px;width:auto;height:auto}
+.ring2{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.ring2 circle{fill:none;stroke:#eef2fa;stroke-width:5}
+.ring2 .pr{stroke-width:5;stroke-linecap:round;transition:stroke-dasharray .8s cubic-bezier(.3,1.4,.5,1)}
+@media(min-width:900px){.avw{width:126px;height:126px}}
+.card{border:1px solid rgba(27,42,74,.04)}
+.card .nm{margin-top:4px}
+.top .clouds g{animation:drift 38s linear infinite}
+@keyframes drift{0%{transform:translateX(0)}50%{transform:translateX(-60px)}100%{transform:translateX(0)}}
+#splash{position:fixed;inset:0;z-index:200;background:radial-gradient(circle at 50% 40%,#3a5aa8,#1b2a4a 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;gap:6px;transition:opacity .45s}
+#splash .spf{width:150px;height:150px}#splash b{font-size:2.6rem;font-weight:800}
+#splash.gone{opacity:0;pointer-events:none}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 /* ---------- fx ---------- */
 #fx{position:fixed;inset:0;pointer-events:none;z-index:80}
 .float{direction:ltr;position:fixed;font-weight:800;font-size:2.2rem;z-index:90;pointer-events:none;text-shadow:0 3px 0 rgba(0,0,0,.12)}
@@ -369,6 +390,7 @@ main{padding-bottom:130px}
 
 
 <main><div class="grid" id="grid"></div></main>
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="rg" x1="0" x2="1" y1="0" y2="1"><stop offset="0" stop-color="#ffc93c"/><stop offset="1" stop-color="#ff6a3d"/></linearGradient></defs></svg>
 
 <div class="selbar" id="selbar" hidden>
   <button class="pill violet" id="awardSel">⭐ نقاط للمحددين (<span id="selCount">0</span>)</button>
@@ -382,6 +404,7 @@ main{padding-bottom:130px}
   <button class="tb" data-tab="report"><span data-ic="chart"></span>التقارير</button>
 </nav>
 
+<div id="splash"><div class="spf" id="spFal"></div><b>صقر</b></div>
 <div id="login">
   <svg class="lclouds" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice"><g fill="#fff" opacity=".1"><ellipse cx="60" cy="250" rx="90" ry="30"/><ellipse cx="130" cy="240" rx="50" ry="26"/><ellipse cx="330" cy="60" rx="80" ry="22"/><ellipse cx="380" cy="70" rx="50" ry="18"/></g></svg>
   <div class="lbox">
@@ -389,7 +412,7 @@ main{padding-bottom:130px}
     <h1>صقر</h1><p class="tag">إدارة الفصل بروح الصقور 🦅<br>نقاط، مستويات، ومتابعة لكل طالب</p>
     <div class="prole">👨‍👩‍👦 دخول ولي الأمر — <button class="lguest" id="parBack" style="padding:0;margin:0">رجوع لدخول المعلم</button></div>
     <div id="loginBtns"><p class="tlabel">👨‍🏫 دخول المعلم</p><button class="gbtn" id="gBtn"><svg viewBox="0 0 48 48" width="24" height="24"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>الدخول بحساب جوجل</button>
-      <div class="lalt"><button class="obtn" id="emailBtn">✉️ بالإيميل</button><button class="obtn" id="phoneBtn">📱 برقم الجوال</button></div>
+      <div class="lalt"><button class="obtn" id="emailBtn">✉️ الدخول بالإيميل</button></div>
       <p class="tlabel" style="margin-top:16px">أو</p><div class="lalt"><button class="kbtn" id="kidBtn" style="margin-top:0">🎒 أنا طالب</button><button class="kbtn" id="parBtn" style="margin-top:0;background:linear-gradient(135deg,#7ee0b0,#22b573)">👨‍👩‍👦 أنا ولي أمر</button></div>
       <button class="lguest" id="guestBtn">جرّب بدون حساب (على هذا الجهاز فقط)</button></div>
     <form id="emailForm" class="lform" hidden>
@@ -406,15 +429,14 @@ main{padding-bottom:130px}
       <button class="gbtn" type="submit" id="kGo">ادخل لصقرك 🦅</button>
       <div class="lrow"><button type="button" class="lguest lback">↩ رجوع</button></div>
     </form>
-    <form id="phoneForm" class="lform" hidden>
-      <div id="pStep1"><input class="lin" id="pNum" type="tel" inputmode="tel" placeholder="05xxxxxxxx" dir="ltr" autocomplete="tel">
-        <button class="gbtn" type="submit" id="pSend">إرسال كود التحقق</button></div>
-      <div id="pStep2" hidden><p style="margin:0 0 8px;opacity:.85">اكتب الكود اللي وصلك في رسالة</p>
-        <input class="lin" id="pCode" inputmode="numeric" maxlength="6" placeholder="••••••" dir="ltr" autocomplete="one-time-code" style="letter-spacing:8px;text-align:center;font-size:1.4rem">
-        <button class="gbtn" type="button" id="pVerify">تأكيد</button></div>
+    <form id="parForm" class="lform" hidden>
+      <p style="margin:0;opacity:.9">👨‍👩‍👦 اكتب كود ابنك أو بنتك اللي بعته المعلم</p>
+      <input class="lin" id="parCode" maxlength="6" placeholder="ABC123" dir="ltr" autocomplete="off" autocapitalize="characters" style="letter-spacing:6px;text-align:center;font-size:1.5rem;text-transform:uppercase">
+      <button class="gbtn" type="submit" id="parGo">متابعة ابني 🦅</button>
+      <p style="margin:0;opacity:.7;font-size:.9rem">مش محتاج إيميل ولا كلمة مرور — تقدر تضيف باقي أبنائك بعد الدخول</p>
       <div class="lrow"><button type="button" class="lguest lback">↩ رجوع</button></div>
     </form>
-    <div id="recap"></div><div id="loginBusy" class="lbusy" hidden></div>
+    <div id="loginBusy" class="lbusy" hidden></div>
     <p id="loginMsg" class="lmsg"></p>
   </div>
 </div>
@@ -488,7 +510,8 @@ function falconSVG(opt = {}){
       <circle cx="46" cy="57" r="12" fill="#fff" stroke="#ffcf3a" stroke-width="3"/>
       <circle cx="74" cy="57" r="12" fill="#fff" stroke="#ffcf3a" stroke-width="3"/>
       <circle cx="47.5" cy="${58+py}" r="${pr}" fill="#1f2a44"/><circle cx="72.5" cy="${58+py}" r="${pr}" fill="#1f2a44"/>
-      <circle cx="49.5" cy="${55.5+py}" r="2.2" fill="#fff"/><circle cx="74.5" cy="${55.5+py}" r="2.2" fill="#fff"/></g>`;
+      <circle cx="49.5" cy="${55.5+py}" r="2.2" fill="#fff"/><circle cx="74.5" cy="${55.5+py}" r="2.2" fill="#fff"/>
+      <circle cx="45.6" cy="${60.4+py}" r="1" fill="#fff" opacity=".8"/><circle cx="70.6" cy="${60.4+py}" r="1" fill="#fff" opacity=".8"/></g>`;
     if(mood==="sad") eyes += `<path d="M36 44 L54 48 M84 44 L66 48" stroke="${dark}" stroke-width="4" stroke-linecap="round"/>`;
     if(mood==="alarm") eyes += `<path d="M37 42 L53 40 M83 42 L67 40" stroke="${dark}" stroke-width="4" stroke-linecap="round"/>`;
   }
@@ -509,18 +532,23 @@ function falconSVG(opt = {}){
       <circle cx="0" cy="-2" r="3" fill="#ff5d5d"/><circle cx="-10" cy="0" r="2" fill="#3d8be0"/><circle cx="10" cy="0" r="2" fill="#3fa864"/></g>` : "";
   const sparkle = level===2 ? `<g fill="#fff6b0"><path d="M14 30 l2 6 l6 2 l-6 2 l-2 6 l-2 -6 l-6 -2 l6 -2z"/><path d="M104 44 l1.6 4.4 l4.4 1.6 l-4.4 1.6 l-1.6 4.4 l-1.6 -4.4 l-4.4 -1.6 l4.4 -1.6z"/></g>` : "";
   return `<svg class="fal" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="صقر">
-  <defs><radialGradient id="${id}" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="${light}"/><stop offset="1" stop-color="${body}"/></radialGradient></defs>
+  <defs><radialGradient id="${id}" cx="40%" cy="30%" r="80%"><stop offset="0" stop-color="${light}"/><stop offset="1" stop-color="${body}"/></radialGradient>
+    <radialGradient id="${id}b" cx="50%" cy="30%" r="75%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="${belly}"/></radialGradient></defs>
   <ellipse cx="60" cy="112" rx="28" ry="5" fill="#000" opacity=".08"/>
   ${sparkle}
   <g transform="translate(60 64) scale(${s}) translate(-60 -64)">
-  <g class="wl"><path d="M30 62 Q6 70 10 96 Q22 92 32 86 Q26 98 30 104 Q40 92 42 80Z" fill="${wing}"/><path d="M14 92 Q22 88 30 84" stroke="${dark}" stroke-width="2" fill="none" opacity=".5"/></g>
-  <g class="wr"><path d="M90 62 Q114 70 110 96 Q98 92 88 86 Q94 98 90 104 Q80 92 78 80Z" fill="${wing}"/><path d="M106 92 Q98 88 90 84" stroke="${dark}" stroke-width="2" fill="none" opacity=".5"/></g>
+  <g class="wl"><path d="M30 62 Q6 70 10 96 Q22 92 32 86 Q26 98 30 104 Q40 92 42 80Z" fill="${wing}" stroke="${dark}" stroke-opacity=".25" stroke-width="1.2"/>
+    <path d="M13 90 Q21 86 29 82" stroke="${dark}" stroke-width="2" fill="none" opacity=".45" stroke-linecap="round"/><path d="M16 80 Q23 77 30 74" stroke="${light}" stroke-width="2" fill="none" opacity=".55" stroke-linecap="round"/><path d="M29 98 Q33 92 37 86" stroke="${dark}" stroke-width="1.6" fill="none" opacity=".35" stroke-linecap="round"/></g>
+  <g class="wr"><path d="M90 62 Q114 70 110 96 Q98 92 88 86 Q94 98 90 104 Q80 92 78 80Z" fill="${wing}" stroke="${dark}" stroke-opacity=".25" stroke-width="1.2"/>
+    <path d="M107 90 Q99 86 91 82" stroke="${dark}" stroke-width="2" fill="none" opacity=".45" stroke-linecap="round"/><path d="M104 80 Q97 77 90 74" stroke="${light}" stroke-width="2" fill="none" opacity=".55" stroke-linecap="round"/><path d="M91 98 Q87 92 83 86" stroke="${dark}" stroke-width="1.6" fill="none" opacity=".35" stroke-linecap="round"/></g>
   <g class="bod">
     <g fill="#ffb400"><path d="M48 104 l-6 6 h8 l2-4 l2 4 h6z"/><path d="M66 104 l-2 6 h6 l2-4 l2 4 h8 l-6-6z"/></g>
-    <path d="M60 22 C86 22 96 44 96 66 C96 92 80 106 60 106 C40 106 24 92 24 66 C24 44 34 22 60 22Z" fill="url(#${id})"/>
+    <path d="M60 22 C86 22 96 44 96 66 C96 92 80 106 60 106 C40 106 24 92 24 66 C24 44 34 22 60 22Z" fill="url(#${id})" stroke="${dark}" stroke-opacity=".22" stroke-width="1.4"/>
+    <path d="M38 34 Q46 26 56 25" stroke="#fff" stroke-opacity=".35" stroke-width="3" fill="none" stroke-linecap="round"/>
     ${tuft}
-    <ellipse cx="60" cy="86" rx="22" ry="19" fill="${belly}"/>
+    <ellipse cx="60" cy="86" rx="22" ry="19" fill="url(#${id}b)"/>
     ${chevrons}${marks}${fluff}
+    ${mood!=="sad"?`<ellipse cx="35" cy="71" rx="5.5" ry="3.2" fill="#ff7b9c" opacity=".38"/><ellipse cx="85" cy="71" rx="5.5" ry="3.2" fill="#ff7b9c" opacity=".38"/>`:""}
     ${eyes}
     <path d="M51 66 Q60 60 69 66 Q68 75 60 83 Q55 76 51 66Z" fill="#ffcf3a" stroke="#e0a400" stroke-width="1.5"/>
     <path d="M60 83 Q63 79 64 74 Q60 78 57 77Z" fill="#3a3a3a"/>
@@ -653,6 +681,8 @@ function floatText(x,y,txt,color){ const el=document.createElement("div"); el.cl
 /* ---------- render ---------- */
 const $ = s => document.querySelector(s);
 const sgn = v => "\u2066"+(v>0?"+":"")+v+"\u2069";
+const FE={"🙋": "1f64b", "📘": "1f4d8", "🤝": "1f91d", "💡": "1f4a1", "😌": "1f60c", "💪": "1f4aa", "🌟": "1f31f", "✨": "2728", "📢": "1f4e2", "📕": "1f4d5", "⏰": "23f0", "😴": "1f634", "📱": "1f4f1", "🙅": "1f645", "🏆": "1f3c6", "🎯": "1f3af", "📝": "1f4dd", "🧮": "1f9ee", "📖": "1f4d6", "🎨": "1f3a8", "🔬": "1f52c", "⚽": "26bd", "🕌": "1f54c", "🧹": "1f9f9", "👂": "1f442", "⏱": "23f1", "❤": "2764", "👏": "1f44f", "🗣": "1f5e3", "🍬": "1f36c", "🚫": "1f6ab", "🤚": "1f91a", "✅": "2705", "❌": "274c", "🏁": "1f3c1", "⚡": "26a1", "📚": "1f4da", "🎮": "1f3ae", "🥇": "1f947", "🥈": "1f948", "🥉": "1f949", "🎉": "1f389", "👑": "1f451", "⭐": "2b50", "📋": "1f4cb", "📊": "1f4ca", "🎒": "1f392", "🔔": "1f514", "🪄": "1fa84", "👀": "1f440", "🤲": "1f932", "✋": "270b", "👍": "1f44d", "📅": "1f4c5", "📈": "1f4c8", "🧩": "1f9e9", "✉": "2709", "🎚": "1f39a", "🐣": "1f423", "🦅": "1f985", "😢": "1f622", "🥳": "1f973", "🔥": "1f525", "🎁": "1f381", "🧠": "1f9e0", "✏": "270f", "🍎": "1f34e", "🤫": "1f92b", "🎲": "1f3b2", "⏳": "23f3", "🪶": "1fab6", "☑": "2611", "➕": "2795", "🔕": "1f515", "📲": "1f4f2", "👋": "1f44b", "🙌": "1f64c"};
+const emo=(e,c="")=>{ const n=FE[String(e||"").replace(/\ufe0f/g,"")]; return n?`<img class="fe ${c}" src="emoji/${n}.svg" alt="" draggable="false">`:`<span class="fet ${c}">${esc(e)}</span>`; };
 const esc = s => String(s).replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 let selMode=false, selected=new Set();
 
@@ -673,11 +703,10 @@ function cardHTML(s){
   const L=levelOf(s.points), p=s.points;
   const st=attOf(cls(),todayKey(),s.id);
   return `<div class="card ${L.lv===2?"gold":""} ${selected.has(s.id)?"sel":""} ${st==="a"||st==="x"?"out":""}" data-id="${s.id}">
-    <span class="pts ${p<0?"neg":p===0?"zero":""}">${p}</span>${st&&st!=="p"?`<span class="attb" style="background:${ATT[st].c}">${ATT[st].e} ${ATT[st].t}</span>`:""}
-    <div class="av">${avatar(s)}</div>
+    <span class="pts ${p<0?"neg":p===0?"zero":""}">${p}</span>${st&&st!=="p"?`<span class="attb" style="background:${ATT[st].c}">${emo(ATT[st].e)} ${ATT[st].t}</span>`:""}
+    <div class="avw"><svg class="ring2" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/><circle class="pr" cx="50" cy="50" r="46" pathLength="100" stroke-dasharray="${(L.prog*100).toFixed(1)} 100" style="stroke:${L.lv===2?"#f5b301":"url(#rg)"}"/></svg><div class="av">${avatar(s)}</div></div>
     <div class="nm">${esc(s.name)}</div>
-    <div class="lv">${L.name}${L.next?` · باقي ${L.next.min-p}`:" 👑"}</div>
-    <div class="bar"><i style="width:${L.prog*100}%"></i></div></div>`;
+    <div class="lv">${L.name}${L.next?` · باقي ${L.next.min-p}`:" 👑"}</div></div>`;
 }
 function render(){
   renderClasses(); renderStats();
@@ -731,6 +760,7 @@ function animateCard(id, skill){
     av.innerHTML = avatar(s,"happy"); av.querySelector(".fal").classList.add("flap");
     gsap.fromTo(av,{y:0},{y:-26,duration:.25,yoyo:true,repeat:3,ease:"power2.out",onComplete:()=>{ av.innerHTML=avatar(s) }});
     gsap.fromTo(el,{scale:1},{scale:1.08,duration:.18,yoyo:true,repeat:1});
+    gsap.fromTo(el.querySelector(".pts"),{scale:.4,rotate:-25},{scale:1,rotate:0,duration:.6,ease:"elastic.out(1.2,.45)"});
     feathers(x,y,s.look.body); confetti(x,y,24); floatText(x,y,"+"+skill.v,"#22b573");
   } else {
     av.innerHTML = avatar(s,"sad");
@@ -753,7 +783,7 @@ function openStudent(id){
   openSheet(`${head}<div class="tabs"><button class="tab p on" data-t="p">👍 إيجابي</button><button class="tab n" data-t="n">✋ يحتاج تحسين</button></div><div class="skills" id="skills"></div>
     <div class="row" style="justify-content:center;margin-top:12px"><button class="btn" id="goSkills">🎚️ تعديل المهارات والنقاط</button></div>`);
   $("#goSkills").onclick=openSkills;
-  const draw = t => { const list=t==="p"?posList():negList(); $("#skills").innerHTML = list.map((k,i)=>`<button class="skill ${t}" data-i="${i}" data-t="${t}"><span class="em" data-v="${k.v>0?"+":""}${k.v}">${k.e}</span>${k.t}</button>`).join("");
+  const draw = t => { const list=t==="p"?posList():negList(); $("#skills").innerHTML = list.map((k,i)=>`<button class="skill ${t}" data-i="${i}" data-t="${t}"><span class="em" data-v="${k.v>0?"+":""}${k.v}">${emo(k.e)}</span>${k.t}</button>`).join("");
     document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.t===t)); };
   draw("p");
   document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>draw(b.dataset.t));
@@ -966,7 +996,7 @@ const EMO=["🙋","📘","🤝","💡","😌","💪","🌟","✨","🏆","🎯",
 function openSkills(){
   const c=cls(); let list=skillsOf(c).map(x=>({...x})), ed=null;
   const draw=()=>{ const P=list.filter(k=>k.v>0), N=list.filter(k=>k.v<0);
-    const row=k=>`<div class="skrow"><span class="em2" style="background:${k.v>0?"#ddf7ea":"#ffe5e5"}">${esc(k.e)}</span><b>${esc(k.t)}</b><span class="vbadge" style="background:${k.v>0?"#22b573":"#ff5d5d"}">${k.v>0?"+":""}${k.v}</span><button class="btn" data-ed="${k.k}">تعديل</button></div>`;
+    const row=k=>`<div class="skrow"><span class="em2" style="background:${k.v>0?"#ddf7ea":"#ffe5e5"}">${emo(k.e)}</span><b>${esc(k.t)}</b><span class="vbadge" style="background:${k.v>0?"#22b573":"#ff5d5d"}">${k.v>0?"+":""}${k.v}</span><button class="btn" data-ed="${k.k}">تعديل</button></div>`;
     const f=ed||{k:"",e:"⭐",t:"",v:1};
     openSheet(`<h2>🎚️ المهارات والنقاط</h2><p class="hint">ضيف السلوكيات اللي تناسب فصلك، وحدد كل واحدة بكام نقطة.</p>
       <h3 style="margin:10px 0 6px;color:#14935b">👍 إيجابي</h3>${P.map(row).join("")||"<p class='hint'>مفيش</p>"}
@@ -974,7 +1004,7 @@ function openSkills(){
       <div class="kcard" style="background:#f6f8fd;box-shadow:none;margin-top:14px" id="skForm"><h3>${ed&&ed.k?"✏️ تعديل المهارة":"➕ مهارة جديدة"}</h3>
         <div class="seg2"><button class="${f.v>0?"on":""}" data-ty="1">👍 إيجابي</button><button class="${f.v<0?"on":""}" data-ty="-1">✋ سلبي</button></div>
         <input class="field" id="skName" placeholder="اسم السلوك — مثلاً: قراءة متميزة" maxlength="28" value="${esc(f.t)}">
-        <b style="display:block;margin-top:10px">الأيقونة</b><div class="emojis">${EMO.map(e=>`<button class="${e===f.e?"on":""}" data-em="${e}">${e}</button>`).join("")}</div>
+        <b style="display:block;margin-top:10px">الأيقونة</b><div class="emojis">${EMO.map(e=>`<button class="${e===f.e?"on":""}" data-em="${e}">${emo(e)}</button>`).join("")}</div>
         <div class="row"><span>أو اكتب إيموجي:</span><input class="field" id="skEmo" maxlength="4" style="width:80px;text-align:center;font-size:1.3rem" value="${esc(f.e)}"></div>
         <b style="display:block;margin-top:10px">عدد النقاط</b><div class="stepper"><button id="vMinus">−</button><b id="vVal">${Math.abs(f.v)}</b><button id="vPlus">+</button><span class="hint">من 1 لـ 5</span></div>
         <div class="row" style="margin-top:12px"><button class="btn pri" id="skSave">${ed&&ed.k?"حفظ التعديل":"إضافة"}</button>${ed&&ed.k?`<button class="btn" id="skCancel">إلغاء</button><span class="spacer"></span><button class="btn red" id="skDel">حذف</button>`:""}</div></div>
@@ -1028,10 +1058,10 @@ function stillOpen(id){ return $("#ov").classList.contains("show") && document.g
 function openGames(){
   openSheet(`<h2>🎮 الألعاب التعليمية</h2><p class="hint">العب مع الفصل على السبورة، والنقاط بتتسجّل للطلاب تلقائياً 🦅</p>
     <div class="gcards">
-      <button class="gc" data-g="race" style="background:linear-gradient(135deg,#22b573,#139a8a)"><span class="gi">🏁</span><div><b>سباق الأسراب</b><small>الفصل يتقسم أسراب، وكل إجابة صح الصقر بتاع السرب يتقدّم. أول سرب يوصل يكسب!</small></div></button>
-      <button class="gc" data-g="quiz" style="background:linear-gradient(135deg,#7b5cd6,#5a46b8)"><span class="gi">🎯</span><div><b>سؤال الصقر</b><small>الصقر يختار طالب عشوائي ويطلعله سؤال. يجاوب صح؟ ياخد نقطة!</small></div></button>
-      <button class="gc" data-g="sprint" style="background:linear-gradient(135deg,#ff8a3d,#ff5d5d)"><span class="gi">⚡</span><div><b>الحساب الذهني السريع</b><small>مسائل ورا بعض بعدّاد وقت — مين يجاوب الأول؟</small></div></button>
-      <button class="gc" data-g="bank" style="background:linear-gradient(135deg,#3d8be0,#27407a)"><span class="gi">📚</span><div><b>بنك الأسئلة</b><small>ضيف أسئلة الدرس بتاعك وتستخدمها في كل الألعاب (${(cls().qs||[]).length} سؤال)</small></div></button>
+      <button class="gc" data-g="race" style="background:linear-gradient(135deg,#22b573,#139a8a)"><span class="gi">${emo("🏁")}</span><div><b>سباق الأسراب</b><small>الفصل يتقسم أسراب، وكل إجابة صح الصقر بتاع السرب يتقدّم. أول سرب يوصل يكسب!</small></div></button>
+      <button class="gc" data-g="quiz" style="background:linear-gradient(135deg,#7b5cd6,#5a46b8)"><span class="gi">${emo("🎯")}</span><div><b>سؤال الصقر</b><small>الصقر يختار طالب عشوائي ويطلعله سؤال. يجاوب صح؟ ياخد نقطة!</small></div></button>
+      <button class="gc" data-g="sprint" style="background:linear-gradient(135deg,#ff8a3d,#ff5d5d)"><span class="gi">${emo("⚡")}</span><div><b>الحساب الذهني السريع</b><small>مسائل ورا بعض بعدّاد وقت — مين يجاوب الأول؟</small></div></button>
+      <button class="gc" data-g="bank" style="background:linear-gradient(135deg,#3d8be0,#27407a)"><span class="gi">${emo("📚")}</span><div><b>بنك الأسئلة</b><small>ضيف أسئلة الدرس بتاعك وتستخدمها في كل الألعاب (${(cls().qs||[]).length} سؤال)</small></div></button>
     </div>`, ()=>setTab("home"));
   gsap.from(".gc",{x:40,opacity:0,stagger:.07,duration:.4,ease:"back.out(1.5)"});
   document.querySelectorAll(".gc").forEach(b=>b.onclick=()=>{ ac(); const g=b.dataset.g; g==="race"?raceSetup():g==="quiz"?quizGame():g==="sprint"?sprintGame():openBank(); });
@@ -1175,7 +1205,7 @@ function openAttendance(day){
     openSheet(`<h2>📋 الحضور والغياب</h2>
       <div class="tabs"><button class="tab p on">تحضير</button><button class="tab" id="attRep">📊 تقرير الشهر</button></div>
       <div class="dnav"><button id="dPrev" title="اليوم السابق">›</button><div class="dt"><b>${esc(g)}${isToday?" · اليوم":""}</b><small>${esc(h)}</small></div><button id="dNext" title="اليوم التالي" ${isToday?"disabled style='opacity:.3'":""}>‹</button></div>
-      <div class="asum">${ORDER.map(k=>`<span style="background:${ATT[k].c}">${ATT[k].e} ${ATT[k].t} ${cnt[k]}</span>`).join("")}</div>
+      <div class="asum">${ORDER.map(k=>`<span style="background:${ATT[k].c}">${emo(ATT[k].e)} ${ATT[k].t} ${cnt[k]}</span>`).join("")}</div>
       <div class="row" style="margin-bottom:8px"><button class="btn pri" id="allP">✅ الكل حاضر</button>${rec?`<button class="btn red" id="clrDay">مسح تحضير اليوم ده</button>`:""}</div>
       <p class="legend">اضغط على الطالب لتغيير حالته: حاضر ← غائب ← متأخر ← مستأذن${rec?"":" — التحضير بيتسجّل مع أول ضغطة"}</p>
       <div class="agrid" id="agrid">${c.students.map(s=>{ const st=attOf(c,day,s.id)||"p";
@@ -1253,7 +1283,7 @@ function openPeriod(){
   const daysArr=[]; if(RP.kind==="week"){ for(let i=0;i<5;i++){ const d=new Date(P.a); d.setDate(d.getDate()+i); daysArr.push(d); } }
   else { for(let d=new Date(P.a); d<P.b; d.setDate(d.getDate()+1)){ if(d.getDay()<5) daysArr.push(new Date(d)); } }
   const mxDay=Math.max(1,...daysArr.map(d=>{ const x=st.days[dkey(d)]||{p:0,n:0}; return x.p+x.n; }));
-  const grp=sign=>{ const m={}; st.logs.filter(l=>sign>0?l.v>0:l.v<0).forEach(l=>{ const sk=skillOf(l.k,l); (m[l.k]=m[l.k]||{label:sk.e+" "+sk.t,n:0}).n++; }); return Object.values(m).sort((a,b)=>b.n-a.n); };
+  const grp=sign=>{ const m={}; st.logs.filter(l=>sign>0?l.v>0:l.v<0).forEach(l=>{ const sk=skillOf(l.k,l); (m[l.k]=m[l.k]||{label:emo(sk.e)+" "+esc(sk.t),n:0}).n++; }); return Object.values(m).sort((a,b)=>b.n-a.n); };
   const pos=grp(1), neg=grp(-1);
   const stars=[...st.rows].filter(r=>r.pos>0).sort((a,b)=>b.pos-a.pos).slice(0,3);
   const watch=[...st.rows].filter(r=>r.neg>0||r.ab>1).sort((a,b)=>(b.neg+2*b.ab)-(a.neg+2*a.ab)).slice(0,5);
@@ -1320,8 +1350,8 @@ function openStuRep(sid){
       <div class="rt"><small>❌ غياب</small><b>${r.ab}</b><small>من ${r.days} يوم</small></div><div class="rt"><small>⏰ تأخير</small><b>${r.late}</b></div></div>
     <div class="rsec"><h3>📈 آخر 8 أسابيع</h3><div class="days">${weeks.map(w=>`<div class="day">${w.p?`<span class="v">${w.p}</span>`:""}<i class="bp" style="height:${110*w.p/mx}px"></i><i class="bn" style="height:${110*w.n/mx}px"></i></div>`).join("")}</div>
       <div class="dlab">${weeks.map((w,i)=>`<span>${i===7?"الحالي":(()=>{ try{ return w.a.toLocaleDateString("ar-EG",{day:"numeric",month:"numeric"}) }catch(e){ return "" } })()}</span>`).join("")}</div></div>
-    ${sk.length?`<div class="rsec"><h3>🧩 السلوكيات</h3>${hbars(sk.map(x=>({label:x.k.e+" "+x.k.t,n:x.n,c:x.k.v>0?"#22b573":"#ff5d5d"})),"#7b5cd6")}</div>`:`<p class="hint">مفيش نقاط في الفترة دي</p>`}
-    ${attList.length?`<div class="rsec"><h3>📋 أيام الغياب والتأخير</h3>${attList.map(x=>`<span class="pill2" style="background:${ATT[x.st].c};color:#fff">${ATT[x.st].e} ${esc(fmtDay(x.k).g)}</span>`).join("")}</div>`:""}
+    ${sk.length?`<div class="rsec"><h3>🧩 السلوكيات</h3>${hbars(sk.map(x=>({label:emo(x.k.e)+" "+esc(x.k.t),n:x.n,c:x.k.v>0?"#22b573":"#ff5d5d"})),"#7b5cd6")}</div>`:`<p class="hint">مفيش نقاط في الفترة دي</p>`}
+    ${attList.length?`<div class="rsec"><h3>📋 أيام الغياب والتأخير</h3>${attList.map(x=>`<span class="pill2" style="background:${ATT[x.st].c};color:#fff">${emo(ATT[x.st].e)} ${esc(fmtDay(x.k).g)}</span>`).join("")}</div>`:""}
     <div class="rsec"><h3>✉️ رسالة لولي الأمر</h3><textarea class="field" id="srMsg" style="min-height:110px">${esc(draft)}</textarea>
       <div class="row" style="margin-top:8px"><button class="btn" id="srCopy">📋 نسخ</button>${MODE==="cloud"?`<button class="btn pri" id="srSend">📝 ابعتها في صقر</button>`:""}</div>
       ${MODE==="cloud"?`<p class="hint">«ابعتها في صقر» بتظهر لولي الأمر في صفحته كرسالة من المعلم</p>`:""}</div>`);
@@ -1356,7 +1386,7 @@ function updateSelBar(){ $("#selbar").hidden=!selMode; $("#selCount").textConten
 function toggleSel(on){ selMode=on; if(!on) selected.clear(); render(); }
 $("#cancelSel").onclick=()=>toggleSel(false);
 $("#awardSel").onclick=()=>{ if(!selected.size){ toast("حدد طلاب الأول"); return; } const ids=[...selected];
-  openSheet(`<h2>⭐ نقاط لـ ${ids.length} طلاب</h2><div class="skills" id="skills">${allSkills().map((k,i)=>`<button class="skill ${k.v>0?"p":"n"}" data-i="${i}"><span class="em" data-v="${k.v>0?"+":""}${k.v}">${k.e}</span>${k.t}</button>`).join("")}</div>`);
+  openSheet(`<h2>⭐ نقاط لـ ${ids.length} طلاب</h2><div class="skills" id="skills">${allSkills().map((k,i)=>`<button class="skill ${k.v>0?"p":"n"}" data-i="${i}"><span class="em" data-v="${k.v>0?"+":""}${k.v}">${emo(k.e)}</span>${k.t}</button>`).join("")}</div>`);
   $("#skills").onclick=e=>{ const b=e.target.closest(".skill"); if(!b) return; const k=allSkills()[+b.dataset.i]; closeSheet(); selMode=false; selected.clear(); render(); setTimeout(()=>award(ids,k),120); }; };
 
 /* ---------- events ---------- */
@@ -1377,7 +1407,7 @@ function showLogin(msg){ $("#login").classList.add("show"); $("#loginMsg").textC
   $("#loginFal").innerHTML=falconSVG({level:2,body:"#f2b01e",mood:"happy"}); $("#loginFal .fal").classList.add("flap");
   gsap.fromTo("#loginFal",{y:30},{y:-10,duration:1.4,yoyo:true,repeat:-1,ease:"sine.inOut"}); }
 function hideLogin(){ $("#login").classList.remove("show"); }
-function showPane(id){ ["loginBtns","emailForm","phoneForm","kidForm"].forEach(k=>$("#"+k).hidden = k!==id); }
+function showPane(id){ ["loginBtns","emailForm","parForm","kidForm"].forEach(k=>$("#"+k).hidden = k!==id); }
 function busy(t){ $("#loginBusy").hidden=false; $("#loginBusy").textContent=t; showPane(null); }
 const AUTH_ERR = {
   "auth/invalid-email":"الإيميل مكتوب غلط","auth/missing-password":"اكتب كلمة المرور","auth/weak-password":"كلمة المرور لازم 6 أحرف على الأقل",
@@ -1438,14 +1468,17 @@ async function routeUser(u){
   if(USER && USER.uid===u.uid) return;
   busy("جاري الدخول…");
   let role=null; try{ role=await Cloud.getRole(); }catch(e){}
-  if(!role){ role = WANT || (MODE==="parent"?"parent":"teacher"); try{ await Cloud.setRole(role, u.displayName||u.email||u.phoneNumber||""); }catch(e){} }
+  if(!role){ role = WANT || (MODE==="parent"?"parent":"teacher"); try{ await Cloud.setRole(role, u.displayName||u.email||""); }catch(e){} }
   WANT=null; $("#login").classList.remove("as-parent");
   role==="parent" ? startParent(u) : startCloud(u);
 }
 function startParent(u){
   USER=u; MODE="parent"; lsSet(MODE_KEY,"parent"); PARENT=u;
   $("#pLogo").innerHTML=falconSVG({level:1,body:"#9a6235"});
-  $("#pHi").textContent="أهلاً "+(u.displayName||"")+" 👋";
+  $("#pHi").textContent=u.displayName?"أهلاً "+u.displayName+" 👋":"أهلاً بك 👋";
+  const pend=PENDING||null; PENDING=null;
+  const carry=localCodes(); if(pend && !carry.includes(pend)) carry.push(pend);
+  carry.forEach(c=>Cloud.linkKid(c,u.displayName||"ولي أمر").catch(()=>{})); lsSet("saqr.pcodes",null);
   hideLogin(); $("#par").classList.add("show"); drawParent(); drawBell();
   Cloud.onForeground(m=>{ const n=m.notification||{}; if(n.title) toast(n.title+(n.body?" — "+n.body:"")); });
   Cloud.listenParent((codes,data)=>{ PDATA=data||{}; PCODES=codes; drawBell(); Object.keys(PKIDS).forEach(c=>{ if(!codes.includes(c)) delete PKIDS[c]; }); drawParent();
@@ -1459,7 +1492,7 @@ function drawParent(changed, prev){
     return `<button class="pkid" data-c="${esc(c)}">${k.note&&k.noteAt>(seen[c]||0)?`<span class="newnote">📝 رسالة جديدة</span>`:""}
       <span class="av">${avatar({points:k.points,look:k.look||{body:BODY[0],acc:"none"}})}</span>
       <div class="grow"><b>${esc(k.name)}</b><small>${esc(k.className)}${k.teacher?" · أ. "+esc(k.teacher):""}</small>
-        <div class="chips"><span style="background:${st?ATT[st].c:"#c3c9d8"}">${st?ATT[st].e+" "+ATT[st].t+" اليوم":"لم يُحضَّر اليوم"}</span><span style="background:#7b5cd6">${L.name}</span><span style="background:#22b573">+${w.pos} الأسبوع</span></div></div>
+        <div class="chips"><span style="background:${st?ATT[st].c:"#c3c9d8"}">${st?emo(ATT[st].e)+" "+ATT[st].t+" اليوم":"لم يُحضَّر اليوم"}</span><span style="background:#7b5cd6">${L.name}</span><span style="background:#22b573">+${w.pos} الأسبوع</span></div></div>
       <div style="text-align:center"><div class="pp">${k.points}</div><small style="color:var(--muted);font-weight:700">نقطة</small></div></button>`; }).join("")
     + `<button class="pkid padd" id="pAdd">➕ ضيف ابنك أو بنتك بالكود</button>`
     + (kids.length?"":`<p class="hint" style="text-align:center">اطلب الكود من معلم الفصل — كود من 6 حروف وأرقام 🦅</p>`);
@@ -1479,19 +1512,52 @@ function addPKid(){
   $("#paGo").onclick=async()=>{ const code=$("#paCode").value.toUpperCase().replace(/[^A-Z0-9]/g,""); if(code.length!==6){ $("#paMsg").textContent="الكود 6 حروف وأرقام"; return; }
     if(PCODES.includes(code)){ $("#paMsg").textContent="مضاف قبل كده 👍"; return; }
     $("#paGo").disabled=true;
-    try{ const k=await Cloud.linkKid(code, PARENT.displayName||PARENT.email||""); closeSheet(); SFX.level(); confetti(innerWidth/2,innerHeight/3,100); toast("🎉 تم إضافة "+k.name); }
+    try{ let k;
+      if(PLOCAL){ k=await Cloud.kidExists(code); if(!k) throw Object.assign(new Error("x"),{code:"no-kid"});
+        const cs=localCodes(); cs.push(code); lsSet("saqr.pcodes",JSON.stringify(cs)); PCODES=cs;
+        Cloud.watchMany(cs,(c,data)=>{ const prev=PKIDS[c]; PKIDS[c]=data; if(PVIEW===c && data){ const pv=KID; KID=data; drawKid(pv); } else drawParent(c, prev); }); }
+      else k=await Cloud.linkKid(code, PARENT.displayName||PARENT.email||"ولي أمر");
+      closeSheet(); SFX.level(); confetti(innerWidth/2,innerHeight/3,100); toast("🎉 تم إضافة "+k.name); }
     catch(e){ $("#paMsg").textContent = e.code==="no-kid" ? "الكود ده مش موجود — اتأكد منه مع المعلم" : "تعذّر الإضافة: "+(e.code||e.message); }
     finally{ const b=$("#paGo"); if(b) b.disabled=false; } };
 }
 function openParentAcct(){
-  openSheet(`<h2>👤 حسابي</h2><div class="li"><div class="grow"><b>${esc(PARENT.displayName||"ولي أمر")}</b><small dir="ltr">${esc(PARENT.email||PARENT.phoneNumber||"")}</small></div><span class="chip p">👨‍👩‍👦 ولي أمر</span></div>
+  openSheet(`<h2>👤 حسابي</h2><div class="li"><div class="grow"><b>${esc(PARENT.displayName||"ولي أمر")}</b><small dir="ltr">${esc(PARENT.email||"")}</small></div><span class="chip p">👨‍👩‍👦 ولي أمر</span></div>
+    ${PARENT.isAnonymous||PLOCAL?`<p class="hint">دخلت بكود الطالب على الجهاز ده. أبناؤك محفوظين هنا، ولو غيّرت الموبايل ضيفهم تاني بالكود.</p>`:""}
     ${PCODES.length?`<b style="display:block;margin-top:12px">أبنائي</b><div class="list" style="margin-top:6px">${PCODES.map(c=>`<div class="li"><div class="grow"><b>${esc((PKIDS[c]||{}).name||c)}</b><small dir="ltr">${esc(c)}</small></div><button class="btn red" data-un="${esc(c)}">إزالة</button></div>`).join("")}</div>`:""}
     <div class="row" style="margin-top:14px"><button class="btn red" id="pOut">تسجيل الخروج</button></div>`);
-  document.querySelectorAll("[data-un]").forEach(b=>b.onclick=()=>ask("إزالة "+((PKIDS[b.dataset.un]||{}).name||"")+" من حسابك؟",async()=>{ try{ await Cloud.unlinkKid(b.dataset.un); closeSheet(); }catch(e){ toast("تعذّر الإزالة"); } }));
-  $("#pOut").onclick=async()=>{ closeSheet(); await Cloud.signOut(); USER=null; PARENT=null; PCODES=[]; PKIDS={}; MODE=null; lsSet(MODE_KEY,null); $("#par").classList.remove("show"); $("#kid").classList.remove("show"); showLogin(); };
-}
+  document.querySelectorAll("[data-un]").forEach(b=>b.onclick=()=>ask("إزالة "+((PKIDS[b.dataset.un]||{}).name||"")+" من حسابك؟",async()=>{ const c=b.dataset.un;
+    try{ if(PLOCAL){ const cs=localCodes().filter(x=>x!==c); lsSet("saqr.pcodes",JSON.stringify(cs)); PCODES=cs; delete PKIDS[c]; Cloud.watchMany(cs,()=>{}); drawParent(); } else await Cloud.unlinkKid(c); closeSheet(); }catch(e){ toast("تعذّر الإزالة"); } }));
+  $("#pOut").onclick=()=>ask(PARENT&&PARENT.isAnonymous||PLOCAL?"الخروج هيشيل أبنائك من الجهاز ده، وتقدر ترجع تضيفهم بالكود تاني. متأكد؟":"تسجيل الخروج؟",doParentOut);
+};
+async function doParentOut(){ closeSheet(); lsSet("saqr.pcodes",null); PLOCAL=false; try{ if(window.Cloud) Cloud.watchMany([],()=>{}); }catch(e){}
+  await Cloud.signOut(); USER=null; PARENT=null; PCODES=[]; PKIDS={}; MODE=null; lsSet(MODE_KEY,null); $("#par").classList.remove("show"); $("#kid").classList.remove("show"); showLogin(); }
 $("#pAcct").onclick=openParentAcct;
-$("#parBtn").onclick=()=>{ ac(); WANT="parent"; $("#login").classList.add("as-parent"); lmsg(""); };
+$("#parBtn").onclick=()=>{ ac(); lmsg(""); showPane("parForm"); setTimeout(()=>$("#parCode").focus(),50); };
+let PENDING=null, PLOCAL=false;
+const normCode=v=>(v||"").toUpperCase().replace(/[^A-Z0-9]/g,"");
+const localCodes=()=>{ try{ return JSON.parse(lsGet("saqr.pcodes"))||[] }catch(e){ return [] } };
+$("#parForm").onsubmit=async e=>{ e.preventDefault(); ac(); const code=normCode($("#parCode").value);
+  if(code.length!==6){ lmsg("الكود 6 حروف وأرقام"); return; }
+  $("#parGo").disabled=true; lmsg("");
+  try{ const C=await cloudReady; const k=await C.kidExists(code);
+    if(!k){ lmsg("الكود ده مش موجود — اتأكد منه مع المعلم"); return; }
+    busy("جاري فتح صفحة "+k.name+"…"); PENDING=code;
+    const cur=C.user();
+    if(cur){ routeUser(cur); return; }
+    WANT="parent";
+    try{ await C.anon(); }                         // onAuth → routeUser → startParent → links PENDING
+    catch(err){ startParentLocal(code); }          // anonymous sign-in disabled: follow without an account
+  }catch(err){ showLogin(); showPane("parForm"); lmsg("تعذّر الاتصال: "+(err.code||err.message)); }
+  finally{ $("#parGo").disabled=false; } };
+function startParentLocal(code){
+  PLOCAL=true; MODE="parent-local"; lsSet(MODE_KEY,"parent-local"); PARENT={displayName:"",local:true};
+  const codes=localCodes(); if(code && !codes.includes(code)) codes.push(code); lsSet("saqr.pcodes",JSON.stringify(codes));
+  PENDING=null; $("#pLogo").innerHTML=falconSVG({level:1,body:"#9a6235"}); $("#pHi").textContent="أهلاً بك 👋";
+  hideLogin(); $("#par").classList.add("show"); $("#pBell").innerHTML="";
+  PCODES=codes; drawParent();
+  Cloud.watchMany(codes,(c,data)=>{ const prev=PKIDS[c]; PKIDS[c]=data; if(PVIEW===c && data){ const pv=KID; KID=data; drawKid(pv); } else drawParent(c, prev); });
+}
 $("#parBack").onclick=()=>{ WANT=null; $("#login").classList.remove("as-parent"); lmsg(""); showPane("loginBtns"); };
 
 function startCloud(user){
@@ -1521,11 +1587,11 @@ function startCloud(user){
 }
 
 function updateAcct(){ const b=$("#acctBtn"); if(!b) return;
-  if(MODE==="cloud" && USER){ const n=(USER.displayName||USER.email||USER.phoneNumber||"؟").trim(); b.textContent=n[0]; b.title=n; b.style.fontWeight="800"; }
+  if(MODE==="cloud" && USER){ const n=(USER.displayName||USER.email||"؟").trim(); b.textContent=n[0]; b.title=n; b.style.fontWeight="800"; }
   else { b.innerHTML=icon("user"); b.title="حساب"; } }
 function openAcct(){
   if(MODE==="cloud" && USER){
-    openSheet(`<h2>👤 حسابك</h2><div class="li"><div class="grow"><b>${esc(USER.displayName||"معلم صقر")}</b><small dir="ltr">${esc(USER.email||USER.phoneNumber||"")}</small></div><span class="chip p">☁️ متزامن</span></div>
+    openSheet(`<h2>👤 حسابك</h2><div class="li"><div class="grow"><b>${esc(USER.displayName||"معلم صقر")}</b><small dir="ltr">${esc(USER.email||"")}</small></div><span class="chip p">☁️ متزامن</span></div>
       <p class="hint">فصولك محفوظة في السحابة، وتقدر تفتحها من أي جهاز بنفس الحساب. وبتشتغل كمان من غير نت وتتزامن لما يرجع.</p>
       <button class="btn red" id="aOut">تسجيل الخروج</button>`);
     $("#aOut").onclick=async()=>{ closeSheet(); await Cloud.signOut(); USER=null; MODE=null; lsSet(MODE_KEY,null); S.classes=[]; showLogin(); };
@@ -1566,20 +1632,6 @@ $("#emailForm").onsubmit=async e=>{ e.preventDefault(); ac(); const em=$("#eEm")
   catch(err){ lmsg(authMsg(err)); } finally{ $("#eGo").disabled=false; } };
 $("#eForgot").onclick=async()=>{ const em=$("#eEm").value.trim(); if(!em){ lmsg("اكتب إيميلك الأول"); return; }
   try{ const C=await cloudReady; await C.resetPass(em); lmsg("📩 بعتنالك رابط تغيير كلمة المرور على الإيميل",true); }catch(err){ lmsg(authMsg(err)); } };
-// ---- phone ----
-$("#phoneBtn").onclick=()=>{ lmsg(""); showPane("phoneForm"); $("#pStep1").hidden=false; $("#pStep2").hidden=true; setTimeout(()=>$("#pNum").focus(),50); };
-function normPhone(v){ v=v.replace(/[\s\-()]/g,"").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d));
-  if(v.startsWith("00")) v="+"+v.slice(2);
-  if(/^05\d{8}$/.test(v)) v="+966"+v.slice(1); else if(/^5\d{8}$/.test(v)) v="+966"+v;
-  return v; }
-$("#phoneForm").onsubmit=async e=>{ e.preventDefault(); ac(); const ph=normPhone($("#pNum").value);
-  if(!/^\+\d{8,15}$/.test(ph)){ lmsg("اكتب رقم الجوال صح، مثلاً 0512345678"); return; }
-  $("#pSend").disabled=true; lmsg("");
-  try{ const C=await cloudReady; await C.phoneSend(ph,"recap"); $("#pStep1").hidden=true; $("#pStep2").hidden=false; lmsg("📩 بعتنا كود على "+ph,true); setTimeout(()=>$("#pCode").focus(),50); }
-  catch(err){ lmsg(authMsg(err)); } finally{ $("#pSend").disabled=false; } };
-$("#pVerify").onclick=async()=>{ const code=$("#pCode").value.trim(); if(code.length<6){ lmsg("الكود 6 أرقام"); return; }
-  $("#pVerify").disabled=true;
-  try{ await Cloud.phoneVerify(code); busy("جاري الدخول…"); }catch(err){ lmsg(authMsg(err)); } finally{ $("#pVerify").disabled=false; } };
 document.querySelectorAll(".lback").forEach(b=>b.onclick=()=>{ lmsg(""); showPane("loginBtns"); });
 $("#guestBtn").onclick=()=>{ ac(); startGuest(); };
 $("#acctBtn").onclick=openAcct;
@@ -1611,7 +1663,7 @@ function drawKid(prev){
   $("#kBar").style.width=(L.prog*100)+"%"; $("#kNext").textContent=L.next?`باقي ${L.next.min-k.points} نقطة وتبقى «${L.next.name}»`:"وصلت لأعلى مستوى! 🏆";
   $("#kPath").innerHTML=LEVELS.map((l,i)=>`<div class="kstep ${i>L.idx?"lock":""} ${i===L.idx?"now":""}"><span class="av">${falconSVG({level:l.lv,body:s.look.body,acc:i<=L.idx?s.look.acc:"none"})}</span>${l.name}<br><small>${l.min} نقطة</small></div>`).join("");
   $("#kRecent").innerHTML=(k.recent||[]).map(r=>{ const sk=r.e?{e:r.e,t:r.nm||""}:skillOf(r.k); let when=""; try{ when=new Date(r.t).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"short"}); }catch(e){}
-    return `<div class="li"><span style="font-size:1.7rem">${sk.e}</span><div class="grow"><b>${esc(sk.t)}</b><small>${esc(when)}</small></div><span class="chip ${r.v>0?"p":"n"}">${sgn(r.v)}</span></div>`; }).join("")||`<p class="hint">لسه مفيش نقاط — شارك في الحصة وخد أول نقطة! 💪</p>`;
+    return `<div class="li"><span class="big-e">${emo(sk.e)}</span><div class="grow"><b>${esc(sk.t)}</b><small>${esc(when)}</small></div><span class="chip ${r.v>0?"p":"n"}">${sgn(r.v)}</span></div>`; }).join("")||`<p class="hint">لسه مفيش نقاط — شارك في الحصة وخد أول نقطة! 💪</p>`;
   const a=k.att||{days:0,a:0,l:0,x:0};
   $("#kAtt").innerHTML=a.days?`<span style="background:#22b573">✅ حاضر ${a.days-a.a-a.x}</span><span style="background:#ff5d5d">❌ غائب ${a.a}</span><span style="background:#f0a020">⏰ متأخر ${a.l}</span><span style="background:#3d8be0">📝 مستأذن ${a.x}</span>`:`<span style="background:#c3c9d8">لسه مفيش تحضير الشهر ده</span>`;
   const w=k.week||{pos:0,neg:0}; $("#kWeek").innerHTML=`<span style="background:#22b573">⭐ +${w.pos} نقطة</span><span style="background:#ff5d5d">✋ −${w.neg}</span>`;
@@ -1648,6 +1700,9 @@ let kidLeft=false;
 $("#kOut").onclick=()=>{ if(PVIEW){ PVIEW=null; KID=null; $("#kid").classList.remove("show"); drawParent(); return; } kidLeft=true; history.replaceState(null,"",location.pathname); if(window.Cloud) Cloud.stopKid(); KID=null; KCODE=null; lsSet("saqr.kid",null); $("#kid").classList.remove("show"); showLogin(); };
 
 paintIcons();
+(()=>{ const sp=$("#splash"); $("#spFal").innerHTML=falconSVG({level:1,body:"#9a6235",mood:"happy"}); const f=$("#spFal .fal"); if(f) f.classList.add("flap");
+  gsap.fromTo("#spFal",{y:20},{y:-10,duration:.6,yoyo:true,repeat:-1,ease:"sine.inOut"});
+  const hide=()=>{ sp.classList.add("gone"); setTimeout(()=>sp.remove(),500); }; setTimeout(hide,750); })();
 // ---- PWA: offline + push service worker ----
 if("serviceWorker" in navigator && location.protocol==="https:") addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 
@@ -1655,9 +1710,10 @@ if("serviceWorker" in navigator && location.protocol==="https:") addEventListene
 const urlKid=new URLSearchParams(location.search).get("k");
 if(urlKid || (!MODE && lsGet("saqr.kid"))){ showLogin(); startKid(urlKid||lsGet("saqr.kid")); MODE=null; }
 else
-if(MODE==="guest") startGuest();
+if(MODE==="parent-local"){ showLogin(); busy("جاري الفتح…"); cloudReady.then(()=>startParentLocal(null)).catch(()=>showLogin("تعذّر تحميل الخدمة. تأكد من الإنترنت.")); }
+else if(MODE==="guest") startGuest();
 else { showLogin(); if(MODE==="cloud"||MODE==="parent") busy("جاري الدخول…"); }
-cloudReady.then(C=>C.onAuth(u=>{ if(KCODE || $("#kid").classList.contains("show") || (urlKid && !USER && !kidLeft)) return; if(u){ if(!USER || USER.uid!==u.uid) routeUser(u); } else if(MODE!=="guest"){ USER=null; showLogin(); } }))
+cloudReady.then(C=>C.onAuth(u=>{ if(KCODE || $("#kid").classList.contains("show") || (urlKid && !USER && !kidLeft)) return; if(u){ if(!USER || USER.uid!==u.uid) routeUser(u); } else if(MODE!=="guest" && MODE!=="parent-local"){ USER=null; showLogin(); } }))
   .catch(()=>{ if(MODE!=="guest") showLogin("تعذّر تحميل خدمة السحابة. تأكد من الإنترنت، أو جرّب بدون حساب."); });
 </script>
 <script type="module" src="cloud.js"></script>

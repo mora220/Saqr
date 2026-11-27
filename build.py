@@ -19,3 +19,6 @@ import shutil
 for f in ("manifest.webmanifest",): shutil.copy("src/"+f,"dist/"+f)
 pathlib.Path("dist/icons").mkdir(exist_ok=True)
 for f in pathlib.Path("src/icons").glob("*.png"): shutil.copy(f,"dist/icons/"+f.name)
+pathlib.Path("dist/emoji").mkdir(exist_ok=True)
+for f in pathlib.Path("src/emoji").glob("*"):
+    if f.suffix in (".svg",".txt"): shutil.copy(f,"dist/emoji/"+f.name)
