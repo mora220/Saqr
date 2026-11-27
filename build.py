@@ -14,3 +14,8 @@ print(len(out)//1024, "KB")
 
 import subprocess
 subprocess.run(["npx","esbuild","src/cloud.js","--bundle","--format=esm","--minify","--target=es2020","--outfile=dist/cloud.js"],check=True)
+subprocess.run(["npx","esbuild","src/sw.js","--bundle","--format=iife","--minify","--target=es2020","--outfile=dist/sw.js"],check=True)
+import shutil
+for f in ("manifest.webmanifest",): shutil.copy("src/"+f,"dist/"+f)
+pathlib.Path("dist/icons").mkdir(exist_ok=True)
+for f in pathlib.Path("src/icons").glob("*.png"): shutil.copy(f,"dist/icons/"+f.name)

@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#1b2a4a">
 <title>صقر – إدارة الفصل</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="صقر">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <style>
 /*FONTS*/
 :root{
@@ -224,6 +231,13 @@ table.rep th{color:var(--muted);font-weight:700}table.rep td:first-child,table.r
 #login.as-parent .prole{display:block}
 .tlabel{margin:0 0 8px;font-weight:700;opacity:.85}#login.as-parent .tlabel{display:none}
 .kbtn+.kbtn{}
+.bell{background:#fff;border-radius:20px;box-shadow:var(--shadow);padding:12px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:center}
+.bell .ic{font-size:1.9rem}.bell .grow{flex:1}.bell b{display:block}.bell small{color:var(--muted);font-weight:600;line-height:1.6;display:block}
+.bell.on{background:#ddf7ea}
+.tg{display:flex;align-items:center;justify-content:space-between;padding:12px 4px;border-bottom:1px solid #eef1f8;font-weight:700}
+.sw2{width:52px;height:30px;border-radius:20px;background:#d5dbe8;position:relative;transition:.2s;flex:0 0 auto}
+.sw2::after{content:"";position:absolute;top:3px;right:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.2s;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+.sw2.on{background:#22b573}.sw2.on::after{right:25px}
 /* ---------- fx ---------- */
 #fx{position:fixed;inset:0;pointer-events:none;z-index:80}
 .float{direction:ltr;position:fixed;font-weight:800;font-size:2.2rem;z-index:90;pointer-events:none;text-shadow:0 3px 0 rgba(0,0,0,.12)}
@@ -346,7 +360,7 @@ table.rep th{color:var(--muted);font-weight:700}table.rep td:first-child,table.r
 </div>
 <div id="par">
   <header class="kh"><div class="brand"><div class="logo" id="pLogo"></div><div><h1>صقر</h1><small style="opacity:.8">ولي الأمر</small></div></div><span class="spacer"></span><button class="icon-btn" id="pAcct" style="width:auto;padding:0 14px;font-weight:700;font-size:.95rem">حسابي</button></header>
-  <div class="kbody"><h2 class="phi" id="pHi"></h2><div class="pgrid" id="pGrid"></div></div>
+  <div class="kbody"><h2 class="phi" id="pHi"></h2><div id="pBell"></div><div class="pgrid" id="pGrid"></div></div>
 </div>
 <div class="ov" id="ov"><div class="sheet" id="sheet"></div></div>
 <div class="ov" id="askOv" style="z-index:70;align-items:center"><div class="sheet" style="max-width:380px;border-radius:24px;text-align:center"><p id="askMsg" style="font-size:1.2rem;font-weight:700;margin:10px 0 18px"></p><div class="row" style="justify-content:center"><button class="btn red" id="askYes">نعم</button><button class="btn" id="askNo">إلغاء</button></div></div></div>
@@ -952,7 +966,43 @@ function startGuest(){ MODE="guest"; lsSet(MODE_KEY,"guest"); const L=store.load
   S.classes = (L && L.classes && L.classes.length) ? L.classes : demo().classes; if(L && L.cur && !S.cur) S.cur=L.cur; fixCur(); save(); firstRender(); }
 
 let gotFirst=false;
-let WANT=null, PARENT=null, PKIDS={}, PCODES=[], PVIEW=null;
+let WANT=null, PARENT=null, PKIDS={}, PCODES=[], PVIEW=null, PDATA={};
+const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+const isStandalone=()=>matchMedia("(display-mode: standalone)").matches || navigator.standalone===true;
+const NTYPES=[["pos","⭐ لما ياخد نقطة أو يترقّى"],["neg","✋ لما ياخد ملاحظة سلبية"],["att","📋 الغياب والتأخير"],["note","📝 رسائل المعلم"]];
+async function drawBell(){
+  const el=$("#pBell"); if(!el) return;
+  const myTok=lsGet("saqr.push"), on = myTok && (PDATA.tokens||[]).includes(myTok) && window.Notification && Notification.permission==="granted";
+  if(on){ el.innerHTML=`<div class="bell on"><span class="ic">🔔</span><div class="grow"><b>الإشعارات شغالة على الجهاز ده</b><small>هيوصلك تنبيه لما ابنك ياخد نقطة أو يغيب أو المعلم يبعت رسالة</small></div><button class="btn" id="bSet">⚙️</button></div>`;
+    $("#bSet").onclick=openNotifSettings; return; }
+  if(isIOS && !isStandalone()){ el.innerHTML=`<div class="bell"><span class="ic">📲</span><div class="grow"><b>عشان توصلك الإشعارات على الآيفون</b><small>١) اضغط زر المشاركة <b style="display:inline">⬆️</b> في Safari<br>٢) اختار «إضافة إلى الشاشة الرئيسية»<br>٣) افتح صقر من الأيقونة وفعّل الإشعارات من هناك</small></div></div>`; return; }
+  if(window.Notification && Notification.permission==="denied"){ el.innerHTML=`<div class="bell"><span class="ic">🔕</span><div class="grow"><b>الإشعارات مقفولة</b><small>افتح إعدادات المتصفح أو الموبايل واسمح بالإشعارات لصقر، وبعدين ارجع هنا</small></div></div>`; return; }
+  const ok = window.Cloud ? await Cloud.pushSupported() : false;
+  if(!ok){ el.innerHTML=""; return; }
+  el.innerHTML=`<div class="bell"><span class="ic">🔔</span><div class="grow"><b>فعّل الإشعارات</b><small>يوصلك تنبيه على الموبايل أول ما ابنك ياخد نقطة أو يغيب</small></div><button class="btn pri" id="bOn">تفعيل</button></div>`;
+  $("#bOn").onclick=enableNotif;
+}
+function enableNotif(){
+  let perm;
+  try{ perm=Notification.requestPermission(); }catch(e){ perm=Promise.resolve("denied"); }   // must be called inside the tap
+  Promise.resolve(perm).then(async r=>{
+    if(r!=="granted"){ toast("مسمحتش بالإشعارات 🔕"); drawBell(); return; }
+    const b=$("#bOn"); if(b){ b.disabled=true; b.textContent="لحظة…"; }
+    try{ const t=await Cloud.enablePush(); lsSet("saqr.push",t); SFX.pos(); toast("🔔 تم تفعيل الإشعارات!"); }
+    catch(e){ toast("تعذّر تفعيل الإشعارات: "+(e.code||e.message)); }
+    drawBell(); });
+}
+function openNotifSettings(){
+  const pr={pos:true,neg:true,att:true,note:true,...(PDATA.notif||{})};
+  const draw=()=>{ openSheet(`<h2>🔔 الإشعارات</h2><p class="hint">اختار التنبيهات اللي عايزها توصلك</p>
+    ${NTYPES.map(([k,t])=>`<div class="tg">${t}<button class="sw2 ${pr[k]?"on":""}" data-k="${k}" aria-label="${t}"></button></div>`).join("")}
+    <div class="row" style="margin-top:14px"><button class="btn red" id="nOff">إيقاف الإشعارات على الجهاز ده</button></div>`);
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    document.querySelectorAll(".sw2").forEach(b=>b.onclick=async()=>{ pr[b.dataset.k]=!pr[b.dataset.k]; draw(); try{ await Cloud.setNotif(pr); }catch(e){ toast("تعذّر الحفظ"); } });
+    $("#nOff").onclick=async()=>{ try{ await Cloud.disablePush(lsGet("saqr.push")); }catch(e){} lsSet("saqr.push",null); closeSheet(); toast("🔕 اتقفلت الإشعارات على الجهاز ده"); drawBell(); };
+  };
+  draw();
+}
 async function routeUser(u){
   if(USER && USER.uid===u.uid) return;
   busy("جاري الدخول…");
@@ -965,8 +1015,9 @@ function startParent(u){
   USER=u; MODE="parent"; lsSet(MODE_KEY,"parent"); PARENT=u;
   $("#pLogo").innerHTML=falconSVG({level:1,body:"#9a6235"});
   $("#pHi").textContent="أهلاً "+(u.displayName||"")+" 👋";
-  hideLogin(); $("#par").classList.add("show"); drawParent();
-  Cloud.listenParent(codes=>{ PCODES=codes; Object.keys(PKIDS).forEach(c=>{ if(!codes.includes(c)) delete PKIDS[c]; }); drawParent();
+  hideLogin(); $("#par").classList.add("show"); drawParent(); drawBell();
+  Cloud.onForeground(m=>{ const n=m.notification||{}; if(n.title) toast(n.title+(n.body?" — "+n.body:"")); });
+  Cloud.listenParent((codes,data)=>{ PDATA=data||{}; PCODES=codes; drawBell(); Object.keys(PKIDS).forEach(c=>{ if(!codes.includes(c)) delete PKIDS[c]; }); drawParent();
     Cloud.watchMany(codes,(code,data)=>{ const prev=PKIDS[code]; PKIDS[code]=data; if(PVIEW===code && data){ const pv=KID; KID=data; drawKid(pv); } else drawParent(code, prev); }); });
 }
 function drawParent(changed, prev){
@@ -1164,6 +1215,9 @@ $("#kidForm").onsubmit=e=>{ e.preventDefault(); ac(); startKid($("#kCode").value
 $("#kStyle").onclick=kidStyle;
 let kidLeft=false;
 $("#kOut").onclick=()=>{ if(PVIEW){ PVIEW=null; KID=null; $("#kid").classList.remove("show"); drawParent(); return; } kidLeft=true; history.replaceState(null,"",location.pathname); if(window.Cloud) Cloud.stopKid(); KID=null; KCODE=null; lsSet("saqr.kid",null); $("#kid").classList.remove("show"); showLogin(); };
+
+// ---- PWA: offline + push service worker ----
+if("serviceWorker" in navigator && location.protocol==="https:") addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 
 // ---- start ----
 const urlKid=new URLSearchParams(location.search).get("k");

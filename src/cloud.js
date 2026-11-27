@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut,
   signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
+import { getMessaging, getToken, isSupported as msgSupported, onMessage } from "firebase/messaging";
 import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, onSnapshot, query, where, serverTimestamp, arrayUnion, arrayRemove } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -52,7 +53,7 @@ const Cloud = {
   // ---- parent side ----
   listenParent(cb) {
     if (unsubParent) unsubParent();
-    unsubParent = onSnapshot(doc(db, "parents", uid), d => cb(d.exists() ? (d.data().kids || []) : []), () => cb([]));
+    unsubParent = onSnapshot(doc(db, "parents", uid), d => cb(d.exists() ? (d.data().kids || []) : [], d.exists() ? d.data() : {}), () => cb([], {}));
   },
   async linkKid(code, name) {
     const k = await getDoc(doc(db, "kids", code));
@@ -65,6 +66,19 @@ const Cloud = {
     await setDoc(doc(db, "parents", uid), { kids: arrayRemove(code) }, { merge: true });
     await updateDoc(doc(db, "kids", code), { ["parents." + uid]: deleteField() }).catch(() => {});
   },
+  // ---- push notifications (parent) ----
+  pushSupported: async () => { try { return "serviceWorker" in navigator && "Notification" in window && await msgSupported(); } catch (e) { return false; } },
+  async enablePush() {
+    const reg = await navigator.serviceWorker.register("sw.js");
+    await navigator.serviceWorker.ready;
+    const token = await getToken(getMessaging(app), { serviceWorkerRegistration: reg });
+    if (!token) throw Object.assign(new Error("no-token"), { code: "no-token" });
+    await setDoc(doc(db, "parents", uid), { tokens: arrayUnion(token) }, { merge: true });
+    return token;
+  },
+  async disablePush(token) { if (token) await setDoc(doc(db, "parents", uid), { tokens: arrayRemove(token) }, { merge: true }); },
+  setNotif: prefs => setDoc(doc(db, "parents", uid), { notif: prefs }, { merge: true }),
+  onForeground(cb) { msgSupported().then(ok => { if (ok) onMessage(getMessaging(app), p => cb(p)); }).catch(() => {}); },
   watchMany(codes, cb) {
     for (const [c, u] of kidWatch) if (!codes.includes(c)) { u(); kidWatch.delete(c); }
     for (const c of codes) if (!kidWatch.has(c)) kidWatch.set(c, onSnapshot(doc(db, "kids", c), d => cb(c, d.exists() ? d.data() : null), () => cb(c, null)));
