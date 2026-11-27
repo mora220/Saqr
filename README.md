@@ -15,3 +15,7 @@ npm run build
 قواعد الأمان في `firestore.rules` — انسخها في Firebase Console → Firestore → Rules.
 
 © محمد رجب
+
+## رسومات
+- أيقونات [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) — رخصة MIT (`emoji/LICENSE.txt`).
+- حركات من [LottieFiles](https://lottiefiles.com) (رخصة Lottie Simple License).

@@ -22,3 +22,6 @@ for f in pathlib.Path("src/icons").glob("*.png"): shutil.copy(f,"dist/icons/"+f.
 pathlib.Path("dist/emoji").mkdir(exist_ok=True)
 for f in pathlib.Path("src/emoji").glob("*"):
     if f.suffix in (".svg",".txt"): shutil.copy(f,"dist/emoji/"+f.name)
+shutil.copy("node_modules/lottie-web/build/player/lottie_light.min.js","dist/lottie.js")
+pathlib.Path("dist/lottie").mkdir(exist_ok=True)
+for f in pathlib.Path("src/lottie").glob("*.json"): shutil.copy(f,"dist/lottie/"+f.name)
