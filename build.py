@@ -23,6 +23,8 @@ pathlib.Path("dist/emoji").mkdir(exist_ok=True)
 for f in pathlib.Path("src/emoji").glob("*"):
     if f.suffix in (".svg",".txt"): shutil.copy(f,"dist/emoji/"+f.name)
 shutil.copy("node_modules/lottie-web/build/player/lottie_light.min.js","dist/lottie.js")
+pathlib.Path("dist/sfx").mkdir(exist_ok=True)
+for f in pathlib.Path("src/sfx").glob("*"): shutil.copy(f,"dist/sfx/"+f.name)
 pathlib.Path("dist/lottie").mkdir(exist_ok=True)
 for f in pathlib.Path("src/lottie").glob("*.json"): shutil.copy(f,"dist/lottie/"+f.name)
 subprocess.run(["npx","esbuild","node_modules/qrcode-generator/dist/qrcode.js","--minify","--outfile=dist/qr.js"],check=True)
