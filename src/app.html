@@ -1330,7 +1330,9 @@ function openAnn(){
 
 /* ---------- AI (Gemini) book → question bank ---------- */
 const AI_KEY="saqr.gemini";
-const aiKey=()=>lsGet(AI_KEY)||S.geminiKey||"";
+// remove spaces, line breaks and invisible direction marks that phones add when pasting into Arabic fields
+const cleanKey=v=>String(v||"").replace(/[\s\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff"'`]/g,"");
+const aiKey=()=>cleanKey(lsGet(AI_KEY)||S.geminiKey||"");
 function openAIKey(){
   openSheet(`<h2>✨ الذكاء الاصطناعي</h2>
     <p class="hint">صقر بيستخدم Gemini من جوجل عشان يحوّل كتاب المنهج لبنك أسئلة مرتّب. محتاج <b>مفتاح API مجاني</b> مرة واحدة:</p>
@@ -1340,7 +1342,7 @@ function openAIKey(){
     <p class="hint" id="akMsg"></p>
     <p class="hint" style="font-size:.8rem">🔒 المفتاح بيتحفظ في حسابك بس، ومحدش غيرك بيشوفه.</p>`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
-  $("#akSave").onclick=async()=>{ const k=$("#akIn").value.trim(); if(!/^[\w-]{20,}$/.test(k)){ $("#akMsg").textContent="المفتاح شكله مش صح"; return; }
+  $("#akSave").onclick=async()=>{ const k=cleanKey($("#akIn").value); $("#akIn").value=k; if(k.length<20){ $("#akMsg").textContent="المفتاح قصير — اتأكد إنك نسخته كله"; return; }
     $("#akSave").disabled=true; $("#akMsg").textContent="جاري الاختبار…";
     try{ const m=await aiPickModel(k); lsSet(AI_KEY,k); S.geminiKey=k; if(MODE==="cloud"&&window.Cloud) Cloud.saveMe({geminiKey:k}).catch(()=>{}); else save();
       $("#akMsg").textContent="✅ المفتاح شغّال ("+m.replace("models/","")+")"; SFX.pos(); }
@@ -1351,8 +1353,15 @@ function openAIKey(){
 const GAPI="https://generativelanguage.googleapis.com";
 let AIMODEL=null;
 async function aiPickModel(key){
-  const r=await fetch(`${GAPI}/v1beta/models?pageSize=200&key=${encodeURIComponent(key)}`);
-  const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error((j.error&&j.error.message)||"المفتاح مش شغّال");
+  let r; try{ r=await fetch(`${GAPI}/v1beta/models?pageSize=200&key=${encodeURIComponent(key)}`); }
+  catch(e){ throw new Error("مفيش اتصال بخدمة Gemini — اتأكد من الإنترنت وجرّب تاني"); }
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){ const m=(j.error&&j.error.message)||"";
+    if(/API key not valid|API_KEY_INVALID/i.test(m)) throw new Error("جوجل رفض المفتاح — انسخه تاني من aistudio.google.com/apikey");
+    if(/not been used|disabled|SERVICE_DISABLED/i.test(m)) throw new Error("خدمة Gemini مش مفعّلة للمفتاح ده — اعمل مفتاح جديد من AI Studio");
+    if(/location|region|not supported/i.test(m)) throw new Error("Gemini مش متاح في المنطقة دي للمفتاح ده");
+    if(r.status===429) throw new Error("طلبات كتير — استنى دقيقة وجرّب تاني");
+    throw new Error(m||"المفتاح مش شغّال"); }
   const ok=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")).map(m=>m.name)
     .filter(n=>/gemini/.test(n)&&!/(image|live|tts|audio|embed|vision|banana|robotics|computer|thinking-exp|learnlm|nano)/.test(n));
   const ver=n=>{ const m=n.match(/gemini-(\d+(?:\.\d+)?)/); return m?parseFloat(m[1]):0; };
