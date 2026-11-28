@@ -640,6 +640,27 @@ body.board .wscene{min-height:72vh}
 .empty{text-align:center;color:var(--muted);padding:40px 10px}
 .empty .av{width:160px;height:160px;margin:0 auto}
 
+/* ---------- leaderboard ---------- */
+.podium{display:flex;justify-content:center;align-items:flex-end;gap:8px;margin:14px 0 6px;padding-top:20px}
+.pod{flex:1;max-width:130px;text-align:center;display:flex;flex-direction:column;align-items:center}
+.pod .pav{width:74px;height:74px;position:relative}.pod.p1 .pav{width:96px;height:96px}
+.pod .crown{position:absolute;top:-24px;left:50%;transform:translateX(-50%);font-size:1.7rem;filter:drop-shadow(0 3px 4px rgba(0,0,0,.2));z-index:1}
+.pod b{font-size:1rem;margin-top:2px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.pod small{color:var(--muted);font-weight:700}
+.pblock{width:100%;border-radius:16px 16px 6px 6px;margin-top:6px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:1.6rem;box-shadow:inset 0 -6px 0 rgba(0,0,0,.12)}
+.pod.p1 .pblock{height:92px;background:linear-gradient(180deg,#ffd75e,#f5a300)}
+.pod.p2 .pblock{height:68px;background:linear-gradient(180deg,#d9e1ee,#9eabc2)}
+.pod.p3 .pblock{height:52px;background:linear-gradient(180deg,#f2b98a,#c9793f)}
+.pod.me b{color:var(--accent)}.pod.me .pav::after{content:attr(data-me);position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:.7rem;font-weight:800;border-radius:8px;padding:0 7px}
+.lbme{display:flex;align-items:center;gap:10px;background:#f1ecff;border-radius:16px;padding:8px 12px;margin-top:8px}
+.lbme.lbtop{background:linear-gradient(135deg,#fff6d6,#ffe9a8)}
+.lbme .rk{width:38px;height:38px;border-radius:12px;background:var(--violet);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.2rem;flex:none}.lbme.lbtop .rk{background:#f5a300}
+.lbme .grow{flex:1;min-width:0}.lbme small{display:block;color:var(--muted);font-weight:600}
+.lbl{margin-top:8px}
+.wkc{position:absolute;top:8px;right:10px;font-size:1.05rem;filter:drop-shadow(0 2px 2px rgba(0,0,0,.2))}
+.reqb{position:absolute;bottom:8px;left:8px;background:#ff5d9a;color:#fff;border-radius:10px;padding:0 7px;font-size:.75rem;font-weight:800;animation:hwpulse 1.6s infinite}
+.reqbar{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#ffe9f2,#fff4f8);border-radius:16px;padding:10px 12px;margin:8px 0;box-shadow:inset 0 0 0 2px #ffc2da}
+.reqbar .grow{flex:1;min-width:0}.reqbar small{display:block;color:var(--muted);font-weight:600}
+.rwk .askb{padding:6px 12px;flex:none}
 /* ---------- homework ---------- */
 .chips2{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
 .chips2 button{padding:8px 14px;border-radius:12px;background:#eef1f8;font-weight:700;color:var(--ink);transition:.15s}
@@ -813,6 +834,7 @@ body.board .wscene{min-height:72vh}
       <div class="klv" id="kLv"></div><div class="bar kbar"><i id="kBar"></i></div><div class="knext" id="kNext"></div>
       <button class="btn pri" id="kStyle" style="margin-top:12px">🎨 غيّر شكل صقرك</button></div>
     <div class="kcard" id="kHwCard" hidden></div>
+    <div class="kcard" id="kLbCard" hidden></div>
     <div class="kcard kchat" id="kChatCard" hidden></div>
     <div class="kcard"><h3>🏅 الأوسمة <span class="cnt" id="kBdgN" style="float:left"></span></h3><div class="bdg sm" id="kBdg"></div></div>
     <div class="kcard" id="kShopCard" hidden><h3>🎁 متجر المكافآت <span class="cnt" id="kBal" style="float:left"></span></h3><div id="kShop"></div></div>
@@ -996,15 +1018,15 @@ function weekOf(c,sid){ const t0=Date.now()-7*864e5, r={pos:0,neg:0}; c.log.forE
 let KIDMETA={};
 function kidPayloads(){ const m=new Map(), teacher=(USER&&USER.displayName)||"";
   S.classes.forEach(c=>c.students.forEach(s=>{ if(!s.code) return;
-    m.set(s.code,{cid:c.id,className:c.name,teacher,name:s.name,points:s.points,pos:s.pos,neg:s.neg,look:s.look,lookAt:s.lookAt||0,
+    m.set(s.code,{cid:c.id,sid:s.id,className:c.name,teacher,name:s.name,points:s.points,pos:s.pos,neg:s.neg,look:s.look,lookAt:s.lookAt||0,
       recent:c.log.filter(l=>l.sid===s.id).slice(-12).reverse().map(l=>({k:l.k,v:l.v,t:l.t,e:l.e||skillOf(l.k).e,nm:l.nm||skillOf(l.k).t})), att:monthAtt(c,s.id), today:attOf(c,todayKey(),s.id)||"",
-      week:weekOf(c,s.id), note:s.note||"", noteAt:s.noteAt||0, balance:balance(s), rewards:rewardsOf(c).map(r=>({e:r.e,t:r.t,c:r.c})), anns:(c.anns||[]).slice(0,3).map(a=>({t:a.text,at:a.at})), badges:Object.keys(s.badges||{}),
+      week:weekOf(c,s.id), note:s.note||"", noteAt:s.noteAt||0, balance:balance(s), rewards:rewardsOf(c).map(r=>({id:r.id,e:r.e,t:r.t,c:r.c})), anns:(c.anns||[]).slice(0,3).map(a=>({t:a.text,at:a.at})), badges:Object.keys(s.badges||{}),
       hw:(c.hw||[]).filter(h=>h.due>Date.now()-3*DAY).slice(0,6).map(h=>({id:h.id,t:h.title,due:h.due,n:h.n,pts:h.pts,s:(s.hwd||{})[h.id]||null}))}); }));
   return m; }
 function fixCur(){ if(!S.cur || !S.classes.find(c=>c.id===S.cur)) S.cur = S.classes[0] && S.classes[0].id; }
 function save(){
   lsSet(PREF_KEY, JSON.stringify({cur:S.cur, sound:S.sound}));
-  if(MODE==="cloud"){ if(window.Cloud){ ensureCodes(); Cloud.sync(S.classes); if(kidsReady) Cloud.syncKids(kidPayloads()); } }
+  if(MODE==="cloud"){ if(window.Cloud){ ensureCodes(); Cloud.sync(S.classes); if(kidsReady){ Cloud.syncKids(kidPayloads()); syncBoards(); } } }
   else store.save(S);
 }
 const cls = () => S.classes.find(c=>c.id===S.cur);
@@ -1094,7 +1116,7 @@ function cardHTML(s){
   const L=levelOf(s.points), p=s.points;
   const st=attOf(cls(),todayKey(),s.id);
   return `<div class="card ${L.lv===2?"gold":""} ${selected.has(s.id)?"sel":""} ${st==="a"||st==="x"?"out":""}" data-id="${s.id}">
-    <span class="pts ${p<0?"neg":p===0?"zero":""}">${p}</span>${st&&st!=="p"?`<span class="attb" style="background:${ATT[st].c}">${emo(ATT[st].e)} ${ATT[st].t}</span>`:""}
+    <span class="pts ${p<0?"neg":p===0?"zero":""}">${p}</span>${weekTop(cls())===s.id?`<span class="wkc" title="صقر الأسبوع">🏆</span>`:""}${s.code&&KIDMETA[s.code]&&KIDMETA[s.code].req?`<span class="reqb">🎁 طلب</span>`:""}${st&&st!=="p"?`<span class="attb" style="background:${ATT[st].c}">${emo(ATT[st].e)} ${ATT[st].t}</span>`:""}
     <div class="avw"><svg class="ring2" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46"/><circle class="pr" cx="50" cy="50" r="46" pathLength="100" stroke-dasharray="${(L.prog*100).toFixed(1)} 100" style="stroke:${L.lv===2?"#f5b301":"url(#rg)"}"/></svg><div class="av">${avatar(s)}</div></div>
     <div class="nm">${esc(s.name)}</div>
     <div class="lv">${L.name}${L.next?` · باقي ${L.next.min-p}`:" 👑"}</div></div>`;
@@ -1117,7 +1139,7 @@ function render(){
 function refreshCard(id){ const s=stu(id), el=document.querySelector(`.card[data-id="${id}"]`); if(!s||!el) return; el.outerHTML = cardHTML(s); renderStats(); }
 
 /* ---------- modal helpers ---------- */
-const BOARDABLE=/id="(spT|qzAv|rcQ|rf0|tTxt|nFace|spAv|agrid|rwAv|luAv|cgame|wheel|cdown|rwL|ceL|cgGo|rcGo|tugA|tgGo|eggB|chB|memG|mgGo|jepB|jpGo|wdS|wdGo)"|class="groups"/;
+const BOARDABLE=/id="(spT|qzAv|rcQ|rf0|tTxt|nFace|spAv|agrid|rwAv|luAv|cgame|wheel|cdown|rwL|ceL|cgGo|rcGo|tugA|tgGo|eggB|chB|memG|mgGo|jepB|jpGo|wdS|wdGo|lbPod)"|class="groups"/;
 function openSheet(html, onClose){ $("#toast").classList.remove("show"); const pf=$("#ov")._close; if(pf && $("#ov").classList.contains("show")){ const ct=(document.querySelector(".tb.on")||{dataset:{}}).dataset.tab; $("#ov")._close=null; try{ pf(); }catch(e){} if(ct) setTab(ct); } $("#sheet").innerHTML = `<button class="x" onclick="closeSheet()">✕</button>` + (BOARDABLE.test(html)&&!BOARD?`<button class="bbtn" onclick="setBoard(true)">${icon("tv")} السبورة</button>`:"") + html; $("#ov").classList.add("show"); $("#ov")._close=onClose;
   gsap.fromTo("#sheet",{y:60,opacity:0},{y:0,opacity:1,duration:.35,ease:"back.out(1.4)"}); }
 function closeSheet(){ setTab("home"); const f=$("#ov")._close; $("#ov")._close=null; if(f) f(); $("#ov").classList.remove("show"); }
@@ -1356,6 +1378,7 @@ function stopMic(){ if(mic){ cancelAnimationFrame(mic.raf); mic.stream.getTracks
 
 /* ---------- icon set (hand-drawn SVG, stroke style) ---------- */
 const ICONS={
+  trophy:'<path d="M8 3h8v6a4 4 0 0 1-8 0z"/><path d="M8 5H5a2.5 2.5 0 0 0 3 4M16 5h3a2.5 2.5 0 0 1-3 4"/><path d="M12 13v4M8.5 21h7M9.5 17h5v4h-5z"/>',
   book:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="m9 9 2 2 4-4"/>',
   chat:'<path d="M4 6.5A3.5 3.5 0 0 1 7.5 3h9A3.5 3.5 0 0 1 20 6.5v6a3.5 3.5 0 0 1-3.5 3.5H11l-4.6 3.8c-.4.3-.9 0-.9-.4V16A3.5 3.5 0 0 1 4 12.5z"/><path d="M8.5 8.3h7M8.5 11.2h4.4"/>',
   send:'<path d="M20.5 3.6 3.9 10.2c-.8.3-.8 1.4 0 1.7l6.4 2.1 2.1 6.4c.3.8 1.4.8 1.7 0L20.5 3.6z"/><path d="m10.3 14 4.6-4.6"/>',
@@ -1405,13 +1428,13 @@ document.addEventListener("fullscreenchange",()=>{ if(!document.fullscreenElemen
 function setTab(t){ document.querySelectorAll(".tb").forEach(b=>b.classList.toggle("on",b.dataset.tab===t)); }
 function openKit(){
   const T=[["random","dice","اختيار عشوائي","#ff8a3d"],["timer","timer","المؤقت","#3d8be0"],["groups","flock","الأسراب","#22b573"],["noise","noise","مقياس الهدوء","#2e9c9a"],
-    ["hw","book","الواجبات","#3d8be0"],["all","star","نقطة للفصل كله","#f5b301"],["select","check","تحديد عدة طلاب","#7b5cd6"],["skills","sliders","المهارات والنقاط","#e0609a"],["shop","gift","متجر المكافآت","#ff5d9a"],["seat","seat","ترتيب الجلوس","#8a5a2b"],["ann","megaphone","إعلان لأولياء الأمور","#7b5cd6"],["board","tv","وضع السبورة","#1b2a4a"]];
+    ["hw","book","الواجبات","#3d8be0"],["lb","trophy","لوحة الصدارة","#f5a300"],["all","star","نقطة للفصل كله","#f5b301"],["select","check","تحديد عدة طلاب","#7b5cd6"],["skills","sliders","المهارات والنقاط","#e0609a"],["shop","gift","متجر المكافآت","#ff5d9a"],["seat","seat","ترتيب الجلوس","#8a5a2b"],["ann","megaphone","إعلان لأولياء الأمور","#7b5cd6"],["board","tv","وضع السبورة","#1b2a4a"]];
   openSheet(`<h2>🪄 أدوات الحصة</h2><div class="kit">${T.map(([k,ic,t,c])=>`<button class="kt" data-k="${k}"><span class="bx" style="background:${c}">${icon(ic)}</span>${t}</button>`).join("")}</div>`, ()=>setTab("home"));
   gsap.from(".kt",{y:20,opacity:0,scale:.9,stagger:.04,duration:.35,ease:"back.out(1.7)"});
   document.querySelectorAll(".kt").forEach(b=>b.onclick=()=>{ const k=b.dataset.k; ac();
     if(k==="random") randomPick(); else if(k==="timer") openTimer(); else if(k==="groups") openGroups(); else if(k==="noise") openNoise();
     else if(k==="all") openStudent("__all"); else if(k==="select"){ closeSheet(); toggleSel(true); toast("دوس على الطلاب اللي عايز تحددهم"); }
-    else if(k==="skills") openSkills(); else if(k==="add") openAdd(); else if(k==="board"){ closeSheet(); setBoard(!BOARD); } else if(k==="shop") openShop(); else if(k==="seat") openSeating(); else if(k==="ann") openAnn(); else if(k==="hw") openHomework(); });
+    else if(k==="skills") openSkills(); else if(k==="add") openAdd(); else if(k==="board"){ closeSheet(); setBoard(!BOARD); } else if(k==="shop") openShop(); else if(k==="seat") openSeating(); else if(k==="ann") openAnn(); else if(k==="hw") openHomework(); else if(k==="lb") openLeaderboard(); });
 }
 document.querySelectorAll(".tb").forEach(b=>b.onclick=()=>{ ac(); const t=b.dataset.tab;
   if(t==="home"){ closeSheet(); window.scrollTo({top:0,behavior:"smooth"}); }
@@ -1503,16 +1526,20 @@ function openShop(sid){
     document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>openShop(b.dataset.p)); $("#shEdit").onclick=editRewards; return; }
   const bal=balance(s), list=rewardsOf(c);
   const bought=c.log.filter(l=>l.sid===s.id&&l.k==="shop").slice(-5).reverse();
+  const rq=s.code&&KIDMETA[s.code]&&KIDMETA[s.code].req, rqR=rq&&(list.find(x=>x.id===rq.id)||list.find(x=>x.t===rq.t));
   openSheet(`<h2>🎁 متجر المكافآت</h2>
+    ${rq?`<div class="reqbar"><span class="big-e">${emo(rq.e)}</span><div class="grow"><b>🙋 طالب «${esc(rq.t)}»</b><small>${rq.c} ⭐ · من صفحته</small></div>${rqR?`<button class="btn pri" id="rqOk">صرف ✅</button>`:""}<button class="btn" id="rqNo">رفض</button></div>`:""}
     <div class="who"><div class="av">${avatar(s)}</div><div class="info"><b>${esc(s.name)}</b><span>الرصيد: <b style="display:inline;font-size:1.3rem;color:#c27c00">⭐ ${bal}</b> نقطة</span></div></div>
     <div class="shopg">${list.map(r=>`<button class="rw ${bal>=r.c?"can":"no"}" data-r="${r.id}">${emo(r.e)}<span>${esc(r.t)}</span><span class="cost">${r.c} ⭐</span></button>`).join("")}</div>
     ${bought.length?`<div class="rsec"><h3>🧾 آخر المشتريات</h3>${bought.map(l=>`<div class="li"><span class="big-e">${emo(l.e)}</span><div class="grow"><b>${esc(l.nm)}</b><small>${(()=>{ try{ return new Date(l.t).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"short"}) }catch(e){ return "" } })()}</small></div><span class="chip n">−${l.cost}</span></div>`).join("")}</div>`:""}
     <div class="row" style="margin-top:12px"><button class="btn" id="shBack">↩ كل الطلاب</button><button class="btn" id="shEdit">✏️ تعديل المكافآت</button></div>`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
   $("#shBack").onclick=()=>openShop(); $("#shEdit").onclick=editRewards;
+  if($("#rqNo")) $("#rqNo").onclick=()=>{ Cloud.clearReq(s.code).catch(()=>{}); delete KIDMETA[s.code].req; toast("اترفض الطلب"); openShop(s.id); render(); };
+  if($("#rqOk")) $("#rqOk").onclick=()=>{ const b=document.querySelector(`[data-r="${rqR.id}"]`); if(b) b.click(); };
   document.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{ const r=list.find(x=>x.id===b.dataset.r); if(!r) return;
     if(balance(s)<r.c){ SFX.neg(); toast(`محتاج ${r.c-balance(s)} نقطة كمان 💪`); return; }
-    ask(`${s.name} يصرف ${r.c} نقطة على «${r.t}»؟`,()=>{ s.spent=(s.spent||0)+r.c; c.log.push({sid:s.id,k:"shop",v:0,t:Date.now(),e:r.e,nm:r.t,cost:r.c}); save(); render();
+    ask(`${s.name} يصرف ${r.c} نقطة على «${r.t}»؟`,()=>{ s.spent=(s.spent||0)+r.c; if(rq&&(rq.id===r.id||rq.t===r.t)){ Cloud.clearReq(s.code).catch(()=>{}); delete KIDMETA[s.code].req; } c.log.push({sid:s.id,k:"shop",v:0,t:Date.now(),e:r.e,nm:r.t,cost:r.c}); save(); render();
       SFX.level(); const rc=b.getBoundingClientRect(); burstAt(rc.left+rc.width/2,rc.top+rc.height/2,"stars",220); confetti(rc.left+rc.width/2,rc.top,80);
       toast(`🎁 ${s.name} اشترى «${r.t}»`); checkBadges(s,c); save(); setTimeout(()=>openShop(s.id),700); }); });
 }
@@ -2893,6 +2920,57 @@ async function solveHw(hid){
   draw();
 }
 
+/* ---------- weekly leaderboard + student page extras ---------- */
+const firstName=n=>String(n||"").trim().split(/\s+/)[0]||n;
+function lbRows(c,a,b){ const m={}; c.students.forEach(s=>m[s.id]={s,p:0});
+  c.log.forEach(l=>{ if(l.v>0 && l.k!=="shop" && l.t>=a && l.t<b && m[l.sid]) m[l.sid].p+=l.v; });
+  return Object.values(m).sort((x,y)=>y.p-x.p||y.s.points-x.s.points); }
+let wkCache={k:"",id:null};
+function weekTop(c){ const L=c.log[c.log.length-1], k=c.id+"|"+c.log.length+"|"+(L?L.t+L.v:0)+"|"+weekStart(new Date()).getTime(); if(wkCache.k!==k){ const r=lbRows(c,+weekStart(new Date()),Infinity); wkCache={k,id:r[0]&&r[0].p>0?r[0].s.id:null}; } return wkCache.id; }
+function podiumHTML(rows,me,id,meL){ const top=rows.slice(0,3), order=[1,0,2].filter(i=>top[i]);
+  return `<div class="podium" ${id?`id="${id}"`:""}>${order.map(i=>{ const r=top[i]; return `<div class="pod p${i+1} ${me&&r.me?"me":""}"><div class="pav" data-me="${esc(meL||"أنت")}">${i===0?`<span class="crown">👑</span>`:""}${r.av}</div><b>${esc(r.n)}</b><small>${r.p} ⭐</small><div class="pblock"><span>${i+1}</span></div></div>`; }).join("")}</div>`; }
+function openLeaderboard(kind){ kind=kind||"week"; const c=cls(); if(!c||c.students.length<2){ toast("ضيف طالبين على الأقل"); return; }
+  const now=new Date(), a=kind==="week"?+weekStart(now):+new Date(now.getFullYear(),now.getMonth(),1);
+  const rows=lbRows(c,a,Infinity).map(r=>({...r,n:r.s.name,av:avatar(r.s,r.p>0?"happy":"idle")}));
+  openSheet(`<h2>🏆 لوحة الصدارة</h2><div class="seg2"><button data-k="week" class="${kind==="week"?"on":""}">الأسبوع ده</button><button data-k="month" class="${kind==="month"?"on":""}">الشهر ده</button></div>
+    ${rows[0].p?podiumHTML(rows,false,"lbPod"):`<div class="mempty">${emo("🏁")}<b>السباق لسه بادئ!</b><p class="hint">أول نقطة إيجابية ${kind==="week"?"الأسبوع ده":"الشهر ده"} هتحط صاحبها على المنصة</p></div>`}
+    <div class="list lbl">${rows.slice(rows[0].p?3:0).map((r,i)=>`<div class="li"><span class="rk">${(rows[0].p?4:1)+i}</span><span class="av sm">${avatar(r.s)}</span><div class="grow"><b>${esc(r.s.name)}</b></div><span class="chip ${r.p?"p":""}">${r.p} ⭐</span></div>`).join("")}</div>
+    <div class="tg" style="margin-top:12px">👀 الترتيب يظهر للطلاب وأولياء الأمور (بالاسم الأول)<button class="sw2 ${c.lbOff?"":"on"}" id="lbVis" aria-label="إظهار الترتيب"></button></div>
+    <p class="hint">بيتحسب من النقاط الإيجابية بس${kind==="week"?"، والأسبوع بيبدأ من الأحد":""}.</p>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  gsap.from(".pod .pblock",{scaleY:0,transformOrigin:"50% 100%",stagger:.15,duration:.6,ease:"back.out(1.6)"}); gsap.from(".pod .pav",{y:-40,opacity:0,stagger:.15,delay:.3,duration:.5,ease:"bounce.out"});
+  if(rows[0].p){ setTimeout(()=>{ const el=document.querySelector(".pod.p1"); if(el){ const r=el.getBoundingClientRect(); burstAt(r.left+r.width/2,r.top+40,"stars",200); } SFX.level(); },700); }
+  document.querySelectorAll(".seg2 [data-k]").forEach(b=>b.onclick=()=>openLeaderboard(b.dataset.k));
+  $("#lbVis").onclick=()=>{ c.lbOff=!c.lbOff; save(); openLeaderboard(kind); toast(c.lbOff?"🙈 الترتيب مخفي عن الطلاب":"👀 الترتيب ظاهر للطلاب"); };
+}
+// teacher: publish each class board (first names + this week's points), deduped
+const lastBoard=new Map(); let boardT=null;
+function syncBoards(){ clearTimeout(boardT); boardT=setTimeout(()=>{ if(MODE!=="cloud"||!window.Cloud) return; const wk=+weekStart(new Date());
+  S.classes.forEach(c=>{ const rows=c.lbOff?[]:lbRows(c,wk,Infinity).slice(0,40).map(r=>({i:r.s.id,n:firstName(r.s.name),p:r.p,lv:levelOf(r.s.points).lv,look:r.s.look}));
+    const d={cls:c.name,wk,off:!!c.lbOff,rows}, j=JSON.stringify(d); if(lastBoard.get(c.id)===j) return; lastBoard.set(c.id,j);
+    Cloud.saveBoard(c.id,d).catch(()=>lastBoard.delete(c.id)); }); },1500); }
+// student / parent: board card
+const BOARDS={}, boardW={};
+function ensureBoard(cid){ if(!cid||boardW[cid]||!window.Cloud) return; boardW[cid]=Cloud.watchBoard(cid,b=>{ BOARDS[cid]=b; if(KID&&KID.cid===cid) drawKidLb(); }); }
+function drawKidLb(){ const el=$("#kLbCard"); if(!el||!KID) return; ensureBoard(KID.cid); const b=BOARDS[KID.cid];
+  const ok=b && !b.off && b.wk===+weekStart(new Date()) && (b.rows||[]).length>1 && b.rows.some(r=>r.p>0);
+  el.hidden=!ok; if(!ok) return;
+  const rows=b.rows.map(r=>({...r,me:r.i===KID.sid,av:falconSVG({level:r.lv,body:(r.look||{}).body||BODY[0],acc:(r.look||{}).acc||"none",mood:r.p>0?"happy":"idle"})}));
+  const mi=rows.findIndex(r=>r.me), me=rows[mi], who=PVIEW?firstName(KID.name):"أنت";
+  const next=mi>0?rows[mi-1]:null, gap=next?next.p-me.p+1:0;
+  el.innerHTML=`<h3>🏆 صدارة الأسبوع <span class="cnt" style="float:left">${esc(b.cls||"")}</span></h3>${podiumHTML(rows,true,"",PVIEW?"ابنك":"أنت")}
+    ${me?`<div class="lbme ${mi<3?"lbtop":""}"><span class="rk">${mi+1}</span><div class="grow"><b>${mi===0?`🥇 ${who} في المركز الأول!`:mi<3?`${who} على المنصة! ${["🥇","🥈","🥉"][mi]}`:`${who} في المركز ${mi+1} من ${rows.length}`}</b>
+      <small>${me.p} نقطة الأسبوع ده${next?` · باقي ${gap} ${gap>1?"نقاط":"نقطة"} ${PVIEW?"ويعدّي":"وتعدّي"} المركز ${mi}`:""}</small></div></div>`:""}`;
+  if(me && !PVIEW){ const key="saqr.lbr."+KCODE+b.wk, prev=+(lsGet(key)||0); lsSet(key,String(mi+1));
+    if(prev && mi+1<prev && mi<3){ setTimeout(()=>{ SFX.level(); confetti(innerWidth/2,innerHeight/3,140); toast(mi===0?"👑 بقيت الأول في الفصل الأسبوع ده!":"🏆 طلعت على منصة الأسبوع!"); },600); } }
+}
+// student: ask for a reward
+function kidAskReward(i){ const r=(KID.rewards||[])[i]; if(!r||!KCODE) return;
+  ask(`تطلب «${r.t}» بـ ${r.c} نقطة؟ المعلم هيوافق عليها في الفصل`,async()=>{
+    try{ await Cloud.requestReward(KCODE,{id:r.id||"",t:String(r.t).slice(0,40),e:String(r.e).slice(0,12),c:r.c,at:Date.now()}); SFX.pos(); toast("🙋 اتبعت طلبك للمعلم"); }
+    catch(e){ toast("تعذّر إرسال الطلب"); } }); }
+async function kidCancelReq(){ try{ await Cloud.clearReq(KCODE); toast("اتلغى الطلب"); }catch(e){ toast("تعذّر الإلغاء"); } }
+
 /* ---------- messages: teacher ↔ parents (one thread per student) ---------- */
 let THREADS=[], CHAT=null, PTH={};
 const QR_T=["شكراً لمتابعتك 🌟","متميّز النهارده ما شاء الله 👏","نرجو متابعة الواجب في البيت 📘","ياريت نتواصل بخصوص مستواه 🤝","تم، وهتابع الموضوع 👍"];
@@ -3191,7 +3269,9 @@ function startCloud(user){
       Cloud.listenThreads(l=>{ const before=liveThreads().filter(tUnread).length; THREADS=l; drawMsgBadge();
         if(liveThreads().filter(tUnread).length>before && !CHAT) SFX.msg(); });
       Cloud.listenMe((d,local)=>{ if(local) return; S.banks=d.banks||[]; if(d.geminiKey!==undefined){ S.geminiKey=d.geminiKey; if(d.geminiKey) lsSet(AI_KEY,d.geminiKey); } migrateQs(); });
-      Cloud.listenKids(kl=>{ kidsReady=true; let changed=false; KIDMETA={}; kl.forEach(k=>KIDMETA[k.code]=k);
+      Cloud.listenKids(kl=>{ kidsReady=true; let changed=false; const oldMeta=KIDMETA; KIDMETA={}; kl.forEach(k=>KIDMETA[k.code]=k);
+        kl.forEach(k=>{ const o=oldMeta[k.code]; if(k.req && (!o || !o.req || o.req.at!==k.req.at) && Object.keys(oldMeta).length){ SFX.msg(); toast(`🙋 ${k.name} طالب «${k.req.t}» من المتجر`); changed=true; }
+          if(!k.req && o && o.req) changed=true; });
         kl.forEach(k=>{ for(const c of S.classes){ const st=c.students.find(x=>x.code===k.code);
           if(st && k.look && (k.lookAt||0)>(st.lookAt||0)){ st.look=k.look; st.lookAt=k.lookAt; changed=true; } } });
         if(changed){ Cloud.sync(S.classes); if(!$("#ov").classList.contains("show")) render(); }
@@ -3288,9 +3368,12 @@ function drawKid(prev){
   $("#kBdg").innerHTML=BADGES.map(b=>`<div class="bd ${got.has(b.id)?"got":""}" title="${esc(b.d)}"><span class="bi">${emo(b.e)}</span><b>${b.t}</b>${got.has(b.id)?"":`<small class="lock">${esc(b.d)}</small>`}</div>`).join("");
   if(prev && (k.badges||[]).length>(prev.badges||[]).length){ const nb=BADGES.find(b=>got.has(b.id)&&!(prev.badges||[]).includes(b.id)); if(nb) setTimeout(()=>{ SFX.level(); toast(`🏅 مبروك! كسبت وسام «${nb.t}»`); burstAt(innerWidth/2,innerHeight/2,"fireworks",300); },1500); }
   const rw=k.rewards||[], bal=k.balance??k.points; $("#kShopCard").hidden=!rw.length; $("#kBal").textContent="رصيد "+bal;
-  $("#kShop").innerHTML=rw.map(r=>{ const ok=bal>=r.c, pc=Math.min(100,Math.round(100*Math.max(0,bal)/r.c));
-    return `<div class="rwk ${ok?"ok":""}"><span class="big-e">${emo(r.e)}</span><div class="grow"><b>${esc(r.t)}</b><div class="bar" style="margin:4px 0 0"><i style="width:${pc}%"></i></div></div><span class="cnt">${r.c} ⭐</span></div>`; }).join("")
-    +(rw.length?`<p class="hint" style="margin:6px 0 0">${PVIEW?"المعلم بيصرف المكافأة لما الطالب يطلبها 🎁":"اجمع النقاط واطلب المكافأة من المعلم 🎁"}</p>`:"");
+  const rq=k.req;
+  $("#kShop").innerHTML=(rq?`<div class="reqbar"><span class="big-e">${emo(rq.e)}</span><div class="grow"><b>⏳ ${PVIEW?"طلب":"طلبت"} «${esc(rq.t)}»</b><small>مستني موافقة المعلم في الفصل</small></div>${PVIEW?"":`<button class="btn" id="kRqX">إلغاء</button>`}</div>`:"")
+    +rw.map((r,i)=>{ const ok=bal>=r.c, pc=Math.min(100,Math.round(100*Math.max(0,bal)/r.c));
+    return `<div class="rwk ${ok?"ok":""}"><span class="big-e">${emo(r.e)}</span><div class="grow"><b>${esc(r.t)}</b><div class="bar" style="margin:4px 0 0"><i style="width:${pc}%"></i></div></div>${ok&&!PVIEW&&!rq?`<button class="btn pri askb" data-ask="${i}">اطلبها 🙋</button>`:`<span class="cnt">${r.c} ⭐</span>`}</div>`; }).join("")
+    +(rw.length?`<p class="hint" style="margin:6px 0 0">${PVIEW?"الطالب بيطلب المكافأة من صفحته، والمعلم بيصرفها في الفصل 🎁":"اجمع النقاط واطلب المكافأة، والمعلم يصرفهالك في الفصل 🎁"}</p>`:"");
+  document.querySelectorAll("[data-ask]").forEach(b=>b.onclick=()=>kidAskReward(+b.dataset.ask)); if($("#kRqX")) $("#kRqX").onclick=kidCancelReq;
   const w=k.week||{pos:0,neg:0}; $("#kWeek").innerHTML=`<span style="background:#22b573">⭐ +${w.pos} نقطة</span><span style="background:#ff5d5d">✋ −${w.neg}</span>`;
   const an=k.anns||[]; $("#kAnnCard").hidden=!an.length; $("#kAnn").innerHTML=an.map(a=>`<div class="ann"><p>${esc(a.t)}</p><small>${(()=>{ try{ return new Date(a.at).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"short"}) }catch(e){ return "" } })()}</small></div>`).join("");
   $("#kNoteCard").hidden=!k.note; $("#kNote").textContent=k.note||""; try{ $("#kNoteAt").textContent=k.noteAt?new Date(k.noteAt).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"long"}):""; }catch(e){}
@@ -3304,7 +3387,7 @@ function drawKid(prev){
     else if(k.points<prev.points){ SFX.neg(); gsap.fromTo(".khero",{x:-8},{x:0,duration:.5,ease:"elastic.out(1,.3)"}); }
   } else gsap.from(".khero,.kcard",{y:30,opacity:0,stagger:.08,duration:.5,ease:"back.out(1.5)"});
   setTimeout(()=>{ if(f) f.classList.remove("flap"); },1500);
-  drawKidChat(); drawKidHw();
+  drawKidChat(); drawKidHw(); drawKidLb();
 }
 function kidStyle(){
   let look={...(KID.look||{body:BODY[0],acc:"none"})}; const pts=KID.points;

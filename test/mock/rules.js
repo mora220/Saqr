@@ -24,6 +24,12 @@ export function check(op, path, before, after, auth, get) {
     if (op === "update") {
       if (uid && before.owner === uid && after.owner === uid) return "";
       if (onlyKeys(before, after, ["look", "lookAt"])) return "";
+      if (onlyKeys(before, after, ["req"])) {
+        const q = after.req;
+        if (q === undefined) return "";
+        const ok = Object.keys(q).every(k => ["id", "t", "e", "c", "at"].includes(k)) && typeof q.t === "string" && q.t.length <= 40 && typeof q.e === "string" && q.e.length <= 12 && Number.isInteger(q.c) && q.c <= (before.balance || 0);
+        return ok ? "" : "bad req";
+      }
       if (uid && onlyKeys(before, after, ["parents"]) && onlyKeys(before.parents, after.parents, [uid])) return "";
       return deny("kid update");
     }
@@ -76,6 +82,13 @@ export function check(op, path, before, after, auth, get) {
     }
     if (op === "update") return uid && before.owner === uid && onlyKeys(before, after, ["awarded", "pts"]) ? "" : deny("sub update");
     if (op === "delete") return uid && before.owner === uid ? "" : deny();
+  }
+  if (p[0] === "boards" && p.length === 2) {
+    if (op === "get") return "";
+    if (op === "create") { const c = get("classes/" + p[1]); return uid && after.owner === uid && c && c.owner === uid ? "" : deny("board create"); }
+    if (op === "update") return uid && before.owner === uid && after.owner === uid ? "" : deny();
+    if (op === "delete") return uid && before.owner === uid ? "" : deny();
+    return deny();
   }
   return "no rule for " + path;
 }

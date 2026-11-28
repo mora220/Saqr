@@ -132,6 +132,12 @@ const Cloud = {
     await Promise.all(subs.docs.map(d => deleteDoc(d.ref)));
     await deleteDoc(doc(db, "hw", id));
   },
+  // ---- weekly leaderboard: boards/{classId} (first names only), readable by the class with the id ----
+  saveBoard: (cid, data) => setDoc(doc(db, "boards", cid), { ...data, owner: uid, at: Date.now() }),
+  watchBoard: (cid, cb) => onSnapshot(doc(db, "boards", cid), d => cb(d.exists() ? d.data() : null), () => cb(null)),
+  // ---- student asks for a reward from the shop (teacher approves) ----
+  requestReward: (code, req) => updateDoc(doc(db, "kids", code), { req }),
+  clearReq: code => updateDoc(doc(db, "kids", code), { req: deleteField() }),
   // live list of this teacher's classes; cb(classes, hasLocalPendingWrites)
   listen(cb, onErr) {
     if (unsub) unsub();

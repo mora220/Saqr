@@ -58,6 +58,16 @@ service cloud.firestore {
       allow delete: if request.auth != null && resource.data.owner == request.auth.uid;
     }
 
+    // لوحة صدارة الفصل: الطالب بيقراها برقم الفصل، وفيها الاسم الأول بس
+    match /boards/{cid} {
+      allow get: if true;
+      allow create: if request.auth != null && request.resource.data.owner == request.auth.uid
+        && exists(/databases/$(database)/documents/classes/$(cid))
+        && get(/databases/$(database)/documents/classes/$(cid)).data.owner == request.auth.uid;
+      allow update: if request.auth != null && resource.data.owner == request.auth.uid && request.resource.data.owner == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.owner == request.auth.uid;
+    }
+
     // فصول المعلم: يشوفها ويعدّلها صاحبها بس
     match /classes/{classId} {
       allow read, delete: if request.auth != null && resource.data.owner == request.auth.uid;
@@ -92,6 +102,14 @@ service cloud.firestore {
           && request.resource.data.look.body is string && request.resource.data.look.body.size() <= 9
           && request.resource.data.look.acc is string && request.resource.data.look.acc.size() <= 12
           && request.resource.data.lookAt is int)
+        ||
+        // الطالب يطلب مكافأة من المتجر في حدود رصيده، أو يلغي طلبه
+        (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['req'])
+          && (!('req' in request.resource.data)
+            || (request.resource.data.req.keys().hasOnly(['id', 't', 'e', 'c', 'at'])
+              && request.resource.data.req.t is string && request.resource.data.req.t.size() <= 40
+              && request.resource.data.req.e is string && request.resource.data.req.e.size() <= 12
+              && request.resource.data.req.c is int && request.resource.data.req.c <= resource.data.get('balance', 0))))
         ||
         // ولي الأمر يربط / يفك حسابه بالطالب
         (request.auth != null
