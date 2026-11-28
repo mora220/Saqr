@@ -25,3 +25,4 @@ for f in pathlib.Path("src/emoji").glob("*"):
 shutil.copy("node_modules/lottie-web/build/player/lottie_light.min.js","dist/lottie.js")
 pathlib.Path("dist/lottie").mkdir(exist_ok=True)
 for f in pathlib.Path("src/lottie").glob("*.json"): shutil.copy(f,"dist/lottie/"+f.name)
+subprocess.run(["npx","esbuild","node_modules/qrcode-generator/dist/qrcode.js","--minify","--outfile=dist/qr.js"],check=True)

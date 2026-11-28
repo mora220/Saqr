@@ -45,6 +45,9 @@ const Cloud = {
   // ---- roles ----
   async getRole() { const d = await getDoc(doc(db, "users", uid)); return d.exists() ? d.data().role : null; },
   setRole: (role, name) => setDoc(doc(db, "users", uid), { role, name: name || "", at: serverTimestamp() }, { merge: true }),
+  // ---- teacher's own doc (question banks) ----
+  listenMe(cb) { return onSnapshot(doc(db, "users", uid), d => cb(d.exists() ? d.data() : {}, d.metadata.hasPendingWrites), () => {}); },
+  saveBanks: banks => setDoc(doc(db, "users", uid), { banks }, { merge: true }),
   // ---- parent side ----
   listenParent(cb) {
     if (unsubParent) unsubParent();
