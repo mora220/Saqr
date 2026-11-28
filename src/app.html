@@ -536,6 +536,45 @@ body.board .stage{height:46vh}body.board .stg-st .av{width:min(30vh,240px);heigh
 .wptr{position:absolute;top:-8px;left:50%;margin-left:-18px;width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:34px solid #e8384f;filter:drop-shadow(0 4px 4px rgba(0,0,0,.3));transform-origin:50% 0}
 .wres{background:#fff;border-radius:22px;padding:12px;margin-top:10px;box-shadow:0 10px 24px rgba(0,0,0,.12);border-top:8px solid var(--c);text-align:center;font-size:1.2rem}
 body.board .wheelw{width:min(62vh,600px)}body.board .cgame{height:78vh}body.board .rscene{height:56vh}
+/* ===== lively games 2 ===== */
+.oralq{display:flex;align-items:center;gap:12px;padding:10px 4px;text-align:right}.oralq .fe{width:54px;height:54px;flex:none}.oralq b{display:block;font-size:1.25rem}.oralq small{color:var(--mut,#667);font-weight:600}
+body.board .oralq b{font-size:2rem}
+.podium.solo{justify-content:center}.podium.solo .pd{width:46%}
+.tugscene{position:relative;height:clamp(230px,40vh,460px);border-radius:24px;overflow:hidden;margin:6px 0}
+.tsc{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;z-index:4}.tsc span{color:#fff;font-weight:800;border-radius:12px;padding:3px 12px;box-shadow:0 4px 10px rgba(0,0,0,.2)}
+.tline{position:absolute;left:50%;top:30%;bottom:6%;width:6px;margin-left:-3px;background:repeating-linear-gradient(0deg,#fff 0 10px,transparent 10px 20px);z-index:2;opacity:.9}
+.tzone{position:absolute;top:58%;bottom:6%;width:8px;border-radius:6px;z-index:2;opacity:.9}.tzone.za{right:24%}.tzone.zb{left:24%}
+.tmove{position:absolute;left:0;right:0;top:0;bottom:0;z-index:3}
+.rope{position:absolute;left:4%;right:4%;top:66%;height:12px;margin-top:-6px;border-radius:8px;background:repeating-linear-gradient(115deg,#c98a4a 0 10px,#a96a2c 10px 20px);box-shadow:0 4px 6px rgba(0,0,0,.2)}
+.rope .rib{position:absolute;left:50%;top:-12px;width:14px;height:36px;margin-left:-7px;background:#e8384f;border-radius:4px;box-shadow:0 0 0 3px #fff}
+.crew{position:absolute;top:40%;display:flex;gap:0}.crew.ca{right:2%;flex-direction:row-reverse}.crew.cb{left:2%}
+.tf{width:clamp(56px,9vh,100px);height:clamp(56px,9vh,100px);margin:0 -10px;filter:drop-shadow(0 6px 5px rgba(0,0,0,.25))}.tfb{transform:scaleX(-1)}
+.eggscene{position:relative;height:clamp(300px,52vh,560px);border-radius:24px;overflow:hidden;margin:6px 0}
+.nest{position:absolute;left:50%;bottom:6%;width:min(70%,340px);transform:translateX(-50%);z-index:3}.nest svg{width:100%}
+.egg{position:absolute;left:50%;bottom:12%;width:min(38%,200px);margin-left:calc(min(38%,200px) / -2);background:none;z-index:2;filter:drop-shadow(0 12px 12px rgba(0,0,0,.25))}.egg svg{width:100%;display:block}
+.hatch{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:4;padding-bottom:12%}.hatch .av{width:min(44vh,190px);height:min(44vh,190px);filter:drop-shadow(0 10px 14px rgba(0,0,0,.3))}
+.eggtip{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:5;background:#fff;border-radius:16px;padding:6px 16px;font-weight:800;box-shadow:0 6px 14px rgba(0,0,0,.15);white-space:nowrap}
+.chpick{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px}.chpick button{background:#fff;border-radius:16px;padding:8px 4px;font-weight:700;font-size:.85rem;box-shadow:0 4px 12px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;gap:4px}.chpick .av{width:54px;height:54px}
+.trs{position:relative;border-radius:24px;overflow:hidden;padding:12px 10px 18px;margin:6px 0;min-height:340px}
+.trwho{position:relative;z-index:2;display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(255,255,255,.92);border-radius:18px;padding:6px 12px;width:max-content;max-width:100%;margin:0 auto 10px;font-weight:700}.trwho .av{width:48px;height:48px}
+.chests{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:70px}
+.chest{position:relative;background:none;padding-top:30px}.chest svg{width:100%;display:block;filter:drop-shadow(0 8px 8px rgba(0,0,0,.25));overflow:visible}
+.chest .sand{position:absolute;left:5%;right:5%;bottom:-6px;height:22px;border-radius:50%;background:#d4913b;opacity:.6}
+.chest .prize{position:absolute;left:0;right:0;top:20px;display:flex;flex-direction:column;align-items:center;opacity:0;z-index:3;pointer-events:none}.chest .prize .fe{width:44px;height:44px}.chest .prize b{background:#fff;border-radius:10px;padding:0 8px;font-size:.95rem;box-shadow:0 4px 10px rgba(0,0,0,.15);white-space:nowrap}
+.chest.open:not(.peek) .prize{filter:drop-shadow(0 0 12px #ffd84d)}
+body.board .chests{max-width:900px;margin:90px auto 0}body.board .chest .prize b{font-size:1.6rem}body.board .chest .prize .fe{width:80px;height:80px}
+.mprev{width:70px;height:90px;border-radius:14px;background:#fff;display:grid;place-items:center;transform:rotate(var(--r));box-shadow:0 8px 16px rgba(0,0,0,.2)}.mprev .fe{width:48px;height:48px}.mprev b{font-size:2rem;color:#7b5cd6}
+.memhud{display:flex;gap:10px;margin-bottom:10px}.mt{flex:1;border-radius:16px;padding:8px 12px;display:flex;justify-content:space-between;align-items:center;background:#fff;border:3px solid transparent;box-shadow:0 4px 12px rgba(0,0,0,.08);opacity:.6;transition:.3s}
+.mt.on{opacity:1;border-color:var(--c);transform:scale(1.04)}.mt b{color:var(--c)}.mt span{font-size:1.6rem;font-weight:800;color:var(--c)}
+.memg{display:grid;gap:8px;perspective:900px}
+.mc{position:relative;aspect-ratio:3/4;background:none;transform-style:preserve-3d;transition:transform .45s cubic-bezier(.3,1.4,.6,1)}
+.mc.up{transform:rotateY(180deg)}
+.mc>span{position:absolute;inset:0;border-radius:14px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:grid;place-items:center;box-shadow:0 6px 12px rgba(0,0,0,.15)}
+.mfront{background:linear-gradient(150deg,#7b5cd6,#4b37a8);padding:14%}.mfront svg{width:100%;height:100%}
+.mback{background:#fff;transform:rotateY(180deg);padding:6px;font-weight:800;font-size:clamp(.72rem,2.6vw,1.1rem);line-height:1.3;text-align:center;unicode-bidi:plaintext;overflow:hidden}
+.mback .fe{width:62%;height:auto}.mback.q{background:#eef3ff;color:#27407a}.mback.a{background:#fff6dc;color:#8a5a00}
+.mc.done .mback{box-shadow:0 0 0 4px #22b573,0 6px 12px rgba(0,0,0,.15)}.mc.done{opacity:.85}
+body.board .memg{max-width:min(140vh,1100px);margin:0 auto}body.board .mback{font-size:clamp(1rem,1.8vw,1.8rem)}
 /* ---------- fx ---------- */
 #fx{position:fixed;inset:0;pointer-events:none;z-index:80}
 .float{direction:ltr;position:fixed;font-weight:800;font-size:2.2rem;z-index:90;pointer-events:none;text-shadow:0 3px 0 rgba(0,0,0,.12)}
@@ -944,7 +983,7 @@ function render(){
 function refreshCard(id){ const s=stu(id), el=document.querySelector(`.card[data-id="${id}"]`); if(!s||!el) return; el.outerHTML = cardHTML(s); renderStats(); }
 
 /* ---------- modal helpers ---------- */
-const BOARDABLE=/id="(spT|qzAv|rcQ|rf0|tTxt|nFace|spAv|agrid|rwAv|luAv)"|class="groups"/;
+const BOARDABLE=/id="(spT|qzAv|rcQ|rf0|tTxt|nFace|spAv|agrid|rwAv|luAv|cgame|wheel|cdown|rwL|ceL|cgGo|rcGo|tugA|tgGo|eggB|chB|memG|mgGo)"|class="groups"/;
 function openSheet(html, onClose){ $("#toast").classList.remove("show"); const pf=$("#ov")._close; if(pf && $("#ov").classList.contains("show")){ const ct=(document.querySelector(".tb.on")||{dataset:{}}).dataset.tab; $("#ov")._close=null; try{ pf(); }catch(e){} if(ct) setTab(ct); } $("#sheet").innerHTML = `<button class="x" onclick="closeSheet()">✕</button>` + (BOARDABLE.test(html)&&!BOARD?`<button class="bbtn" onclick="setBoard(true)">${icon("tv")} السبورة</button>`:"") + html; $("#ov").classList.add("show"); $("#ov")._close=onClose;
   gsap.fromTo("#sheet",{y:60,opacity:0},{y:0,opacity:1,duration:.35,ease:"back.out(1.4)"}); }
 function closeSheet(){ setTab("home"); const f=$("#ov")._close; $("#ov")._close=null; if(f) f(); $("#ov").classList.remove("show"); }
@@ -1649,7 +1688,7 @@ function openBanks(){
   openSheet(`<h2>📚 بنوك الأسئلة والمنهج</h2>
     <button class="aibtn" id="aiBook"><span class="aiic">✨</span><span class="grow"><b>حوّل كتاب المنهج لبنك أسئلة</b><small>ارفع ملف الكتاب PDF، والذكاء الاصطناعي يرتّبه وحدات ودروس ويطلّع أسئلة لكل درس</small></span><span class="chev">‹</span></button>
     <div class="list">${B.map(b=>`<button class="li" data-b="${b.id}" style="width:100%;text-align:right"><span class="big-e">${emo("📚")}</span><div class="grow"><b>${esc(b.title)}</b><small>${b.units.length} وحدة · ${bankCount(b)} سؤال</small></div><span class="chev" style="color:#b6bfd3">‹</span></button>`).join("")||"<p class='hint'>لسه مفيش بنوك</p>"}</div>
-    <div class="row" style="margin-top:12px"><input class="field" id="nbT" placeholder="اسم البنك — مثلاً: رياضيات خامس ف1" style="flex:1"><button class="btn pri" id="nbGo">➕ إنشاء</button></div>`, ()=>setTab("home"));
+    <div class="row" style="margin-top:12px"><input class="field" id="nbT" placeholder="اسم البنك — مثلاً: علوم خامس ف1" style="flex:1"><button class="btn pri" id="nbGo">➕ إنشاء</button></div>`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
   document.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>openBankEd(b.dataset.b));
   $("#aiBook").onclick=openAIBook;
@@ -1689,41 +1728,33 @@ function openLessonEd(bid,ui,li){
 }
 
 /* ---------- educational games ---------- */
-const GSET={src:"math", op:"mix", lvl:"easy", pts:1, bank:null, unit:"*", lesson:"*"};
+const GSET={src:"oral", pts:1, bank:null, unit:"*", lesson:"*"};
 const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
-function mathQ(op,lvl){
-  const ops=op==="mix"?["+","−","×","÷"]:[op], o=ops[rnd(0,ops.length-1)]; let a,b,ans;
-  const R={easy:{as:[10,99],m:[2,10],d:[2,10]},mid:{as:[100,999],m:[11,99],d:[2,12]},hard:{as:[1000,9999],m:[11,99],d:[11,25]}}[lvl];
-  if(o==="+"){ a=rnd(...R.as); b=rnd(...R.as); ans=a+b; }
-  else if(o==="−"){ a=rnd(...R.as); b=rnd(R.as[0],a); ans=a-b; }
-  else if(o==="×"){ a=rnd(...R.m); b=lvl==="hard"?rnd(11,99):rnd(2,lvl==="mid"?9:10); ans=a*b; }
-  else { b=rnd(...R.d); ans=lvl==="easy"?rnd(2,10):lvl==="mid"?rnd(10,99):rnd(10,60); a=b*ans; }
-  return {q:`${a} ${o} ${b} = ?`, a:String(ans), math:true};
-}
+const hasBankQs=()=>(S.banks||[]).some(x=>bankCount(x));
 function bankPool(){ const b=(S.banks||[]).find(x=>x.id===GSET.bank)||(S.banks||[])[0]; if(!b) return [];
   const us=b.units.filter(u=>GSET.unit==="*"||u.id===GSET.unit); const out=[];
   us.forEach(u=>u.lessons.filter(l=>GSET.lesson==="*"||l.id===GSET.lesson).forEach(l=>out.push(...l.qs))); return out; }
-let lastQ=null;
+let lastQ=null, srcInit=false;
 function nextQ(){
   if(GSET.src==="bank"){ const pool=bankPool(); if(pool.length){ let it=pool[rnd(0,pool.length-1)]; if(pool.length>1&&it===lastQ) it=pool[(pool.indexOf(it)+1)%pool.length]; lastQ=it;
-      return {q:it.q,a:it.a,ch:it.ch?[...it.ch].sort(()=>Math.random()-.5):null,math:false}; } }
-  return mathQ(GSET.op,GSET.lvl); }
+      return {q:it.q,a:it.a,ch:it.ch?[...it.ch].sort(()=>Math.random()-.5):null,math:String(it.q).length<=16}; } }
+  return {q:"🎤 اسأل سؤالك للفصل",a:"",oral:true}; }
 const qHTML=q=>(q.math?`<div class="qbig">${esc(q.q)}</div>`:`<div class="qtext">${esc(q.q)}</div>`)+(q.ch?`<div class="opts">${q.ch.map((o,i)=>`<div class="opt" ${o===q.a?"data-ok":""}><i>${"أبجد"[i]}</i>${esc(o)}</div>`).join("")}</div>`:"");
+const qCard=q=>q.oral?`<div class="oralq">${emo("🗣")}<div><b>اسأل سؤالك شفهياً</b><small>أي مادة، أي سؤال — وبعدين حدّد مين جاوب صح 👇</small></div></div>`:(q.math?`<div class="qbig">${esc(q.q)}</div>`:`<div class="qtext">${esc(q.q)}</div>`);
 const markOk=()=>document.querySelectorAll(".opt[data-ok]").forEach(o=>o.classList.add("ok"));
-function srcPicker(){ migrateQs(); const B=S.banks||[]; if(GSET.src==="bank"&&!B.find(x=>x.id===GSET.bank)) GSET.bank=B[0]&&B[0].id;
+function srcPicker(){ migrateQs(); const B=S.banks||[];
+  if(!srcInit){ srcInit=true; if(hasBankQs()) GSET.src="bank"; }
+  if(GSET.src==="bank"&&!hasBankQs()) GSET.src="oral";
+  if(GSET.src==="bank"&&!B.find(x=>x.id===GSET.bank)) GSET.bank=B[0]&&B[0].id;
   const b=B.find(x=>x.id===GSET.bank), u=b&&b.units.find(x=>x.id===GSET.unit);
-  return `<div class="seg2"><button data-src="math" class="${GSET.src==="math"?"on":""}">🧮 حساب تلقائي</button><button data-src="bank" class="${GSET.src==="bank"?"on":""}">📚 بنك المنهج (${B.reduce((a,x)=>a+bankCount(x),0)})</button></div>
+  return `<div class="seg2"><button data-src="oral" class="${GSET.src==="oral"?"on":""}">🎤 أسئلة المعلم</button><button data-src="bank" class="${GSET.src==="bank"?"on":""}">📚 بنك الأسئلة (${B.reduce((a,x)=>a+bankCount(x),0)})</button></div>
   ${GSET.src==="bank"&&b?`<select class="bsel" id="gsB">${B.map(x=>`<option value="${x.id}" ${x.id===b.id?"selected":""}>${esc(x.title)} (${bankCount(x)})</option>`).join("")}</select>
     <div class="row" style="gap:6px"><select class="bsel" id="gsU" style="flex:1"><option value="*">كل الوحدات</option>${b.units.map(x=>`<option value="${x.id}" ${x.id===GSET.unit?"selected":""}>${esc(x.name)} (${unitCount(x)})</option>`).join("")}</select>
-    <select class="bsel" id="gsL" style="flex:1"><option value="*">كل الدروس</option>${(u?u.lessons:[]).map(x=>`<option value="${x.id}" ${x.id===GSET.lesson?"selected":""}>${esc(x.name)} (${x.qs.length})</option>`).join("")}</select></div>`:""}
-  ${GSET.src==="math"?`<div class="seg2">${[["mix","مخلوط"],["+","جمع"],["−","طرح"],["×","ضرب"],["÷","قسمة"]].map(([k,t])=>`<button data-op="${k}" class="${GSET.op===k?"on":""}">${t}</button>`).join("")}</div>
-  <div class="seg2">${[["easy","سهل"],["mid","متوسط"],["hard","صعب"]].map(([k,t])=>`<button data-lv="${k}" class="${GSET.lvl===k?"on":""}">${t}</button>`).join("")}</div>`:""}`; }
-function bindSrc(redraw){ document.querySelectorAll("[data-src]").forEach(b=>b.onclick=()=>{ if(b.dataset.src==="bank"&&!(S.banks||[]).some(x=>bankCount(x))){ toast("ضيف أسئلة في بنك المنهج الأول"); openBanks(); return; } GSET.src=b.dataset.src; redraw(); });
+    <select class="bsel" id="gsL" style="flex:1"><option value="*">كل الدروس</option>${(u?u.lessons:[]).map(x=>`<option value="${x.id}" ${x.id===GSET.lesson?"selected":""}>${esc(x.name)} (${x.qs.length})</option>`).join("")}</select></div>`:""}`; }
+function bindSrc(redraw){ document.querySelectorAll("[data-src]").forEach(b=>b.onclick=()=>{ if(b.dataset.src==="bank"&&!hasBankQs()){ toast("ضيف أسئلة في بنك الأسئلة الأول"); openBanks(); return; } GSET.src=b.dataset.src; redraw(); });
   if($("#gsB")) $("#gsB").onchange=e=>{ GSET.bank=e.target.value; GSET.unit="*"; GSET.lesson="*"; redraw(); };
   if($("#gsU")) $("#gsU").onchange=e=>{ GSET.unit=e.target.value; GSET.lesson="*"; redraw(); };
-  if($("#gsL")) $("#gsL").onchange=e=>{ GSET.lesson=e.target.value; redraw(); };
-  document.querySelectorAll("[data-op]").forEach(b=>b.onclick=()=>{ GSET.op=b.dataset.op; redraw(); });
-  document.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{ GSET.lvl=b.dataset.lv; redraw(); }); }
+  if($("#gsL")) $("#gsL").onchange=e=>{ GSET.lesson=e.target.value; redraw(); }; }
 function stillOpen(id){ return $("#ov").classList.contains("show") && document.getElementById(id); }
 
 /* ===== game scene engine (illustrated Saudi sky & desert) ===== */
@@ -1750,7 +1781,7 @@ function gameHUD(items){ return `<div class="ghud">${items.map(([e,t,id])=>`<spa
 const KCOL=[{c:"#e8384f",s:"▲"},{c:"#2d7ff9",s:"◆"},{c:"#f5b301",s:"●"},{c:"#22b573",s:"■"}];
 // choices for any question: bank choices, else distractors from math or from other answers
 function withChoices(q){
-  if(q.ch&&q.ch.length>1) return q;
+  if(q.oral||(q.ch&&q.ch.length>1)) return q;
   const a=q.a, n=Number(String(a).replace(/[,٬\s]/g,""));
   let w=[];
   if(!isNaN(n)&&String(a).trim()!==""){ const cand=[n+1,n-1,n+10,n-10,n+2,n*10,Math.round(n/10),n+5,n-5,n+100,n-100,Number(String(Math.abs(n)).split("").reverse().join(""))].filter(x=>x>=0&&x!==n&&Number.isFinite(x));
@@ -1762,40 +1793,20 @@ function withChoices(q){
 }
 
 function openGames(){
-  const G=[["cloud","☁️","صيد الغيوم","الإجابات طايرة في السما — الطالب يطلع يلمس الغيمة الصح والصقر يطير يصطادها!","#4fb3ff","#2d7ff9"],
+  const G=[["cloud","☁️","صيد الغيوم","الإجابات طايرة في السما — الطالب يلمس الغيمة الصح والصقر يطير يصطادها!","#4fb3ff","#2d7ff9"],
+    ["tug","🪢","شد الحبل","فريقين بيشدّوا الحبل — كل إجابة صح الحبل يتسحب ناحيتكم!","#ff8a3d","#c2452d"],
     ["race","🏁","سباق الأسراب","الفصل أسراب بتتسابق فوق الصحرا — كل إجابة صح الصقر ينطلق قدام!","#22b573","#0f8c6e"],
-    ["wheel","🎡","عجلة الصقر","لفّ العجلة: نقاط، أسئلة مضاعفة، مفاجآت… والصقر يختار مين يجاوب!","#ff8a3d","#e8384f"],
-    ["quiz","🎯","سؤال الصقر","الصقر يختار طالب وسط تشويق، وسؤال بأربع اختيارات ملونة وعدّاد وقت","#7b5cd6","#4b37a8"],
-    ["sprint","⚡","الحساب الذهني","مسائل ورا بعض بعدّاد — مين يحسب الأسرع؟","#f5b301","#e08a00"],
-    ["bank","📚","بنوك الأسئلة",`أسئلة المنهج بالوحدات والدروس (${(S.banks||[]).reduce((a,x)=>a+bankCount(x),0)} سؤال)`,"#5b6b8c","#27407a"]];
-  openSheet(`<h2>🎮 الألعاب التعليمية</h2><p class="hint">اعرض اللعبة على السبورة (📺) والعب مع الفصل — النقاط بتتسجّل تلقائياً 🦅</p>
-    <div class="gcards2">${G.map(([k,e,t,d,c1,c2])=>`<button class="gc2" data-g="${k}" style="--c1:${c1};--c2:${c2}"><span class="gsky">${k==="bank"?"":sceneSVG({night:k==="quiz"})}</span><span class="gface">${emo(e)}</span><span class="gtxt"><b>${t}</b><small>${d}</small></span></button>`).join("")}</div>`, ()=>setTab("home"));
+    ["egg","🥚","بيضة المفاجأة","البيضة بتتهزّ وتتشقّق… ويطلع منها اسم الطالب اللي عليه الدور!","#f7b733","#d9822b"],
+    ["wheel","🎡","عجلة الصقر","لفّ العجلة: نقاط، أسئلة مضاعفة، مفاجآت… والصقر يختار مين يجاوب!","#ff5d9a","#b8327a"],
+    ["chest","💎","كنز الصحراء","اللي جاوب صح يختار صندوق من الكنوز المدفونة… جايز نقاط وجايز مفاجأة!","#2e9c9a","#17606b"],
+    ["memory","🃏","صقر الذاكرة","اقلب كارتين وطابقهم — فريقين بيتنافسوا مين ذاكرته أقوى!","#7b5cd6","#4b37a8"],
+    ["quiz","🎯","سؤال الصقر","الصقر يختار طالب وسط تشويق، وسؤال بعدّاد وقت واختيارات ملونة","#3d5bd9","#26318f"],
+    ["bank","📚","بنوك الأسئلة",`أسئلة أي مادة بالوحدات والدروس (${(S.banks||[]).reduce((a,x)=>a+bankCount(x),0)} سؤال)`,"#5b6b8c","#27407a"]];
+  openSheet(`<h2>🎮 الألعاب التعليمية</h2><p class="hint">ألعاب لأي مادة — اسأل شفهياً أو من بنك الأسئلة، واعرضها على السبورة (📺). النقاط بتتسجّل تلقائياً 🦅</p>
+    <div class="gcards2">${G.map(([k,e,t,d,c1,c2])=>`<button class="gc2" data-g="${k}" style="--c1:${c1};--c2:${c2}"><span class="gsky">${k==="bank"?"":sceneSVG({night:k==="quiz"||k==="memory"})}</span><span class="gface">${emo(e)}</span><span class="gtxt"><b>${t}</b><small>${d}</small></span></button>`).join("")}</div>`, ()=>setTab("home"));
   gsap.from(".gc2",{y:30,opacity:0,stagger:.06,duration:.45,ease:"back.out(1.6)"});
-  document.querySelectorAll(".gc2").forEach(b=>b.onclick=()=>{ ac(); const g=b.dataset.g; ({cloud:cloudSetup,race:raceSetup,wheel:wheelGame,quiz:quizGame,sprint:sprintGame,bank:openBanks})[g](); });
+  document.querySelectorAll(".gc2").forEach(b=>b.onclick=()=>{ ac(); const g=b.dataset.g; ({cloud:cloudSetup,tug:tugSetup,race:raceSetup,egg:eggGame,wheel:wheelGame,chest:chestGame,memory:memSetup,quiz:quizGame,bank:openBanks})[g](); });
 }
-
-function sprintGame(){
-  let q=nextQ(), shown=false, sec=15, left=sec, tid=null, n=0;
-  const C=2*Math.PI*52;
-  const stop=()=>{ clearInterval(tid); tid=null; };
-  const draw=()=>{ openSheet(`<h2>⚡ الحساب الذهني</h2>${srcPicker()}
-    <div class="seg2"><span style="align-self:center;font-weight:700">الوقت:</span>${[10,15,30,60].map(t=>`<button data-sec="${t}" class="${sec===t?"on":""}">${t} ث</button>`).join("")}</div>
-    <div class="cring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" stroke="#eef1f8" stroke-width="12" fill="none"/><circle id="spArc" cx="60" cy="60" r="52" stroke="#ff8a3d" stroke-width="12" fill="none" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="0"/></svg><b id="spT">${left}</b></div>
-    <div id="spQ">${qHTML(q)}</div><div class="qans" id="spA">${shown?esc(q.a):""}</div>
-    <div class="row" style="justify-content:center"><button class="btn vio" id="spShow">👀 الإجابة</button><button class="btn pri" id="spNext">التالي ⬅</button></div>
-    <p class="hint" style="text-align:center">مسألة رقم ${n+1}</p>`, stop);
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
-    bindSrc(()=>{ stop(); q=nextQ(); shown=false; left=sec; draw(); run(); });
-    document.querySelectorAll("[data-sec]").forEach(b=>b.onclick=()=>{ sec=+b.dataset.sec; stop(); left=sec; draw(); run(); });
-    $("#spShow").onclick=()=>{ shown=true; stop(); $("#spA").textContent=q.a; markOk(); SFX.pick(); gsap.fromTo("#spA",{scale:.3},{scale:1,duration:.5,ease:"back.out(2)"}); };
-    $("#spNext").onclick=()=>{ stop(); q=nextQ(); shown=false; left=sec; n++; draw(); run(); gsap.from("#spQ",{x:-60,opacity:0,duration:.35}); };
-  };
-  const run=()=>{ stop(); tid=setInterval(()=>{ if(!stillOpen("spT")){ stop(); return; } left--; $("#spT").textContent=Math.max(0,left);
-      $("#spArc").style.strokeDashoffset=C*(1-left/sec); if(left<=3&&left>0) SFX.tick();
-      if(left<=0){ stop(); SFX.alarm(); shown=true; $("#spA").textContent=q.a; markOk(); } },1000); };
-  draw(); run();
-}
-
 
 /* ===== سؤال الصقر — stage, drumroll pick, coloured answer tiles, timer ===== */
 function quizGame(){
@@ -1809,9 +1820,9 @@ function quizGame(){
     <div class="stage"><span class="lights"></span>${sceneSVG({night:true})}
       <div class="stg-st"><div class="av" id="qzAv">${avatar(cur,"idle")}</div><div class="stg-nm" id="qzNm">${esc(cur.name)}</div></div>
       <div class="qring"><svg viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" stroke="rgba(255,255,255,.25)" stroke-width="7" fill="none"/><circle id="qzArc" cx="35" cy="35" r="30" stroke="#ffd84d" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="${C}"/></svg><b id="qzT">${left}</b></div></div>
-    <div class="qcard" id="qzQ">${q.math?`<div class="qbig">${esc(q.q)}</div>`:`<div class="qtext">${esc(q.q)}</div>`}</div>
+    <div class="qcard" id="qzQ">${qCard(q)}</div>
     ${q.ch?`<div class="ktiles">${q.ch.map((o,i)=>`<button class="kt2" data-o="${esc(o)}" style="background:${KCOL[i].c}"><span>${KCOL[i].s}</span>${esc(o)}</button>`).join("")}</div>`
-      :`<div class="qans" id="qzA"></div><div class="tbtns"><button style="background:#22b573" id="qzOk">✅ صح</button><button style="background:#e8384f" id="qzNo">❌ غلط</button></div><div class="row" style="justify-content:center;margin-top:8px"><button class="btn vio" id="qzShow">👀 الإجابة</button></div>`}
+      :`<div class="qans" id="qzA"></div><div class="tbtns"><button style="background:#22b573" id="qzOk">✅ صح</button><button style="background:#e8384f" id="qzNo">❌ غلط</button></div>${q.oral?"":`<div class="row" style="justify-content:center;margin-top:8px"><button class="btn vio" id="qzShow">👀 الإجابة</button></div>`}`}
     <div class="row" style="justify-content:space-between;margin-top:10px"><button class="btn" id="qzSkip">🔄 طالب تاني</button><span class="hint" style="margin:0">صح ${right} من ${asked}</span></div>`, stop);
     gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
     bindSrc(()=>{ q=withChoices(nextQ()); done=false; left=sec; draw(); run(); });
@@ -1874,11 +1885,11 @@ function raceView(countdown){
       ${R.teams.map((t,i)=>`<div class="rlane" style="top:${8+i*(84/R.teams.length)}%;height:${84/R.teams.length}%"><span class="rtag" style="background:${t.color}">${t.name.replace("سرب ","")} <b>${t.score}</b></span>
         <span class="rbird" id="rb${i}" style="right:calc(${pos(t)*84}% + 4%)">${falconSVG({level:t.score>=R.goal?2:1,body:t.color,mood:"happy"})}</span></div>`).join("")}
       <div class="cdown" id="cdown"></div></div>
-    ${R.done?"":`<div class="qcard">${R.q.math?`<div class="qbig">${esc(R.q.q)}</div>`:`<div class="qtext">${esc(R.q.q)}</div>`}
+    ${R.done?"":`<div class="qcard">${qCard(R.q)}
       ${R.q.ch?`<div class="opts">${R.q.ch.map((o,i)=>`<div class="opt" ${o===R.q.a?"data-ok":""}><i style="background:${KCOL[i].c}">${KCOL[i].s}</i>${esc(o)}</div>`).join("")}</div>`:""}<div class="qans" id="rcA">${R.shown?esc(R.q.a):""}</div></div>
     <p class="hint" style="text-align:center;margin:4px 0 8px">مين جاوب صح؟ دوس على السرب 👇</p>
     <div class="tbtns">${R.teams.map((t,i)=>`<button style="background:${t.color}" data-tm="${i}">${t.name}</button>`).join("")}</div>
-    <div class="row" style="justify-content:center;margin-top:10px"><button class="btn vio" id="rcShow">👀 الإجابة</button><button class="btn" id="rcNext">سؤال تاني ⬅</button><button class="btn" id="rcMem">👥 الأعضاء</button></div>`}`, ()=>setTab("home"));
+    <div class="row" style="justify-content:center;margin-top:10px">${R.q.oral?"":`<button class="btn vio" id="rcShow">👀 الإجابة</button><button class="btn" id="rcNext">سؤال تاني ⬅</button>`}<button class="btn" id="rcMem">👥 الأعضاء</button></div>`}`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
   document.querySelectorAll(".rbird .fal").forEach(f=>f.classList.add("flap"));
   document.querySelectorAll(".rbird").forEach((b,i)=>gsap.to(b,{y:-6,duration:.7+i*.13,yoyo:true,repeat:-1,ease:"sine.inOut"}));
@@ -1886,8 +1897,8 @@ function raceView(countdown){
     const tick=()=>{ if(!stillOpen("cdown")) return; if(k<seq.length){ el.textContent=seq[k]; k===3?SFX.level():SFX.tick(); gsap.fromTo(el,{scale:2.4,opacity:0},{scale:1,opacity:1,duration:.45,ease:"back.out(2)"}); k++; setTimeout(tick,750); } else gsap.to(el,{opacity:0,duration:.3}); };
     tick(); }
   if(R.done) return;
-  $("#rcShow").onclick=()=>{ R.shown=true; $("#rcA").textContent=R.q.a; markOk(); SFX.pick(); };
-  $("#rcNext").onclick=()=>{ R.q=withChoices(nextQ()); R.shown=false; raceView(); };
+  if($("#rcShow")) $("#rcShow").onclick=()=>{ R.shown=true; $("#rcA").textContent=R.q.a; markOk(); SFX.pick(); };
+  if($("#rcNext")) $("#rcNext").onclick=()=>{ R.q=withChoices(nextQ()); R.shown=false; raceView(); };
   $("#rcMem").onclick=()=>{ openSheet(`<h2>👥 أعضاء الأسراب</h2><div class="groups">${R.teams.map(t=>`<div class="grp" style="border-top:6px solid ${t.color}"><h3>${t.name}</h3>${t.members.map(id=>stu(id)).filter(Boolean).map(s=>`<div class="m"><span class="av">${avatar(s)}</span>${esc(s.name)}</div>`).join("")}</div>`).join("")}</div>
     <div class="row" style="margin-top:12px"><button class="btn pri" id="rcBack">↩ رجوع للسباق</button></div>`); $("#rcBack").onclick=()=>raceView(); };
   document.querySelectorAll("[data-tm]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.tm, t=R.teams[i]; if(R.lock) return; R.lock=true; t.score++; SFX.whoosh(); SFX.pos();
@@ -1916,6 +1927,8 @@ function raceWin(t){
 
 /* ===== صيد الغيوم — tap the right cloud, the falcon swoops to catch it ===== */
 let CG=null;
+function cloudSrc(){ if(!hasBankQs()) return `<div class="oralq" style="background:#fff6dc;border-radius:16px;padding:10px">${emo("📚")}<div><b>اللعبة دي محتاجة بنك أسئلة</b><small>ارفع كتاب أي مادة والذكاء الاصطناعي يحوّله لأسئلة باختيارات</small><div><button class="btn pri" id="cgBank" style="margin-top:6px">📚 افتح بنوك الأسئلة</button></div></div></div>`;
+  GSET.src="bank"; return srcPicker().replace(/<div class="seg2">[\s\S]*?<\/div>/,""); }
 function cloudSetup(){
   let rounds=10, who="class";
   const draw=()=>{ openSheet(`<h2>☁️ صيد الغيوم</h2>
@@ -1923,19 +1936,19 @@ function cloudSetup(){
     <p class="hint">السؤال بيظهر فوق، والإجابات جوه غيوم طايرة. الطالب يطلع السبورة ويلمس الغيمة الصح، والصقر يطير يصطادها 🦅</p>
     <b>عدد الجولات</b><div class="seg2">${[5,10,15].map(k=>`<button data-r="${k}" class="${k===rounds?"on":""}">${k}</button>`).join("")}</div>
     <b>النقاط في الآخر</b><div class="seg2"><button data-w="class" class="${who==="class"?"on":""}">للفصل كله</button><button data-w="none" class="${who==="none"?"on":""}">بدون نقاط</button></div>
-    <b>الأسئلة</b>${srcPicker()}
+    <b>الأسئلة من</b>${cloudSrc()}
     <div class="row" style="margin-top:12px;justify-content:center"><button class="btn pri big" id="cgGo">☁️ ابدأ اللعب</button></div>`, ()=>setTab("home"));
     gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
     document.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{ rounds=+b.dataset.r; draw(); });
     document.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{ who=b.dataset.w; draw(); });
-    bindSrc(draw);
-    $("#cgGo").onclick=()=>{ CG={rounds,who,round:0,score:0,streak:0}; cloudRound(); };
+    bindSrc(draw); if($("#cgBank")) $("#cgBank").onclick=openBanks;
+    $("#cgGo").onclick=()=>{ if(!hasBankQs()){ toast("صيد الغيوم محتاج بنك أسئلة"); openBanks(); return; } GSET.src="bank"; CG={rounds,who,round:0,score:0,streak:0}; cloudRound(); };
   };
   draw();
 }
 function cloudRound(){
   const G=CG; if(G.round>=G.rounds) return cloudEnd();
-  let q=withChoices(nextQ()); if(!q.ch){ q=withChoices(mathQ("mix","easy")); }
+  let q=withChoices(nextQ()); if(!q.ch){ toast("محتاج أسئلة أكتر في البنك (٢ على الأقل)"); return cloudEnd(); }
   G.round++; let locked=false;
   openSheet(`<h2>☁️ صيد الغيوم</h2>
     <div class="cgame" id="cgame">${sceneSVG()}
@@ -2003,7 +2016,7 @@ function wheelResult(sg,here){
     box.innerHTML=`<div class="wres" style="--c:${sg.c}">${emo(sg.e)} <b>نقطة لكل الفصل!</b> (${ids.length} طالب)</div>`; return; }
   const s=here[rnd(0,here.length-1)]; let val=sg.v==="x2"?2*GSET.pts:sg.v==="gift"?rnd(1,3):sg.v; const q=withChoices(nextQ());
   box.innerHTML=`<div class="wres" style="--c:${sg.c}"><div class="who" style="justify-content:center"><div class="av" style="width:90px;height:90px">${avatar(s,"happy")}</div><div class="info"><b>${esc(s.name)}</b><span>${emo(sg.e)} ${sg.t} — على المحك ${sgn(val)}</span></div></div>
-    <div class="qcard">${q.math?`<div class="qbig">${esc(q.q)}</div>`:`<div class="qtext">${esc(q.q)}</div>`}</div>
+    <div class="qcard">${qCard(q)}</div>
     ${q.ch?`<div class="ktiles">${q.ch.map((o,i)=>`<button class="kt2" data-o="${esc(o)}" style="background:${KCOL[i].c}"><span>${KCOL[i].s}</span>${esc(o)}</button>`).join("")}</div>`
       :`<div class="qans" id="wA"></div><div class="tbtns"><button style="background:#22b573" id="wOk">✅ صح</button><button style="background:#e8384f" id="wNo">❌ غلط</button></div>`}</div>`;
   box.scrollIntoView({behavior:"smooth",block:"start"});
@@ -2013,6 +2026,188 @@ function wheelResult(sg,here){
     else { SFX.neg(); const a=$("#wA"); if(a) a.textContent=q.a; } };
   document.querySelectorAll("#wRes .kt2").forEach(b=>b.onclick=()=>fin(b.dataset.o===q.a,b));
   if($("#wOk")) $("#wOk").onclick=()=>fin(true); if($("#wNo")) $("#wNo").onclick=()=>fin(false);
+}
+
+
+/* ===== صندوق مشترك: اختيار طالب من الحاضرين ===== */
+function teamsOf(n){ const here=cls().students.filter(s=>!isOut(s.id)).sort(()=>Math.random()-.5); const T=TEAMS.slice(0,n).map(t=>({name:t.n,color:t.c,members:[],score:0})); here.forEach((s,i)=>T[i%n].members.push(s.id)); return T; }
+function winScreen(t,again,extra=""){
+  SFX.level(); confetti(innerWidth/2,innerHeight/3,220,[t.color,"#ffc93c","#fff","#ff5d9a"]);
+  openSheet(`<h2>🏆 الفوز!</h2><div class="podium solo">${sceneSVG()}<div class="lbg" id="rwL"></div><div class="pd p1"><span class="pdb">${falconSVG({level:2,body:t.color,mood:"happy"})}</span><div class="pdk" style="background:${t.color}"><b>1</b><small>${esc(t.name)}</small></div></div></div>
+    <div style="color:${t.color};text-align:center;font-size:1.8rem;font-weight:800;margin-top:8px">🎉 ${esc(t.name)} كسب!</div>${extra}
+    <p class="hint" style="text-align:center">${t.members.map(id=>stu(id)).filter(Boolean).map(s=>esc(s.name)).join("، ")}</p>
+    <div class="row" style="justify-content:center"><button class="btn pri" id="wsGive">⭐ ${sgn(1)} نقطة لكل أعضاء الفريق</button><button class="btn" id="wsAgain">🔁 العب تاني</button></div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); document.querySelectorAll(".pd .fal").forEach(f=>f.classList.add("flap"));
+  gsap.from(".pdk",{scaleY:0,transformOrigin:"bottom",duration:.7,ease:"back.out(1.6)"}); gsap.from(".pdb",{y:-80,opacity:0,delay:.3,duration:.8,ease:"bounce.out"});
+  playLottie($("#rwL"),"trophy",{loop:true});
+  $("#wsGive").onclick=()=>{ awardQuiet(t.members,{...GAME_OK,v:1}); SFX.pos(); toast(`⭐ اتسجّلت نقطة لـ ${t.members.length} طالب`); $("#wsGive").disabled=true; };
+  $("#wsAgain").onclick=again;
+}
+
+/* ===== شد الحبل ===== */
+let TUG=null;
+function tugSetup(){
+  const here=cls().students.filter(s=>!isOut(s.id)); if(here.length<2){ toast("محتاج طالبين حاضرين على الأقل"); return; }
+  let goal=5;
+  const draw=()=>{ openSheet(`<h2>🪢 شد الحبل</h2>
+    <div class="gprev">${sceneSVG()}<div class="gprev-f"><span>${falconSVG({level:1,body:"#ff8a3d",mood:"happy"})}</span><span style="font-size:2.4rem;width:auto;height:auto">🪢</span><span>${falconSVG({level:1,body:"#2d7ff9",mood:"happy"})}</span></div></div>
+    <p class="hint">الفصل بيتقسم فريقين. اسأل سؤال، واللي يجاوب صح فريقه يشد الحبل خطوة. أول فريق يسحب الشريطة لعنده يكسب!</p>
+    <b>قوة الحبل</b><div class="seg2">${[[3,"قصير"],[5,"متوسط"],[7,"طويل"]].map(([k,t])=>`<button data-gl="${k}" class="${k===goal?"on":""}">${t} (${k})</button>`).join("")}</div>
+    <b>الأسئلة</b>${srcPicker()}
+    <div class="row" style="margin-top:12px;justify-content:center"><button class="btn pri big" id="tgGo">🪢 يلا نشد!</button></div>`, ()=>setTab("home"));
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); document.querySelectorAll(".gprev .fal").forEach(f=>f.classList.add("flap"));
+    document.querySelectorAll("[data-gl]").forEach(b=>b.onclick=()=>{ goal=+b.dataset.gl; draw(); });
+    bindSrc(draw);
+    $("#tgGo").onclick=()=>{ TUG={teams:teamsOf(2),goal,pos:0,q:withChoices(nextQ()),lock:false}; tugView(true); };
+  };
+  draw();
+}
+function tugView(intro){
+  const T=TUG, A=T.teams[0], B=T.teams[1];
+  const crew=(t,side)=>[0,1,2].map(i=>`<span class="tf tf${side}" style="--i:${i}">${falconSVG({level:1,body:t.color,mood:"happy"})}</span>`).join("");
+  openSheet(`<h2>🪢 شد الحبل</h2>
+    <div class="tugscene" id="tugA">${sceneSVG()}
+      <div class="tsc"><span style="background:${A.color}">${esc(A.name)}</span><span style="background:${B.color}">${esc(B.name)}</span></div>
+      <div class="tline"></div><div class="tzone za" style="background:${A.color}"></div><div class="tzone zb" style="background:${B.color}"></div>
+      <div class="tmove" id="tugM"><div class="rope"><i class="rib"></i></div><div class="crew ca">${crew(A,"a")}</div><div class="crew cb">${crew(B,"b")}</div></div>
+      <div class="cdown" id="cdown"></div></div>
+    <div class="qcard">${qCard(T.q)}${T.q.ch?`<div class="opts">${T.q.ch.map((o,i)=>`<div class="opt" ${o===T.q.a?"data-ok":""}><i style="background:${KCOL[i].c}">${KCOL[i].s}</i>${esc(o)}</div>`).join("")}</div>`:""}<div class="qans" id="tgAns"></div></div>
+    <p class="hint" style="text-align:center;margin:4px 0 8px">مين جاوب صح؟ 👇</p>
+    <div class="tbtns"><button style="background:${A.color}" data-tt="0">💪 ${esc(A.name)}</button><button style="background:${B.color}" data-tt="1">💪 ${esc(B.name)}</button></div>
+    <div class="row" style="justify-content:center;margin-top:10px">${T.q.oral?"":`<button class="btn vio" id="tgShow">👀 الإجابة</button>`}<button class="btn" id="tgNext">سؤال تاني ⬅</button><button class="btn" id="tgMem">👥 الفريقين</button></div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  const place=(anim)=>{ const x=(T.pos/T.goal)*26; gsap.to("#tugM",{xPercent:x,duration:anim?.8:0,ease:"elastic.out(1,.5)"}); };
+  place(false);
+  document.querySelectorAll(".tf .fal").forEach(f=>f.classList.add("flap"));
+  gsap.to(".tf",{rotate:(i,el)=>el.classList.contains("tfa")?10:-10,duration:.5,yoyo:true,repeat:-1,ease:"sine.inOut",stagger:.12});
+  if(intro){ const el=$("#cdown"); const seq=["3","2","1","شُدّ!"]; let k=0;
+    const tick=()=>{ if(!stillOpen("cdown")) return; if(k<seq.length){ el.textContent=seq[k]; k===3?SFX.level():SFX.tick(); gsap.fromTo(el,{scale:2.4,opacity:0},{scale:1,opacity:1,duration:.45,ease:"back.out(2)"}); k++; setTimeout(tick,700); } else gsap.to(el,{opacity:0,duration:.3}); }; tick(); }
+  if($("#tgShow")) $("#tgShow").onclick=()=>{ $("#tgAns").textContent=T.q.a; markOk(); SFX.pick(); };
+  $("#tgNext").onclick=()=>{ T.q=withChoices(nextQ()); tugView(); };
+  $("#tgMem").onclick=()=>{ openSheet(`<h2>👥 الفريقين</h2><div class="groups">${T.teams.map(t=>`<div class="grp" style="border-top:6px solid ${t.color}"><h3>${esc(t.name)}</h3>${t.members.map(id=>stu(id)).filter(Boolean).map(s=>`<div class="m"><span class="av">${avatar(s)}</span>${esc(s.name)}</div>`).join("")}</div>`).join("")}</div><div class="row" style="margin-top:12px"><button class="btn pri" id="tgBack">↩ رجوع</button></div>`); $("#tgBack").onclick=()=>tugView(); };
+  document.querySelectorAll("[data-tt]").forEach(b=>b.onclick=()=>{ if(T.lock) return; T.lock=true; const i=+b.dataset.tt; T.pos+=i===0?1:-1; SFX.whoosh(); SFX.pos();
+    gsap.fromTo(`.crew.c${i?"b":"a"} .tf`,{scale:1},{scale:1.18,duration:.18,yoyo:true,repeat:1,stagger:.05}); place(true);
+    const r=b.getBoundingClientRect(); burstAt(r.left+r.width/2,r.top,"stars",160);
+    setTimeout(()=>{ T.lock=false; if(Math.abs(T.pos)>=T.goal){ winScreen(T.teams[T.pos>0?0:1],tugSetup); return; } T.q=withChoices(nextQ()); tugView(); },1000); });
+}
+
+/* ===== بيضة المفاجأة ===== */
+let EGGSEEN=[];
+function eggSVG(){ return `<svg viewBox="0 0 200 240" class="eggsvg"><defs><radialGradient id="egG" cx=".38" cy=".3" r=".8"><stop offset="0" stop-color="#fffdf5"/><stop offset=".6" stop-color="#f6e7c8"/><stop offset="1" stop-color="#e2c48f"/></radialGradient></defs>
+  <path class="eh eh1" d="M100 12 C150 12 182 100 182 150 C182 200 146 230 100 230 C54 230 18 200 18 150 C18 100 50 12 100 12Z" fill="url(#egG)" stroke="#d1ae6d" stroke-width="3"/>
+  <g fill="#f2b01e" opacity=".75"><circle cx="70" cy="90" r="9"/><circle cx="128" cy="70" r="6"/><circle cx="140" cy="150" r="10"/><circle cx="62" cy="170" r="7"/></g>
+  <path class="crk" d="M40 120 L62 108 L76 126 L96 104 L112 128 L130 106 L146 124 L162 112" fill="none" stroke="#6b4a1f" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="200" stroke-dashoffset="200"/></svg>`; }
+function eggGame(){
+  const here=cls().students.filter(s=>!isOut(s.id)); if(!here.length){ toast("مفيش طلاب حاضرين"); return; }
+  let left=here.filter(s=>!EGGSEEN.includes(s.id)); if(!left.length){ EGGSEEN=[]; left=here; }
+  const s=left[rnd(0,left.length-1)];
+  openSheet(`<h2>🥚 بيضة المفاجأة</h2>
+    <div class="eggscene">${sceneSVG()}<div class="nest"><svg viewBox="0 0 300 90"><ellipse cx="150" cy="50" rx="140" ry="36" fill="#8a5a2b"/><path d="M14 46 Q80 20 150 40 T286 46" stroke="#b07a3e" stroke-width="7" fill="none"/><path d="M20 60 Q90 34 160 54 T280 58" stroke="#6b4320" stroke-width="6" fill="none"/></svg></div>
+      <button class="egg" id="eggB">${eggSVG()}</button><div class="hatch" id="eggH"><div class="av">${avatar(s,"happy")}</div><div class="stg-nm">${esc(s.name)}</div></div>
+      <div class="eggtip" id="eggT">👆 دوس على البيضة</div></div>
+    <div id="eggR"></div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  gsap.to("#eggB",{rotate:4,duration:.9,yoyo:true,repeat:-1,ease:"sine.inOut",transformOrigin:"50% 90%"});
+  let taps=0;
+  $("#eggB").onclick=()=>{ taps++; SFX.tick(); gsap.killTweensOf("#eggB");
+    gsap.fromTo("#eggB",{rotate:-14},{rotate:0,duration:.6,ease:"elastic.out(1.2,.25)",transformOrigin:"50% 90%"});
+    if(taps===1){ $("#eggT").textContent="كمان! 👆"; gsap.to(".crk",{strokeDashoffset:120,duration:.3}); }
+    else if(taps===2){ $("#eggT").textContent="خلاص هتفقس! 👆"; gsap.to(".crk",{strokeDashoffset:0,duration:.3}); }
+    else { $("#eggT").style.display="none"; EGGSEEN.push(s.id); SFX.level();
+      const r=$("#eggB").getBoundingClientRect(); burstAt(r.left+r.width/2,r.top+r.height/2,"stars",280); confetti(r.left+r.width/2,r.top+r.height/3,140);
+      gsap.to("#eggB",{scale:1.3,opacity:0,duration:.35});
+      $("#eggH").style.display="flex"; gsap.from("#eggH .av",{y:80,scale:.3,duration:.8,ease:"back.out(1.8)"}); gsap.from("#eggH .stg-nm",{scale:0,delay:.4,duration:.5,ease:"back.out(2)"});
+      const f=$("#eggH .fal"); if(f) f.classList.add("flap");
+      const q=withChoices(nextQ());
+      $("#eggR").innerHTML=`<div class="qcard">${qCard(q)}</div>${q.ch?`<div class="ktiles">${q.ch.map((o,i)=>`<button class="kt2" data-o="${esc(o)}" style="background:${KCOL[i].c}"><span>${KCOL[i].s}</span>${esc(o)}</button>`).join("")}</div>`:`<div class="qans" id="egA"></div><div class="tbtns"><button style="background:#22b573" id="egOk">✅ جاوب صح ${sgn(GSET.pts)}</button><button style="background:#e8384f" id="egNo">❌ مش المرة دي</button></div>`}
+        <div class="row" style="justify-content:center;margin-top:10px"><button class="btn pri" id="egAgain">🥚 بيضة جديدة</button></div>`;
+      gsap.from("#eggR > *",{y:30,opacity:0,stagger:.08,delay:.5});
+      let done=false; const fin=(ok,btn)=>{ if(done) return; done=true; document.querySelectorAll("#eggR .kt2").forEach(t=>t.dataset.o===q.a?t.classList.add("win"):t.classList.add("dim"));
+        if(ok){ awardQuiet([s.id],{...GAME_OK,v:GSET.pts}); SFX.pos(); $("#eggH .av").innerHTML=avatar(stu(s.id),"happy"); const rr=(btn||$("#eggH")).getBoundingClientRect(); burstAt(rr.left+rr.width/2,rr.top+rr.height/2,"stars",200); toast(`⭐ ${s.name} ${sgn(GSET.pts)}`); }
+        else { SFX.neg(); $("#eggH .av").innerHTML=avatar(s,"sad"); const a=$("#egA"); if(a&&q.a) a.textContent=q.a; } };
+      document.querySelectorAll("#eggR .kt2").forEach(b=>b.onclick=()=>fin(b.dataset.o===q.a,b));
+      if($("#egOk")) $("#egOk").onclick=()=>fin(true); if($("#egNo")) $("#egNo").onclick=()=>fin(false);
+      $("#egAgain").onclick=eggGame; }
+  };
+}
+
+/* ===== كنز الصحراء ===== */
+const CHEST=[{t:"+1",v:1,e:"⭐"},{t:"+2",v:2,e:"🌟"},{t:"+3",v:3,e:"🏆"},{t:"+1",v:1,e:"⭐"},{t:"+2",v:2,e:"🌟"},{t:"حظ أوفر",v:0,e:"😅"},{t:"+5 جاكبوت!",v:5,e:"👑"},{t:"نقطة للفصل كله",v:"all",e:"🎉"}];
+function chestSVG(){ return `<svg viewBox="0 0 120 100"><g class="lid"><path d="M10 44 Q10 14 60 14 Q110 14 110 44Z" fill="#c9792f" stroke="#7a4313" stroke-width="4"/><rect x="52" y="14" width="16" height="30" fill="#f2b01e" stroke="#7a4313" stroke-width="3"/></g>
+  <rect x="10" y="44" width="100" height="48" rx="6" fill="#a8601f" stroke="#7a4313" stroke-width="4"/><rect x="52" y="44" width="16" height="48" fill="#f2b01e" stroke="#7a4313" stroke-width="3"/><rect x="54" y="50" width="12" height="14" rx="3" fill="#7a4313"/><path d="M14 58 H48 M72 58 H106" stroke="#7a4313" stroke-width="3" opacity=".5"/></svg>`; }
+function chestGame(pre){
+  const here=cls().students.filter(s=>!isOut(s.id)); if(!here.length){ toast("مفيش طلاب حاضرين"); return; }
+  let who=pre||null;
+  const pickView=()=>{ openSheet(`<h2>💎 كنز الصحراء</h2><p class="hint">مين جاوب صح أو عمل حاجة تستاهل؟ اختاره يفتح صندوق كنز 👇</p>
+    <div class="row" style="justify-content:center;margin-bottom:10px"><button class="btn pri" id="chRnd">🎲 اختيار عشوائي</button></div>
+    <div class="chpick">${here.map(s=>`<button data-st="${s.id}"><span class="av">${avatar(s)}</span>${esc(s.name)}</button>`).join("")}</div>`, ()=>setTab("home"));
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    $("#chRnd").onclick=()=>{ who=here[rnd(0,here.length-1)].id; board(); };
+    document.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{ who=b.dataset.st; board(); }); };
+  const board=()=>{ const s=stu(who), prizes=[...CHEST].sort(()=>Math.random()-.5).slice(0,6);
+    openSheet(`<h2>💎 كنز الصحراء</h2>
+      <div class="trs" id="chB">${sceneSVG()}<div class="trwho"><span class="av">${avatar(s,"happy")}</span><b>${esc(s.name)}</b> اختار صندوق!</div>
+        <div class="chests">${prizes.map((p,i)=>`<button class="chest" data-i="${i}"><span class="sand"></span>${chestSVG()}<span class="prize">${emo(p.e)}<b>${p.t}</b></span></button>`).join("")}</div></div>
+      <div class="row" style="justify-content:center;margin-top:10px"><button class="btn" id="chOther">👤 طالب تاني</button></div>`, ()=>setTab("home"));
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    gsap.from(".chest",{y:60,opacity:0,stagger:.08,duration:.5,ease:"back.out(1.7)"}); gsap.to(".chest svg",{y:-4,duration:.8,yoyo:true,repeat:-1,stagger:.15,ease:"sine.inOut"});
+    $("#chOther").onclick=pickView; let opened=false;
+    document.querySelectorAll(".chest").forEach(b=>b.onclick=()=>{ if(opened) return; opened=true; const p=prizes[+b.dataset.i]; SFX.tick();
+      gsap.fromTo(b,{rotate:-6},{rotate:6,duration:.08,repeat:7,yoyo:true,onComplete:()=>{ gsap.set(b,{rotate:0}); b.classList.add("open"); const r=b.getBoundingClientRect();
+        gsap.to(b.querySelector(".lid"),{rotate:-35,transformOrigin:"10px 44px",duration:.4,ease:"back.out(2)"});
+        gsap.fromTo(b.querySelector(".prize"),{y:20,scale:.3,opacity:0},{y:-40,scale:1.2,opacity:1,duration:.6,ease:"back.out(2)"});
+        if(p.v===0){ SFX.neg(); }
+        else { SFX.level(); burstAt(r.left+r.width/2,r.top,"stars",240); confetti(r.left+r.width/2,r.top,110,["#ffd84d","#fff","#f2b01e"]);
+          if(p.v==="all"){ const ids=here.map(x=>x.id); awardQuiet(ids,{k:"chest",e:"💎",t:"كنز الصحراء",v:1}); toast(`🎉 نقطة لكل الفصل (${ids.length})`); }
+          else { awardQuiet([who],{k:"chest",e:"💎",t:"كنز الصحراء",v:p.v}); toast(`💎 ${s.name} ${sgn(p.v)}`); } }
+        setTimeout(()=>{ if(!stillOpen("chB")) return; document.querySelectorAll(".chest:not(.open)").forEach(c=>{ c.classList.add("open","peek"); gsap.to(c.querySelector(".lid"),{rotate:-35,transformOrigin:"10px 44px",duration:.3}); gsap.to(c.querySelector(".prize"),{y:-30,opacity:.55,duration:.4}); }); },1300); }});
+    }); };
+  who?board():pickView();
+}
+
+/* ===== صقر الذاكرة ===== */
+let MEM=null;
+function memSetup(){
+  let pairs=6, mode=hasBankQs()?"bank":"emoji";
+  const draw=()=>{ openSheet(`<h2>🃏 صقر الذاكرة</h2>
+    <div class="gprev">${sceneSVG({night:true})}<div class="gprev-f">${["🦅","?","🦅"].map((x,i)=>`<span class="mprev" style="--r:${(i-1)*10}deg">${x==="?"?"<b>؟</b>":emo(x)}</span>`).join("")}</div></div>
+    <p class="hint">فريقين بالدور: كل فريق يقلب كارتين، لو اتطابقوا ياخد نقطة ويلعب تاني. ${mode==="bank"?"الكروت: سؤال وإجابته من البنك.":"الكروت صور — استراحة نشاط ذهني لأي حصة."}</p>
+    <b>الكروت</b><div class="seg2"><button data-md="emoji" class="${mode==="emoji"?"on":""}">🖼 صور (تنشيط)</button><button data-md="bank" class="${mode==="bank"?"on":""}">📚 سؤال ↔ إجابة</button></div>
+    ${mode==="bank"?srcPicker().replace(/<div class="seg2">[\s\S]*?<\/div>/,""):""}
+    <b>عدد الأزواج</b><div class="seg2">${[4,6,8].map(k=>`<button data-pr="${k}" class="${k===pairs?"on":""}">${k}</button>`).join("")}</div>
+    <div class="row" style="margin-top:12px;justify-content:center"><button class="btn pri big" id="mgGo">🃏 ابدأ</button></div>`, ()=>setTab("home"));
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    document.querySelectorAll("[data-md]").forEach(b=>b.onclick=()=>{ if(b.dataset.md==="bank"&&!hasBankQs()){ toast("ضيف أسئلة في بنك الأسئلة الأول"); openBanks(); return; } mode=b.dataset.md; if(mode==="bank") GSET.src="bank"; draw(); });
+    document.querySelectorAll("[data-pr]").forEach(b=>b.onclick=()=>{ pairs=+b.dataset.pr; draw(); });
+    bindSrc(draw);
+    $("#mgGo").onclick=()=>{ let items=[];
+      if(mode==="bank"){ const pool=[...new Map(bankPool().filter(x=>x.q&&x.a&&String(x.q).length<=70&&String(x.a).length<=40).map(x=>[x.a,x])).values()].sort(()=>Math.random()-.5).slice(0,pairs);
+        if(pool.length<3){ toast("محتاج ٣ أسئلة قصيرة على الأقل في البنك"); return; }
+        pool.forEach((x,i)=>{ items.push({p:i,t:x.q,k:"q"}); items.push({p:i,t:x.a,k:"a"}); }); }
+      else { const E=["🦅","🍎","⚽","🎨","🔬","📚","🏆","🎁","🧩","🎲","🧠","🔥","👑","🕌","⭐","🐣"].sort(()=>Math.random()-.5).slice(0,pairs);
+        E.forEach((e,i)=>{ items.push({p:i,e}); items.push({p:i,e}); }); }
+      MEM={cards:items.sort(()=>Math.random()-.5).map(x=>({...x,up:false,done:false})),teams:teamsOf(2),turn:0,open:[],lock:false,mode};
+      memView(); };
+  };
+  draw();
+}
+function memView(){
+  const M=MEM, cols=M.cards.length<=8?4:M.cards.length<=12?4:4;
+  openSheet(`<h2>🃏 صقر الذاكرة</h2>
+    <div class="memhud">${M.teams.map((t,i)=>`<div class="mt ${M.turn===i?"on":""}" style="--c:${t.color}"><b>${esc(t.name)}</b><span id="ms${i}">${t.score}</span></div>`).join("")}</div>
+    <div class="memg" id="memG" style="grid-template-columns:repeat(${cols},1fr)">${M.cards.map((c,i)=>`<button class="mc ${c.done?"done up":""}" data-i="${i}"><span class="mfront">${falconSVG({level:1,body:"#ffd84d",mood:"happy"})}</span><span class="mback ${c.k||""}">${c.e?emo(c.e):`<b>${esc(c.t)}</b>`}</span></button>`).join("")}</div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  gsap.from(".mc:not(.done)",{scale:0,rotate:-20,stagger:.03,duration:.4,ease:"back.out(1.8)"});
+  const hud=()=>document.querySelectorAll(".mt").forEach((e,i)=>e.classList.toggle("on",i===M.turn));
+  document.querySelectorAll(".mc").forEach(b=>b.onclick=()=>{ const i=+b.dataset.i, c=M.cards[i]; if(M.lock||c.done||c.up) return;
+    c.up=true; b.classList.add("up"); SFX.tick(); M.open.push(i);
+    if(M.open.length===2){ M.lock=true; const [x,y]=M.open, A=M.cards[x], B=M.cards[y], bx=$(`.mc[data-i="${x}"]`), by=$(`.mc[data-i="${y}"]`);
+      if(A.p===B.p){ setTimeout(()=>{ A.done=B.done=true; bx.classList.add("done"); by.classList.add("done"); const t=M.teams[M.turn]; t.score++; $("#ms"+M.turn).textContent=t.score; SFX.pos();
+          const r=by.getBoundingClientRect(); burstAt(r.left+r.width/2,r.top+r.height/2,"stars",200); gsap.fromTo([bx,by],{scale:1},{scale:1.12,yoyo:true,repeat:1,duration:.2});
+          M.open=[]; M.lock=false;
+          if(M.cards.every(c=>c.done)){ setTimeout(()=>{ const [a,b2]=M.teams; if(a.score===b2.score){ SFX.level(); confetti(innerWidth/2,innerHeight/3,200); toast("🤝 تعادل! الفريقين أبطال"); memSetup(); } else winScreen(a.score>b2.score?a:b2,memSetup,`<p style="text-align:center;font-weight:800">${a.score} — ${b2.score}</p>`); },900); } },450); }
+      else { setTimeout(()=>{ SFX.neg(); gsap.fromTo([bx,by],{x:-6},{x:0,duration:.4,ease:"elastic.out(1,.3)"}); },350);
+        setTimeout(()=>{ A.up=B.up=false; bx.classList.remove("up"); by.classList.remove("up"); M.open=[]; M.lock=false; M.turn=1-M.turn; hud(); },1300); } } });
 }
 
 /* ---------- attendance ---------- */
