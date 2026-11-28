@@ -416,6 +416,18 @@ body.board .groups{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}bod
 body.board .noise-face{width:min(45vh,360px);height:min(45vh,360px)}body.board .noise-label{font-size:3rem}body.board .meter{height:60px}
 body.board .levelup .lstage{width:min(55vh,440px);height:min(55vh,440px)}body.board .levelup .big{font-size:3.4rem}
 body.board .x{width:52px;height:52px;font-size:1.6rem;top:18px;left:18px}
+/* ---------- rewards shop ---------- */
+.rwk{display:flex;align-items:center;gap:10px;padding:8px;border-radius:14px;background:#f6f8fd;margin-bottom:6px;opacity:.75}
+.rwk.ok{opacity:1;background:#fff6dc;box-shadow:inset 0 0 0 2px #ffd76a}
+.rwk .grow{flex:1;min-width:0}.rwk b{display:block}
+.shopg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.rw{background:#f6f8fd;border-radius:20px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-weight:800;text-align:center;position:relative;border:3px solid transparent;color:var(--ink)}
+.rw .fe{width:46px;height:46px}.rw .fet{font-size:2.4rem}
+.rw .cost{background:#ffc93c;color:#1f2a44;border-radius:12px;padding:2px 10px;font-size:.9rem}
+.rw.no{opacity:.45}.rw.can{border-color:#ffd76a;background:#fffaf0}
+.pickg{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.pk{background:#f6f8fd;border-radius:16px;padding:6px 4px 8px;text-align:center;font-weight:700;color:var(--ink)}
+.pk .av{width:56px;height:56px;margin:0 auto}.pk b{display:block;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pk small{color:#c27c00;font-weight:800}
 /* ---------- fx ---------- */
 #fx{position:fixed;inset:0;pointer-events:none;z-index:80}
 .float{direction:ltr;position:fixed;font-weight:800;font-size:2.2rem;z-index:90;pointer-events:none;text-shadow:0 3px 0 rgba(0,0,0,.12)}
@@ -529,6 +541,7 @@ body.board .x{width:52px;height:52px;font-size:1.6rem;top:18px;left:18px}
       <div class="kpts"><b id="kPts">0</b><span>نقطة</span></div>
       <div class="klv" id="kLv"></div><div class="bar kbar"><i id="kBar"></i></div><div class="knext" id="kNext"></div>
       <button class="btn pri" id="kStyle" style="margin-top:12px">🎨 غيّر شكل صقرك</button></div>
+    <div class="kcard" id="kShopCard" hidden><h3>🎁 متجر المكافآت <span class="cnt" id="kBal" style="float:left"></span></h3><div id="kShop"></div></div>
     <div class="kcard"><h3>🪜 رحلة الصقر</h3><div class="kpath" id="kPath"></div></div>
     <div class="kcard"><h3>⭐ آخر النقاط</h3><div class="list" id="kRecent"></div></div>
     <div class="kcard" id="kNoteCard" hidden><h3>📝 رسالة من المعلم</h3><p id="kNote" style="margin:0;font-size:1.1rem;line-height:1.7"></p><small class="hint" id="kNoteAt"></small></div>
@@ -721,7 +734,7 @@ function kidPayloads(){ const m=new Map(), teacher=(USER&&USER.displayName)||"";
   S.classes.forEach(c=>c.students.forEach(s=>{ if(!s.code) return;
     m.set(s.code,{cid:c.id,className:c.name,teacher,name:s.name,points:s.points,pos:s.pos,neg:s.neg,look:s.look,lookAt:s.lookAt||0,
       recent:c.log.filter(l=>l.sid===s.id).slice(-12).reverse().map(l=>({k:l.k,v:l.v,t:l.t,e:l.e||skillOf(l.k).e,nm:l.nm||skillOf(l.k).t})), att:monthAtt(c,s.id), today:attOf(c,todayKey(),s.id)||"",
-      week:weekOf(c,s.id), note:s.note||"", noteAt:s.noteAt||0}); }));
+      week:weekOf(c,s.id), note:s.note||"", noteAt:s.noteAt||0, balance:balance(s), rewards:rewardsOf(c).map(r=>({e:r.e,t:r.t,c:r.c}))}); }));
   return m; }
 function fixCur(){ if(!S.cur || !S.classes.find(c=>c.id===S.cur)) S.cur = S.classes[0] && S.classes[0].id; }
 function save(){
@@ -895,8 +908,8 @@ function openStudent(id){
     ? `<div class="who"><div class="av">${falconSVG({level:2,body:"#f2b01e",mood:"happy"})}</div><div class="info"><b>الفصل كله</b><span>${cls().students.length} طالب</span></div></div>`
     : `<div class="who"><div class="av">${avatar(s)}</div><div class="info"><b>${esc(s.name)}</b><span>${L.name} · ${s.points} نقطة</span><div class="row" style="margin-top:6px"><button class="btn" onclick="openEdit('${id}')">🎨 تعديل الصقر</button></div></div></div>`;
   openSheet(`${head}<div class="tabs"><button class="tab p on" data-t="p">👍 إيجابي</button><button class="tab n" data-t="n">✋ يحتاج تحسين</button></div><div class="skills" id="skills"></div>
-    <div class="row" style="justify-content:center;margin-top:12px"><button class="btn" id="goSkills">🎚️ تعديل المهارات والنقاط</button></div>`);
-  $("#goSkills").onclick=openSkills;
+    <div class="row" style="justify-content:center;margin-top:12px">${all?"":`<button class="btn vio" id="goShop">🎁 المتجر · رصيد ${balance(s)}</button>`}<button class="btn" id="goSkills">🎚️ تعديل المهارات والنقاط</button></div>`);
+  $("#goSkills").onclick=openSkills; if($("#goShop")) $("#goShop").onclick=()=>openShop(id);
   const draw = t => { const list=t==="p"?posList():negList(); $("#skills").innerHTML = list.map((k,i)=>`<button class="skill ${t}" data-i="${i}" data-t="${t}"><span class="em" data-v="${k.v>0?"+":""}${k.v}">${emo(k.e)}</span>${k.t}</button>`).join("");
     document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.t===t)); };
   draw("p");
@@ -1090,6 +1103,7 @@ const ICONS={
   info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
   logout:'<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5M5 12h11"/>',
   tv:'<rect x="2.5" y="4" width="19" height="13" rx="2.5"/><path d="M8 21h8M12 17v4"/>',
+  gift:'<rect x="3" y="8" width="18" height="5" rx="1.5"/><path d="M5 13v7h14v-7M12 8v12"/><path d="M12 8c-2-3-6-4-6-1.5S9 8 12 8zm0 0c2-3 6-4 6-1.5S15 8 12 8z"/>',
   key:'<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3M15 8l2 2"/>',
 };
 const icon=n=>`<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]||""}</svg>`;
@@ -1108,13 +1122,13 @@ document.addEventListener("fullscreenchange",()=>{ if(!document.fullscreenElemen
 function setTab(t){ document.querySelectorAll(".tb").forEach(b=>b.classList.toggle("on",b.dataset.tab===t)); }
 function openKit(){
   const T=[["random","dice","اختيار عشوائي","#ff8a3d"],["timer","timer","المؤقت","#3d8be0"],["groups","flock","الأسراب","#22b573"],["noise","noise","مقياس الهدوء","#2e9c9a"],
-    ["all","star","نقطة للفصل كله","#f5b301"],["select","check","تحديد عدة طلاب","#7b5cd6"],["skills","sliders","المهارات والنقاط","#e0609a"],["board","tv","وضع السبورة","#1b2a4a"]];
+    ["all","star","نقطة للفصل كله","#f5b301"],["select","check","تحديد عدة طلاب","#7b5cd6"],["skills","sliders","المهارات والنقاط","#e0609a"],["shop","gift","متجر المكافآت","#ff5d9a"],["board","tv","وضع السبورة","#1b2a4a"]];
   openSheet(`<h2>🪄 أدوات الحصة</h2><div class="kit">${T.map(([k,ic,t,c])=>`<button class="kt" data-k="${k}"><span class="bx" style="background:${c}">${icon(ic)}</span>${t}</button>`).join("")}</div>`, ()=>setTab("home"));
   gsap.from(".kt",{y:20,opacity:0,scale:.9,stagger:.04,duration:.35,ease:"back.out(1.7)"});
   document.querySelectorAll(".kt").forEach(b=>b.onclick=()=>{ const k=b.dataset.k; ac();
     if(k==="random") randomPick(); else if(k==="timer") openTimer(); else if(k==="groups") openGroups(); else if(k==="noise") openNoise();
     else if(k==="all") openStudent("__all"); else if(k==="select"){ closeSheet(); toggleSel(true); toast("دوس على الطلاب اللي عايز تحددهم"); }
-    else if(k==="skills") openSkills(); else if(k==="add") openAdd(); else if(k==="board"){ closeSheet(); setBoard(!BOARD); } });
+    else if(k==="skills") openSkills(); else if(k==="add") openAdd(); else if(k==="board"){ closeSheet(); setBoard(!BOARD); } else if(k==="shop") openShop(); });
 }
 document.querySelectorAll(".tb").forEach(b=>b.onclick=()=>{ ac(); const t=b.dataset.tab;
   if(t==="home"){ closeSheet(); window.scrollTo({top:0,behavior:"smooth"}); }
@@ -1156,6 +1170,52 @@ function openSkills(){
     if($("#skDel")) $("#skDel").onclick=()=>{ if(list.filter(x=>Math.sign(x.v)===Math.sign(ed.v)).length<2){ toast("لازم يفضل سلوك واحد على الأقل"); return; } list=list.filter(x=>x.k!==ed.k); ed=null; commit(); draw(); };
     $("#skAll").onclick=()=>ask("نسخ نفس المهارات لكل فصولك؟",()=>{ S.classes.forEach(x=>x.skills=list.map(k=>({...k}))); save(); toast("✅ اتنسخت لكل الفصول"); });
     $("#skReset").onclick=()=>ask("ترجع للمهارات الافتراضية في الفصل ده؟",()=>{ delete c.skills; list=skillsOf(c).map(x=>({...x})); ed=null; save(); draw(); });
+  };
+  draw();
+}
+
+/* ---------- rewards shop ---------- */
+const DEF_REWARDS=[{id:"r1",e:"🎨",t:"رسم على السبورة",c:5},{id:"r2",e:"🚶",t:"قائد الطابور",c:5},{id:"r3",e:"🎧",t:"مساعد المعلم ليوم",c:8},
+  {id:"r4",e:"💺",t:"اختيار مكانه ليوم",c:10},{id:"r5",e:"🎮",t:"يختار لعبة الحصة",c:12},{id:"r6",e:"📚",t:"إعفاء من واجب",c:20},{id:"r7",e:"🎁",t:"هدية من المعلم",c:30}];
+const rewardsOf=c=>(c&&Array.isArray(c.rewards))?c.rewards:DEF_REWARDS;
+const balance=s=>Math.max(0,(s.points||0)-(s.spent||0));
+function openShop(sid){
+  const c=cls(); if(!c.students.length){ toast("ضيف طلاب الأول"); return; }
+  const s=sid&&stu(sid);
+  if(!s){ openSheet(`<h2>🎁 متجر المكافآت</h2><p class="hint">اختار الطالب اللي عايز يصرف نقاطه. الصرف مش بيقلّل مستوى الصقر.</p>
+      <div class="pickg">${[...c.students].sort((a,b)=>balance(b)-balance(a)).map(x=>`<button class="pk" data-p="${x.id}"><span class="av">${avatar(x)}</span><b>${esc(x.name)}</b><small>⭐ ${balance(x)}</small></button>`).join("")}</div>
+      <div class="row" style="margin-top:12px"><button class="btn" id="shEdit">✏️ تعديل المكافآت</button></div>`, ()=>setTab("home"));
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>openShop(b.dataset.p)); $("#shEdit").onclick=editRewards; return; }
+  const bal=balance(s), list=rewardsOf(c);
+  const bought=c.log.filter(l=>l.sid===s.id&&l.k==="shop").slice(-5).reverse();
+  openSheet(`<h2>🎁 متجر المكافآت</h2>
+    <div class="who"><div class="av">${avatar(s)}</div><div class="info"><b>${esc(s.name)}</b><span>الرصيد: <b style="display:inline;font-size:1.3rem;color:#c27c00">⭐ ${bal}</b> نقطة</span></div></div>
+    <div class="shopg">${list.map(r=>`<button class="rw ${bal>=r.c?"can":"no"}" data-r="${r.id}">${emo(r.e)}<span>${esc(r.t)}</span><span class="cost">${r.c} ⭐</span></button>`).join("")}</div>
+    ${bought.length?`<div class="rsec"><h3>🧾 آخر المشتريات</h3>${bought.map(l=>`<div class="li"><span class="big-e">${emo(l.e)}</span><div class="grow"><b>${esc(l.nm)}</b><small>${(()=>{ try{ return new Date(l.t).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"short"}) }catch(e){ return "" } })()}</small></div><span class="chip n">−${l.cost}</span></div>`).join("")}</div>`:""}
+    <div class="row" style="margin-top:12px"><button class="btn" id="shBack">↩ كل الطلاب</button><button class="btn" id="shEdit">✏️ تعديل المكافآت</button></div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  $("#shBack").onclick=()=>openShop(); $("#shEdit").onclick=editRewards;
+  document.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{ const r=list.find(x=>x.id===b.dataset.r); if(!r) return;
+    if(balance(s)<r.c){ SFX.neg(); toast(`محتاج ${r.c-balance(s)} نقطة كمان 💪`); return; }
+    ask(`${s.name} يصرف ${r.c} نقطة على «${r.t}»؟`,()=>{ s.spent=(s.spent||0)+r.c; c.log.push({sid:s.id,k:"shop",v:0,t:Date.now(),e:r.e,nm:r.t,cost:r.c}); save(); render();
+      SFX.level(); const rc=b.getBoundingClientRect(); burstAt(rc.left+rc.width/2,rc.top+rc.height/2,"stars",220); confetti(rc.left+rc.width/2,rc.top,80);
+      toast(`🎁 ${s.name} اشترى «${r.t}»`); setTimeout(()=>openShop(s.id),700); }); });
+}
+function editRewards(){
+  const c=cls(); let list=rewardsOf(c).map(x=>({...x}));
+  const draw=()=>{ openSheet(`<h2>✏️ مكافآت الفصل</h2><p class="hint">غيّر الاسم أو الأيقونة أو السعر بالنقاط، والتعديل بيتحفظ لوحده.</p>
+    ${list.map((r,i)=>`<div class="skrow"><input class="field" data-i="${i}" data-f="e" value="${esc(r.e)}" maxlength="4" style="width:58px;text-align:center;font-size:1.3rem;padding:8px"><input class="field" data-i="${i}" data-f="t" value="${esc(r.t)}" maxlength="30" style="flex:1;padding:8px">
+      <div class="stepper"><button data-i="${i}" data-d="-1">−</button><b>${r.c}</b><button data-i="${i}" data-d="1">+</button></div><button class="btn red" data-del="${i}" style="padding:8px 10px">🗑️</button></div>`).join("")}
+    <div class="row" style="margin-top:10px"><button class="btn pri" id="rwAdd">➕ مكافأة جديدة</button><button class="btn vio" id="rwAll">نسخ لكل فصولي</button><button class="btn" id="rwBack">↩ المتجر</button></div>`, ()=>setTab("home"));
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    const commit=()=>{ c.rewards=list; save(); };
+    document.querySelectorAll("input[data-f]").forEach(inp=>inp.onchange=()=>{ const r=list[+inp.dataset.i]; r[inp.dataset.f]=inp.value.trim()||(inp.dataset.f==="e"?"🎁":r.t); commit(); });
+    document.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{ const r=list[+b.dataset.i]; r.c=Math.max(1,Math.min(500,r.c+(+b.dataset.d)*(r.c>=20?5:1))); commit(); draw(); });
+    document.querySelectorAll("[data-del]").forEach(b=>b.onclick=()=>{ list.splice(+b.dataset.del,1); commit(); draw(); });
+    $("#rwAdd").onclick=()=>{ list.push({id:"r_"+uid(),e:"🎁",t:"مكافأة جديدة",c:10}); commit(); draw(); };
+    $("#rwAll").onclick=()=>ask("نسخ نفس المكافآت لكل فصولك؟",()=>{ S.classes.forEach(x=>x.rewards=list.map(r=>({...r}))); save(); toast("✅ اتنسخت"); });
+    $("#rwBack").onclick=()=>openShop();
   };
   draw();
 }
@@ -1928,6 +1988,10 @@ function drawKid(prev){
     return `<div class="li"><span class="big-e">${emo(sk.e)}</span><div class="grow"><b>${esc(sk.t)}</b><small>${esc(when)}</small></div><span class="chip ${r.v>0?"p":"n"}">${sgn(r.v)}</span></div>`; }).join("")||`<p class="hint">لسه مفيش نقاط — شارك في الحصة وخد أول نقطة! 💪</p>`;
   const a=k.att||{days:0,a:0,l:0,x:0};
   $("#kAtt").innerHTML=a.days?`<span style="background:#22b573">✅ حاضر ${a.days-a.a-a.x}</span><span style="background:#ff5d5d">❌ غائب ${a.a}</span><span style="background:#f0a020">⏰ متأخر ${a.l}</span><span style="background:#3d8be0">📝 مستأذن ${a.x}</span>`:`<span style="background:#c3c9d8">لسه مفيش تحضير الشهر ده</span>`;
+  const rw=k.rewards||[], bal=k.balance??k.points; $("#kShopCard").hidden=!rw.length; $("#kBal").textContent="رصيد "+bal;
+  $("#kShop").innerHTML=rw.map(r=>{ const ok=bal>=r.c, pc=Math.min(100,Math.round(100*Math.max(0,bal)/r.c));
+    return `<div class="rwk ${ok?"ok":""}"><span class="big-e">${emo(r.e)}</span><div class="grow"><b>${esc(r.t)}</b><div class="bar" style="margin:4px 0 0"><i style="width:${pc}%"></i></div></div><span class="cnt">${r.c} ⭐</span></div>`; }).join("")
+    +(rw.length?`<p class="hint" style="margin:6px 0 0">${PVIEW?"المعلم بيصرف المكافأة لما الطالب يطلبها 🎁":"اجمع النقاط واطلب المكافأة من المعلم 🎁"}</p>`:"");
   const w=k.week||{pos:0,neg:0}; $("#kWeek").innerHTML=`<span style="background:#22b573">⭐ +${w.pos} نقطة</span><span style="background:#ff5d5d">✋ −${w.neg}</span>`;
   $("#kNoteCard").hidden=!k.note; $("#kNote").textContent=k.note||""; try{ $("#kNoteAt").textContent=k.noteAt?new Date(k.noteAt).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"long"}):""; }catch(e){}
   $("#kStyle").hidden=!!PVIEW; $("#kAttH").textContent=PVIEW?"📋 الحضور الشهر ده":"📋 حضورك الشهر ده";
