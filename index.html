@@ -451,6 +451,14 @@ body.board .x{width:52px;height:52px;font-size:1.6rem;top:18px;left:18px}
 .ann.new{background:#f1ecff}.ann.new::before{content:"جديد";float:left;background:#ff5d5d;color:#fff;border-radius:8px;padding:0 8px;font-size:.75rem;font-weight:800}
 .ann p{margin:0 0 4px;font-weight:700;line-height:1.7;white-space:pre-wrap}.ann small{color:var(--muted);font-weight:600}
 .tpls{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.tpls button{background:#f1ecff;color:#5a46b8;border-radius:12px;padding:6px 10px;font-weight:700}
+/* ---------- badges ---------- */
+.bdg{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.bd{background:#f6f8fd;border-radius:18px;padding:10px 6px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:3px;filter:grayscale(1);opacity:.55}
+.bd.got{filter:none;opacity:1;background:linear-gradient(160deg,#fff6d6,#fff);box-shadow:inset 0 0 0 2px #ffd76a}
+.bd .bi .fe{width:40px;height:40px}.bd .bi .fet{font-size:2rem}
+.bd b{font-size:.88rem}.bd small{color:var(--muted);font-size:.7rem;line-height:1.4}.bd .when{color:#c27c00;font-weight:800}.bd .lock{font-size:.7rem}
+.bdg.sm{grid-template-columns:repeat(auto-fill,minmax(86px,1fr))}.bdg.sm .bi .fe{width:32px;height:32px}
+.bstrip{background:#fff6dc;color:#8a5a00}.bstrip .fe{width:1.1em;height:1.1em}
 /* ---------- fx ---------- */
 #fx{position:fixed;inset:0;pointer-events:none;z-index:80}
 .float{direction:ltr;position:fixed;font-weight:800;font-size:2.2rem;z-index:90;pointer-events:none;text-shadow:0 3px 0 rgba(0,0,0,.12)}
@@ -564,6 +572,7 @@ body.board .x{width:52px;height:52px;font-size:1.6rem;top:18px;left:18px}
       <div class="kpts"><b id="kPts">0</b><span>نقطة</span></div>
       <div class="klv" id="kLv"></div><div class="bar kbar"><i id="kBar"></i></div><div class="knext" id="kNext"></div>
       <button class="btn pri" id="kStyle" style="margin-top:12px">🎨 غيّر شكل صقرك</button></div>
+    <div class="kcard"><h3>🏅 الأوسمة <span class="cnt" id="kBdgN" style="float:left"></span></h3><div class="bdg sm" id="kBdg"></div></div>
     <div class="kcard" id="kShopCard" hidden><h3>🎁 متجر المكافآت <span class="cnt" id="kBal" style="float:left"></span></h3><div id="kShop"></div></div>
     <div class="kcard"><h3>🪜 رحلة الصقر</h3><div class="kpath" id="kPath"></div></div>
     <div class="kcard"><h3>⭐ آخر النقاط</h3><div class="list" id="kRecent"></div></div>
@@ -758,7 +767,7 @@ function kidPayloads(){ const m=new Map(), teacher=(USER&&USER.displayName)||"";
   S.classes.forEach(c=>c.students.forEach(s=>{ if(!s.code) return;
     m.set(s.code,{cid:c.id,className:c.name,teacher,name:s.name,points:s.points,pos:s.pos,neg:s.neg,look:s.look,lookAt:s.lookAt||0,
       recent:c.log.filter(l=>l.sid===s.id).slice(-12).reverse().map(l=>({k:l.k,v:l.v,t:l.t,e:l.e||skillOf(l.k).e,nm:l.nm||skillOf(l.k).t})), att:monthAtt(c,s.id), today:attOf(c,todayKey(),s.id)||"",
-      week:weekOf(c,s.id), note:s.note||"", noteAt:s.noteAt||0, balance:balance(s), rewards:rewardsOf(c).map(r=>({e:r.e,t:r.t,c:r.c})), anns:(c.anns||[]).slice(0,3).map(a=>({t:a.text,at:a.at}))}); }));
+      week:weekOf(c,s.id), note:s.note||"", noteAt:s.noteAt||0, balance:balance(s), rewards:rewardsOf(c).map(r=>({e:r.e,t:r.t,c:r.c})), anns:(c.anns||[]).slice(0,3).map(a=>({t:a.text,at:a.at})), badges:Object.keys(s.badges||{})}); }));
   return m; }
 function fixCur(){ if(!S.cur || !S.classes.find(c=>c.id===S.cur)) S.cur = S.classes[0] && S.classes[0].id; }
 function save(){
@@ -898,6 +907,7 @@ function award(ids, skill){
   toast(`${skill.e} ${sgn(skill.v)} ${skill.t} — ${label}`, ()=>{
     ids.forEach(id=>{ const s=stu(id); if(!s) return; s.points-=skill.v; skill.v>0 ? s.pos-- : s.neg--; });
     c.log = c.log.filter(l=>!(l.t===t && l.k===skill.k)); save(); ids.forEach(refreshCard); });
+  ids.forEach(id=>{ const s=stu(id); if(s && skill.v>0) checkBadges(s,c); }); save();
   if(leveled.length) setTimeout(()=>levelUp(leveled[0]), 900);
 }
 function animateCard(id, skill){
@@ -933,7 +943,7 @@ function openStudent(id){
   const all = id==="__all", s = all?null:stu(id), L = all?null:levelOf(s.points);
   const head = all
     ? `<div class="who"><div class="av">${falconSVG({level:2,body:"#f2b01e",mood:"happy"})}</div><div class="info"><b>الفصل كله</b><span>${cls().students.length} طالب</span></div></div>`
-    : `<div class="who"><div class="av">${avatar(s)}</div><div class="info"><b>${esc(s.name)}</b><span>${L.name} · ${s.points} نقطة</span><div class="row" style="margin-top:6px"><button class="btn" onclick="openEdit('${id}')">🎨 تعديل الصقر</button></div></div></div>`;
+    : `<div class="who"><div class="av">${avatar(s)}</div><div class="info"><b>${esc(s.name)}</b><span>${L.name} · ${s.points} نقطة</span><div class="row" style="margin-top:6px"><button class="btn" onclick="openEdit('${id}')">🎨 تعديل الصقر</button><button class="btn bstrip" onclick="openBadges('${id}')">🏅 ${badgeCount(s)} ${BADGES.filter(b=>s.badges&&s.badges[b.id]).slice(-3).map(b=>emo(b.e)).join("")}</button></div></div></div>`;
   openSheet(`${head}<div class="tabs"><button class="tab p on" data-t="p">👍 إيجابي</button><button class="tab n" data-t="n">✋ يحتاج تحسين</button></div><div class="skills" id="skills"></div>
     <div class="row" style="justify-content:center;margin-top:12px">${all?"":`<button class="btn vio" id="goShop">🎁 المتجر · رصيد ${balance(s)}</button>`}<button class="btn" id="goSkills">🎚️ تعديل المهارات والنقاط</button></div>`);
   $("#goSkills").onclick=openSkills; if($("#goShop")) $("#goShop").onclick=()=>openShop(id);
@@ -1203,6 +1213,37 @@ function openSkills(){
   draw();
 }
 
+/* ---------- badges ---------- */
+const BADGES=[
+  {id:"first", e:"🌟", t:"أول نقطة", d:"خد أول نقطة إيجابية", f:x=>x.pos>=1},
+  {id:"falcon",e:"🦅", t:"صار صقر", d:"وصل لمستوى «صقر» (10 نقاط)", f:x=>x.lvl>=1},
+  {id:"pts25", e:"🔥", t:"25 نقطة", d:"جمع 25 نقطة", f:x=>x.points>=25},
+  {id:"pts50", e:"🏆", t:"نص المية", d:"جمع 50 نقطة", f:x=>x.points>=50},
+  {id:"gold",  e:"👑", t:"الصقر الذهبي", d:"وصل للمستوى الذهبي", f:x=>x.lvl>=3},
+  {id:"part10",e:"🙋", t:"صوت الفصل", d:"10 مشاركات", f:x=>x.k("part")>=10},
+  {id:"hw10",  e:"📘", t:"بطل الواجبات", d:"حلّ الواجب 10 مرات", f:x=>x.k("hw")>=10},
+  {id:"help5", e:"💪", t:"الزميل الخدوم", d:"ساعد زمايله 5 مرات", f:x=>x.k("help")>=5},
+  {id:"crea5", e:"💡", t:"المبدع", d:"5 مرات إبداع", f:x=>x.k("crea")>=5},
+  {id:"game10",e:"🎮", t:"عبقري الألعاب", d:"10 إجابات صح في الألعاب", f:x=>x.k("game")>=10},
+  {id:"race",  e:"🏁", t:"بطل السباق", d:"كسب سباق الأسراب", f:x=>x.k("race")>=1},
+  {id:"shop",  e:"🎁", t:"أول مكافأة", d:"اشترى أول مكافأة من المتجر", f:x=>x.k("shop")>=1},
+  {id:"clean", e:"😌", t:"أسبوع مثالي", d:"3 نقاط إيجابية أو أكتر في أسبوع من غير أي ملاحظة", f:x=>x.wpos>=3&&x.wneg===0},
+  {id:"att",   e:"✅", t:"حضور كامل", d:"10 أيام حضور في الشهر من غير غياب", f:x=>x.att.days>=10&&x.att.a===0},
+];
+function badgeCtx(s,c){ const mine=c.log.filter(l=>l.sid===s.id), w=weekOf(c,s.id), cnt={}; mine.forEach(l=>cnt[l.k]=(cnt[l.k]||0)+1);
+  return {pos:s.pos||0, points:s.points||0, lvl:levelOf(s.points).idx, k:k=>cnt[k]||0, wpos:w.pos, wneg:w.neg, att:monthAtt(c,s.id)}; }
+function checkBadges(s,c,quiet){ c=c||cls(); s.badges=s.badges||{}; const x=badgeCtx(s,c), fresh=[];
+  BADGES.forEach(b=>{ if(!s.badges[b.id] && b.f(x)){ s.badges[b.id]=Date.now(); fresh.push(b); } });
+  if(fresh.length && !quiet) setTimeout(()=>{ const b=fresh[0]; SFX.level(); toast(`🏅 ${s.name} كسب وسام «${b.t}»${fresh.length>1?` و${fresh.length-1} كمان`:""}`);
+    const el=document.querySelector(`.card[data-id="${s.id}"]`); if(el){ const r=el.getBoundingClientRect(); burstAt(r.left+r.width/2,r.top+r.height/2,"stars",230); } },1300);
+  return fresh; }
+const badgeCount=s=>Object.keys(s.badges||{}).length;
+function openBadges(sid){ const s=stu(sid); if(!s) return; checkBadges(s,cls(),true); save();
+  openSheet(`<h2>🏅 أوسمة ${esc(s.name)}</h2><p class="hint">${badgeCount(s)} من ${BADGES.length} وسام</p>
+    <div class="bdg">${BADGES.map(b=>{ const got=s.badges&&s.badges[b.id]; return `<div class="bd ${got?"got":""}"><span class="bi">${emo(b.e)}</span><b>${b.t}</b><small>${b.d}</small>${got?`<small class="when">${(()=>{ try{ return new Date(got).toLocaleDateString("ar-EG",{day:"numeric",month:"short"}) }catch(e){ return "" } })()}</small>`:`<small class="lock">🔒</small>`}</div>`; }).join("")}</div>
+    <div class="row" style="margin-top:12px"><button class="btn" onclick="openStudent('${sid}')">↩ ${esc(s.name)}</button></div>`, ()=>setTab("home"));
+  gsap.from(".bd.got",{scale:.6,opacity:0,stagger:.05,duration:.4,ease:"back.out(2)"}); }
+
 /* ---------- rewards shop ---------- */
 const DEF_REWARDS=[{id:"r1",e:"🎨",t:"رسم على السبورة",c:5},{id:"r2",e:"🚶",t:"قائد الطابور",c:5},{id:"r3",e:"🎧",t:"مساعد المعلم ليوم",c:8},
   {id:"r4",e:"💺",t:"اختيار مكانه ليوم",c:10},{id:"r5",e:"🎮",t:"يختار لعبة الحصة",c:12},{id:"r6",e:"📚",t:"إعفاء من واجب",c:20},{id:"r7",e:"🎁",t:"هدية من المعلم",c:30}];
@@ -1229,7 +1270,7 @@ function openShop(sid){
     if(balance(s)<r.c){ SFX.neg(); toast(`محتاج ${r.c-balance(s)} نقطة كمان 💪`); return; }
     ask(`${s.name} يصرف ${r.c} نقطة على «${r.t}»؟`,()=>{ s.spent=(s.spent||0)+r.c; c.log.push({sid:s.id,k:"shop",v:0,t:Date.now(),e:r.e,nm:r.t,cost:r.c}); save(); render();
       SFX.level(); const rc=b.getBoundingClientRect(); burstAt(rc.left+rc.width/2,rc.top+rc.height/2,"stars",220); confetti(rc.left+rc.width/2,rc.top,80);
-      toast(`🎁 ${s.name} اشترى «${r.t}»`); setTimeout(()=>openShop(s.id),700); }); });
+      toast(`🎁 ${s.name} اشترى «${r.t}»`); checkBadges(s,c); save(); setTimeout(()=>openShop(s.id),700); }); });
 }
 function editRewards(){
   const c=cls(); let list=rewardsOf(c).map(x=>({...x}));
@@ -1525,7 +1566,7 @@ function quizGame(){
 // award without re-rendering the grid animations (used inside games)
 function awardQuiet(ids, skill){ const c=cls(), t=Date.now();
   ids.forEach(id=>{ const s=stu(id); if(!s) return; s.points+=skill.v; s.pos++; c.log.push({sid:id,k:skill.k,v:skill.v,t,e:skill.e,nm:skill.t}); });
-  if(c.log.length>5000) c.log=c.log.slice(-5000); save(); render(); }
+  if(c.log.length>5000) c.log=c.log.slice(-5000); ids.forEach(id=>{ const s=stu(id); if(s) checkBadges(s,c); }); save(); render(); }
 
 let RACE=null;
 function raceSetup(){
@@ -1604,7 +1645,7 @@ function openAttendance(day){
       <div class="row" style="margin-top:14px;justify-content:center"><button class="btn vio" onclick="closeSheet()">تم ✔</button></div>`);
     gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
     const ensure=()=>{ if(!c.att[day]) c.att[day]={s:{},t:Date.now()}; return c.att[day]; };
-    const commit=()=>{ save(); render(); const sc=$("#sheet").scrollTop; draw(); $("#sheet").scrollTop=sc; };
+    const commit=()=>{ c.students.forEach(x=>checkBadges(x,c,true)); save(); render(); const sc=$("#sheet").scrollTop; draw(); $("#sheet").scrollTop=sc; };
     $("#agrid").onclick=e=>{ const b=e.target.closest(".at"); if(!b) return; const r=ensure(), cur=r.s[b.dataset.id]||"p";
       const nx=ORDER[(ORDER.indexOf(cur)+1)%4]; if(nx==="p") delete r.s[b.dataset.id]; else r.s[b.dataset.id]=nx; SFX.tick(); commit(); };
     $("#allP").onclick=()=>{ const r=ensure(); r.s={}; SFX.pos(); commit(); toast("✅ تم تحضير الفصل"); };
@@ -1889,7 +1930,7 @@ function drawParent(changed, prev){ drawPAnn();
     return `<button class="pkid" data-c="${esc(c)}">${k.note&&k.noteAt>(seen[c]||0)?`<span class="newnote">📝 رسالة جديدة</span>`:""}
       <span class="av">${avatar({points:k.points,look:k.look||{body:BODY[0],acc:"none"}})}</span>
       <div class="grow"><b>${esc(k.name)}</b><small>${esc(k.className)}${k.teacher?" · أ. "+esc(k.teacher):""}</small>
-        <div class="chips"><span style="background:${st?ATT[st].c:"#c3c9d8"}">${st?emo(ATT[st].e)+" "+ATT[st].t+" اليوم":"لم يُحضَّر اليوم"}</span><span style="background:#7b5cd6">${L.name}</span><span style="background:#22b573">+${w.pos} الأسبوع</span></div></div>
+        <div class="chips"><span style="background:${st?ATT[st].c:"#c3c9d8"}">${st?emo(ATT[st].e)+" "+ATT[st].t+" اليوم":"لم يُحضَّر اليوم"}</span><span style="background:#7b5cd6">${L.name}</span><span style="background:#22b573">+${w.pos} الأسبوع</span>${(k.badges||[]).length?`<span style="background:#f5b301">🏅 ${(k.badges||[]).length}</span>`:""}</div></div>
       <div style="text-align:center"><div class="pp">${k.points}</div><small style="color:var(--muted);font-weight:700">نقطة</small></div></button>`; }).join("")
     + `<button class="pkid padd" id="pAdd">➕ ضيف ابنك أو بنتك بالكود</button>`
     + (kids.length?"":`<p class="hint" style="text-align:center">اطلب الكود من معلم الفصل — كود من 6 حروف وأرقام 🦅</p>`);
@@ -2064,6 +2105,9 @@ function drawKid(prev){
     return `<div class="li"><span class="big-e">${emo(sk.e)}</span><div class="grow"><b>${esc(sk.t)}</b><small>${esc(when)}</small></div><span class="chip ${r.v>0?"p":"n"}">${sgn(r.v)}</span></div>`; }).join("")||`<p class="hint">لسه مفيش نقاط — شارك في الحصة وخد أول نقطة! 💪</p>`;
   const a=k.att||{days:0,a:0,l:0,x:0};
   $("#kAtt").innerHTML=a.days?`<span style="background:#22b573">✅ حاضر ${a.days-a.a-a.x}</span><span style="background:#ff5d5d">❌ غائب ${a.a}</span><span style="background:#f0a020">⏰ متأخر ${a.l}</span><span style="background:#3d8be0">📝 مستأذن ${a.x}</span>`:`<span style="background:#c3c9d8">لسه مفيش تحضير الشهر ده</span>`;
+  const got=new Set(k.badges||[]); $("#kBdgN").textContent=`${got.size} / ${BADGES.length}`;
+  $("#kBdg").innerHTML=BADGES.map(b=>`<div class="bd ${got.has(b.id)?"got":""}" title="${esc(b.d)}"><span class="bi">${emo(b.e)}</span><b>${b.t}</b>${got.has(b.id)?"":`<small class="lock">${esc(b.d)}</small>`}</div>`).join("");
+  if(prev && (k.badges||[]).length>(prev.badges||[]).length){ const nb=BADGES.find(b=>got.has(b.id)&&!(prev.badges||[]).includes(b.id)); if(nb) setTimeout(()=>{ SFX.level(); toast(`🏅 مبروك! كسبت وسام «${nb.t}»`); burstAt(innerWidth/2,innerHeight/2,"fireworks",300); },1500); }
   const rw=k.rewards||[], bal=k.balance??k.points; $("#kShopCard").hidden=!rw.length; $("#kBal").textContent="رصيد "+bal;
   $("#kShop").innerHTML=rw.map(r=>{ const ok=bal>=r.c, pc=Math.min(100,Math.round(100*Math.max(0,bal)/r.c));
     return `<div class="rwk ${ok?"ok":""}"><span class="big-e">${emo(r.e)}</span><div class="grow"><b>${esc(r.t)}</b><div class="bar" style="margin:4px 0 0"><i style="width:${pc}%"></i></div></div><span class="cnt">${r.c} ⭐</span></div>`; }).join("")
