@@ -386,6 +386,7 @@ body:has(#kid.show) .ov,body:has(#par.show) .ov{padding-bottom:0}
 .opt.ok{border-color:#22b573;background:#ddf7ea}
 .codeb{display:block;background:#fff;border-radius:12px;padding:8px 10px;margin:6px 0;font-weight:700;color:#27407a;line-height:1.8;unicode-bidi:plaintext}
 .bsel{width:100%;padding:10px;border-radius:12px;border:2px solid #e3e8f3;font-weight:700;background:#fafbff;margin:4px 0}
+.aibtn.ai2{background:linear-gradient(135deg,#ff9d4d,#ff6a3d)}
 .bmeta{display:inline-block;background:#eef4ff;color:#27407a;border-radius:10px;padding:1px 10px;font-weight:800;font-size:.8rem;margin:2px 0}
 .aqw{display:grid;gap:6px}
 .unit{background:#f6f8fd;border-radius:18px;padding:10px 12px;margin-bottom:8px}.unit h3{margin:0 0 6px;font-size:1.05rem}
@@ -1731,22 +1732,20 @@ async function aiUpload(file,key,onStep){
   if(f.state==="FAILED") throw new Error("جوجل مقدرش يقرا الملف");
   return {file_data:{mime_type:"application/pdf",file_uri:f.uri}};
 }
-async function aiBuildBank(part,key,opt){
-  const schema={type:"OBJECT",properties:{title:{type:"STRING"},units:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},lessons:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},
-    qs:{type:"ARRAY",items:{type:"OBJECT",properties:{q:{type:"STRING"},a:{type:"STRING"},wrong:{type:"ARRAY",items:{type:"STRING"}}},required:["q","a"]}}},required:["name","qs"]}}},required:["name","lessons"]}}},required:["units"]};
-  const M=opt.meta||{}, who=[M.subject&&("مادة "+M.subject),M.grade&&("الصف "+M.grade),M.term].filter(Boolean).join(" — ");
-  const prompt=`أنت معلم خبير في المنهج السعودي. الملف المرفق كتاب مدرسي${who?` (${who})`:""}.${opt.scope?`\nالمطلوب فقط الجزء ده من الكتاب: «${opt.scope}» — تجاهل باقي الوحدات والدروس.`:""}
-المطلوب: استخرج فهرس الكتاب بالوحدات والدروس بنفس عناوين الكتاب بالظبط وبنفس الترتيب${opt.range?`، وركّز فقط على الصفحات ${opt.range}`:""}.
-لكل درس اكتب ${opt.n} أسئلة متنوعة من محتوى الدرس نفسه (فهم وتطبيق ومسائل)، بالعربية الفصحى المبسطة المناسبة لمستوى الطلاب.
-${opt.mcq?"اجعل أغلب الأسئلة اختيار من متعدد: ضع الإجابة الصحيحة في a وثلاث إجابات خاطئة معقولة في wrong.":"اجعل الأسئلة قصيرة الإجابة: الإجابة الصحيحة في a واترك wrong فارغة."}
-الإجابات قصيرة ودقيقة. استخدم الأرقام الإنجليزية في المسائل. لا تكرر الأسئلة. اكتب في title اسم الكتاب والصف والفصل الدراسي.`;
-  const body={contents:[{role:"user",parts:[part,{text:prompt}]}],generationConfig:{responseMimeType:"application/json",responseSchema:schema,temperature:.4,maxOutputTokens:65536}};
-  // try the best model first; if it is busy/overloaded, wait and retry, then fall back to the next models
+function aiUnitsFrom(j){
+  const txt=((j.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||"").join("");
+  let d; try{ d=JSON.parse(txt); }catch(e){ const m=txt.lastIndexOf("}]}"); try{ d=JSON.parse(txt.slice(0,m+3)+"]}"); }catch(e2){ throw new Error("الرد اتقطع — جرّب عدد أسئلة أقل أو حدد صفحات"); } }
+  const units=(d.units||[]).map(u=>({name:String(u.name||"وحدة").slice(0,80),lessons:(u.lessons||[]).map(l=>({name:String(l.name||"درس").slice(0,80),
+    qs:(l.qs||[]).filter(q=>q&&q.q&&q.a).map(q=>{ const w=(q.wrong||[]).map(String).filter(x=>x&&x!==q.a).slice(0,3); return w.length?{q:String(q.q).slice(0,300),a:String(q.a).slice(0,120),ch:[String(q.a),...w]}:{q:String(q.q).slice(0,300),a:String(q.a).slice(0,120)}; })})).filter(l=>l.qs.length)})).filter(u=>u.lessons.length);
+  return {title:String(d.title||"").slice(0,60),units};
+}
+async function aiRequest(body,key,onStatus){
+// try the best model first; if it is busy/overloaded, wait and retry, then fall back to the next models
   const busy=(st,m)=>st===503||st===429||st===500||/overloaded|high demand|UNAVAILABLE|RESOURCE_EXHAUSTED|try again/i.test(m||"");
   const models=(AIMODELS.length?AIMODELS:[AIMODEL]); let j=null, lastErr="";
   outer: for(let mi=0; mi<models.length; mi++){
     for(let attempt=0; attempt<2; attempt++){
-      if(mi||attempt) opt.onStatus&&opt.onStatus(mi?`النموذج مشغول — بجرّب نموذج تاني (${models[mi].replace("models/","")})…`:"النموذج مشغول — بعيد المحاولة…");
+      if(mi||attempt) onStatus&&onStatus(mi?`النموذج مشغول — بجرّب نموذج تاني (${models[mi].replace("models/","")})…`:"النموذج مشغول — بعيد المحاولة…");
       let r; try{ r=await fetch(`${GAPI}/v1beta/${models[mi]}:generateContent?key=${encodeURIComponent(key)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); }
       catch(e){ lastErr="مفيش اتصال بالإنترنت"; await new Promise(z=>setTimeout(z,3000)); continue; }
       const jj=await r.json().catch(()=>({}));
@@ -1757,11 +1756,20 @@ ${opt.mcq?"اجعل أغلب الأسئلة اختيار من متعدد: ضع �
     }
   }
   if(!j) throw new Error("خدمة Gemini عليها ضغط كبير دلوقتي — جرّب كمان شوية دقايق");
-  const txt=((j.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||"").join("");
-  let d; try{ d=JSON.parse(txt); }catch(e){ const m=txt.lastIndexOf("}]}"); try{ d=JSON.parse(txt.slice(0,m+3)+"]}"); }catch(e2){ throw new Error("الرد اتقطع — جرّب عدد أسئلة أقل أو حدد صفحات"); } }
-  const units=(d.units||[]).map(u=>({name:String(u.name||"وحدة").slice(0,80),lessons:(u.lessons||[]).map(l=>({name:String(l.name||"درس").slice(0,80),
-    qs:(l.qs||[]).filter(q=>q&&q.q&&q.a).map(q=>{ const w=(q.wrong||[]).map(String).filter(x=>x&&x!==q.a).slice(0,3); return w.length?{q:String(q.q).slice(0,300),a:String(q.a).slice(0,120),ch:[String(q.a),...w]}:{q:String(q.q).slice(0,300),a:String(q.a).slice(0,120)}; })})).filter(l=>l.qs.length)})).filter(u=>u.lessons.length);
-  return {title:String(d.title||"").slice(0,60),units};
+  return j;
+}
+async function aiBuildBank(part,key,opt){
+  const schema={type:"OBJECT",properties:{title:{type:"STRING"},units:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},lessons:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},
+    qs:{type:"ARRAY",items:{type:"OBJECT",properties:{q:{type:"STRING"},a:{type:"STRING"},wrong:{type:"ARRAY",items:{type:"STRING"}}},required:["q","a"]}}},required:["name","qs"]}}},required:["name","lessons"]}}},required:["units"]};
+  const M=opt.meta||{}, who=[M.subject&&("مادة "+M.subject),M.grade&&("الصف "+M.grade),M.term].filter(Boolean).join(" — ");
+  const prompt=`أنت معلم خبير في المنهج السعودي. الملف المرفق كتاب مدرسي${who?` (${who})`:""}.${opt.scope?`\nالمطلوب فقط الجزء ده من الكتاب: «${opt.scope}» — تجاهل باقي الوحدات والدروس.`:""}
+المطلوب: استخرج فهرس الكتاب بالوحدات والدروس بنفس عناوين الكتاب بالظبط وبنفس الترتيب${opt.range?`، وركّز فقط على الصفحات ${opt.range}`:""}.
+لكل درس اكتب ${opt.n} أسئلة متنوعة من محتوى الدرس نفسه (فهم وتطبيق ومسائل)، بالعربية الفصحى المبسطة المناسبة لمستوى الطلاب.
+${opt.mcq?"اجعل أغلب الأسئلة اختيار من متعدد: ضع الإجابة الصحيحة في a وثلاث إجابات خاطئة معقولة في wrong.":"اجعل الأسئلة قصيرة الإجابة: الإجابة الصحيحة في a واترك wrong فارغة."}
+الإجابات قصيرة ودقيقة. استخدم الأرقام الإنجليزية في المسائل. لا تكرر الأسئلة. اكتب في title اسم الكتاب والصف والفصل الدراسي.`;
+  const body={contents:[{role:"user",parts:[part,{text:prompt}]}],generationConfig:{responseMimeType:"application/json",responseSchema:schema,temperature:.4,maxOutputTokens:65536}};
+  const j=await aiRequest(body,key,opt.onStatus);
+  return aiUnitsFrom(j);
 }
 function openAIBook(){
   if(!aiKey()){ toast("أضف مفتاح Gemini الأول ✨"); openAIKey(); return; }
@@ -1804,11 +1812,68 @@ async function runAI(file,opt){
     <div class="row"><button class="btn pri" id="aiRetry">جرّب تاني</button><button class="btn" id="aiKeyB">المفتاح</button></div>`);
     $("#aiRetry").onclick=openAIBook; $("#aiKeyB").onclick=openAIKey; }
 }
-function aiPreview(res,fname){
+/* ---------- AI questions without a book: from subject, grade, unit and lesson ---------- */
+async function aiGenQs(key,opt){
+  const schema={type:"OBJECT",properties:{units:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},lessons:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},
+    qs:{type:"ARRAY",items:{type:"OBJECT",properties:{q:{type:"STRING"},a:{type:"STRING"},wrong:{type:"ARRAY",items:{type:"STRING"}}},required:["q","a"]}}},required:["name","qs"]}}},required:["name","lessons"]}}},required:["units"]};
+  const M=opt.meta||{};
+  const prompt=`أنت معلم خبير في مناهج وزارة التعليم في السعودية.
+اكتب أسئلة لمادة «${M.subject}» للصف «${M.grade}»${M.term?` — ${M.term}`:""}.
+${opt.unit?`الوحدة: «${opt.unit}».`:""} ${opt.lesson?`الدرس: «${opt.lesson}».`:""}
+${opt.lesson?`اكتب ${opt.n} أسئلة لهذا الدرس فقط، وضعها في وحدة واحدة باسم الوحدة المذكورة${opt.unit?"":" (اكتب اسم الوحدة التي يتبعها الدرس في الكتاب)"} ودرس واحد باسم الدرس.`
+  :`اكتب دروس هذه الوحدة كما هي في الكتاب المدرسي بنفس الترتيب، ولكل درس ${opt.n} أسئلة.`}
+${opt.notes?`ملاحظات المعلم: ${opt.notes}`:""}
+الأسئلة متنوعة (تذكر وفهم وتطبيق) ومناسبة لعمر الطلاب، بالعربية الفصحى المبسطة${/إنجليزي|English/i.test(M.subject||"")?"، وأسئلة اللغة الإنجليزية تكتب بالإنجليزية":""}.
+${opt.mcq?"اجعل الأسئلة اختيار من متعدد: الإجابة الصحيحة في a وثلاث إجابات خاطئة معقولة في wrong.":"اجعل الأسئلة قصيرة الإجابة: الإجابة الصحيحة في a (كلمة أو رقم أو جملة قصيرة) واترك wrong فارغة."}
+الإجابات دقيقة وقصيرة. استخدم الأرقام الإنجليزية. لا تكرر الأسئلة.`;
+  const body={contents:[{role:"user",parts:[{text:prompt}]}],generationConfig:{responseMimeType:"application/json",responseSchema:schema,temperature:.6,maxOutputTokens:32768}};
+  const j=await aiRequest(body,key,opt.onStatus);
+  return aiUnitsFrom(j);
+}
+function openAIGen(pre){ pre=pre||{};
+  if(!aiKey()){ toast("أضف مفتاح Gemini الأول ✨"); openAIKey(); return; }
+  const B=S.banks||[], bk=pre.bank&&B.find(x=>x.id===pre.bank);
+  const m=bk&&bk.subject?{subject:bk.subject,grade:bk.grade||"",term:bk.term||""}:(openAIBook.m=openAIBook.m||{subject:"",grade:"",term:""});
+  const st={unit:pre.unit||"",lesson:pre.lesson||"",n:pre.n||5,mcq:pre.mcq!==undefined?pre.mcq:true,notes:""};
+  const draw=()=>{ openSheet(`<h2>✨ أسئلة بالذكاء الاصطناعي</h2><p class="hint">من غير ما ترفع كتاب — حدّد المادة والصف والوحدة أو الدرس، وجيميني يكتب الأسئلة من المنهج</p>
+      ${bk?`<p class="hint">📚 هتتحفظ في: <b>${esc(bk.title)}</b></p>`:""}
+      ${metaFormHTML(m)}
+      <b style="display:block;margin-top:10px">📂 الوحدة</b><input class="field" id="agU" maxlength="80" placeholder="مثلاً: الوحدة الثانية: المادة وتغيراتها" value="${esc(st.unit)}">
+      <b style="display:block;margin-top:8px">📄 الدرس <small class="hint">(سيبه فاضي لو عايز كل دروس الوحدة)</small></b><input class="field" id="agL" maxlength="80" placeholder="مثلاً: حالات المادة" value="${esc(st.lesson)}">
+      <b style="display:block;margin-top:10px">عدد الأسئلة ${st.lesson?"":"لكل درس"}</b><div class="seg2" id="agN">${[3,5,8,10,15].map(k=>`<button data-n="${k}" class="${k===st.n?"on":""}">${k}</button>`).join("")}</div>
+      <b>نوع الأسئلة</b><div class="seg2" id="agM"><button data-m="1" class="${st.mcq?"on":""}">اختيار من متعدد</button><button data-m="0" class="${!st.mcq?"on":""}">إجابة قصيرة</button></div>
+      <b>ملاحظات (اختياري)</b><input class="field" id="agX" maxlength="150" placeholder="مثلاً: ركّز على المسائل الكلامية — أو: مستوى سهل" value="${esc(st.notes)}">
+      <div class="row" style="justify-content:center;margin-top:12px"><button class="btn pri" id="agGo">✨ اكتب الأسئلة</button></div>`, ()=>setTab("home"));
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    bindMetaForm(m);
+    const grab=()=>{ st.unit=$("#agU").value.trim(); st.lesson=$("#agL").value.trim(); st.notes=$("#agX").value.trim(); };
+    $("#agN").onclick=e=>{ const b=e.target.closest("[data-n]"); if(!b) return; grab(); st.n=+b.dataset.n; draw(); };
+    $("#agM").onclick=e=>{ const b=e.target.closest("[data-m]"); if(!b) return; grab(); st.mcq=b.dataset.m==="1"; draw(); };
+    $("#agL").oninput=()=>{ const had=!!st.lesson; grab(); if(had!==!!st.lesson){ const l=$("#agN").previousElementSibling; if(l) l.firstChild.textContent="عدد الأسئلة "+(st.lesson?"":"لكل درس"); } };
+    $("#agGo").onclick=()=>{ grab(); if(!m.subject){ toast("اختار المادة"); return; } if(!m.grade){ toast("اختار الصف"); return; } if(!st.unit&&!st.lesson){ toast("اكتب اسم الوحدة أو الدرس"); return; }
+      runAIGen({...st,meta:{...m}},bk&&bk.id); };
+  };
+  draw();
+}
+async function runAIGen(opt,bid){
+  openSheet(`<h2>✨ جيميني بيكتب الأسئلة…</h2><div class="aifal" id="aiFal">${falconSVG({level:1,body:"#7b5cd6",acc:"grad",mood:"happy"})}</div>
+    <p class="hint" style="text-align:center;font-weight:700">${esc(opt.meta.subject)} · ${esc(opt.meta.grade)}<br>${esc([opt.unit,opt.lesson].filter(Boolean).join(" — "))}</p>
+    <p class="hint" id="aiStat" style="text-align:center;color:#7b5cd6;font-weight:700;min-height:1.4em"></p><p class="hint" style="text-align:center">بياخد من ١٠ ثواني لدقيقة 🦅</p>`);
+  const f=$("#aiFal .fal"); if(f) f.classList.add("flap"); gsap.to("#aiFal",{y:-12,duration:.8,yoyo:true,repeat:-1,ease:"sine.inOut"});
+  const key=aiKey();
+  try{ if(!AIMODEL) await aiPickModel(key);
+    const res=await aiGenQs(key,{...opt,onStatus:t=>{ const el=$("#aiStat"); if(el) el.textContent=t; }});
+    if(!res.units.length) throw new Error("ماطلعتش أسئلة — جرّب تكتب اسم الوحدة أو الدرس بشكل أوضح");
+    res.meta=opt.meta; res.title=autoBankTitle(opt.meta); aiPreview(res,res.title,bid);
+  }catch(e){ openSheet(`<h2>❌ ماقدرتش أكتب الأسئلة</h2><p class="hint" style="font-size:1rem">${esc(e.message||"حصل خطأ")}</p>
+    <div class="row"><button class="btn pri" id="agRetry">جرّب تاني</button><button class="btn" id="agKey">المفتاح</button></div>`);
+    $("#agRetry").onclick=()=>openAIGen({bank:bid,unit:opt.unit,lesson:opt.lesson,n:opt.n,mcq:opt.mcq}); $("#agKey").onclick=openAIKey; }
+}
+function aiPreview(res,fname,bid){
   const total=res.units.reduce((a,u)=>a+u.lessons.reduce((x,l)=>x+l.qs.length,0),0), B=S.banks=S.banks||[];
   openSheet(`<h2>🎉 البنك جاهز!</h2><p class="hint">${res.units.length} وحدة · ${res.units.reduce((a,u)=>a+u.lessons.length,0)} درس · ${total} سؤال</p>
     ${res.units.map(u=>`<div class="unit"><h3>${esc(u.name)}</h3>${u.lessons.map(l=>`<div class="lrow2"><span class="grow">${esc(l.name)}</span><span class="cnt">${l.qs.length}</span></div>`).join("")}</div>`).join("")}
-    <b>احفظه في:</b><select class="bsel" id="apB"><option value="__new">بنك جديد: ${esc(res.meta&&res.meta.subject?autoBankTitle(res.meta):(res.title||fname))}</option>${B.map(b=>`<option value="${b.id}">${esc(b.title)}</option>`).join("")}</select>
+    <b>احفظه في:</b><select class="bsel" id="apB"><option value="__new">بنك جديد: ${esc(res.meta&&res.meta.subject?autoBankTitle(res.meta):(res.title||fname))}</option>${B.map(b=>{ const same=bid?b.id===bid:(res.meta&&res.meta.subject&&b.subject===res.meta.subject&&b.grade===res.meta.grade); return `<option value="${b.id}" ${same?"selected":""}>${esc(b.title)}</option>`; }).join("")}</select>
     <div class="row" style="margin-top:10px"><button class="btn pri" id="apSave">💾 حفظ البنك</button></div>`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); SFX.level(); confetti(innerWidth/2,innerHeight/3,120);
   $("#apSave").onclick=()=>{ const v=$("#apB").value; let b=B.find(x=>x.id===v); if(!b){ const M=res.meta||{}; b={id:uid(),title:(M.subject?autoBankTitle(M):(res.title||fname)).slice(0,60),subject:M.subject||"",grade:M.grade||"",term:M.term||"",units:[]}; B.push(b); }
@@ -1982,7 +2047,8 @@ function openAddQ(bid, ui, li, keep){ const b=(S.banks||[]).find(x=>x.id===bid);
     <b>❓ السؤال</b><textarea class="field" id="aqQ" maxlength="300" style="min-height:70px" placeholder="اكتب السؤال"></textarea>
     <b style="display:block;margin-top:8px">✅ الإجابة الصحيحة</b><input class="field" id="aqA" maxlength="120" placeholder="الإجابة الصحيحة">
     ${st.mcq?`<b style="display:block;margin-top:8px">❌ اختيارات غلط</b><div class="aqw">${[0,1,2].map(i=>`<input class="field" id="aqW${i}" maxlength="120" placeholder="اختيار غلط ${i+1}">`).join("")}</div>`:""}
-    <div class="row" style="margin-top:12px"><button class="btn pri" id="aqGo">💾 حفظ وإضافة سؤال تاني</button><button class="btn" id="aqDone">✔ خلصت</button></div>`, ()=>setTab("home"));
+    <div class="row" style="margin-top:12px"><button class="btn pri" id="aqGo">💾 حفظ وإضافة سؤال تاني</button><button class="btn" id="aqDone">✔ خلصت</button></div>
+    <button class="aibtn ai2" id="aqAI" style="margin-top:12px"><span class="aiic">✨</span><span class="grow"><b>خلّي جيميني يكتب أسئلة الدرس ده</b><small>بالمادة والصف والوحدة والدرس اللي اخترتهم — من غير كتاب</small></span><span class="chev">‹</span></button>`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
   const grab=()=>{ if($("#aqNU")) st.newU=$("#aqNU").value; if($("#aqNL")) st.newL=$("#aqNL").value; };
   $("#aqU").onchange=e=>{ grab(); st.ui=e.target.value; st.li=""; openAddQ(bid,null,null,st); };
@@ -1998,6 +2064,8 @@ function openAddQ(bid, ui, li, keep){ const b=(S.banks||[]).find(x=>x.id===bid);
     let L=U.lessons.find(x=>x.id===st.li); if(!L){ L={id:uid(),name:st.newL.trim().slice(0,80),qs:[]}; U.lessons.push(L); st.li=L.id; st.newL=""; }
     L.qs.push(w.length?{q:q.slice(0,300),a:a.slice(0,120),ch:[a.slice(0,120),...w]}:{q:q.slice(0,300),a:a.slice(0,120)}); saveBanks(); SFX.pos();
     toast(`✅ اتضاف — «${L.name}» فيه ${L.qs.length} سؤال`); return {U,L}; };
+  $("#aqAI").onclick=()=>{ grab(); const U=b.units.find(x=>x.id===st.ui), L=U&&U.lessons.find(x=>x.id===st.li);
+    openAIGen({bank:bid,unit:U?U.name:st.newU.trim(),lesson:L?L.name:st.newL.trim(),mcq:st.mcq}); };
   $("#aqGo").onclick=()=>{ if(save()){ openAddQ(bid,null,null,st); setTimeout(()=>$("#aqQ")&&$("#aqQ").focus(),250); } };
   $("#aqDone").onclick=()=>{ const has=$("#aqQ").value.trim()||$("#aqA").value.trim(); if(has){ const r=save(); if(!r) return; openLessonEd(bid,r.U.id,r.L.id); return; } openBankEd(bid); };
 }
@@ -2006,17 +2074,18 @@ function openBanks(){
   migrateQs(); const B=S.banks=S.banks||[];
   openSheet(`<h2>📚 بنوك الأسئلة والمنهج</h2>
     <button class="aibtn" id="aiBook"><span class="aiic">✨</span><span class="grow"><b>حوّل كتاب المنهج لبنك أسئلة</b><small>ارفع ملف الكتاب PDF، والذكاء الاصطناعي يرتّبه وحدات ودروس ويطلّع أسئلة لكل درس</small></span><span class="chev">‹</span></button>
+    <button class="aibtn ai2" id="aiGen"><span class="aiic">🪄</span><span class="grow"><b>أسئلة بالذكاء الاصطناعي من غير كتاب</b><small>اختار المادة والصف واكتب الوحدة أو الدرس، وجيميني يكتب الأسئلة من المنهج</small></span><span class="chev">‹</span></button>
     <div class="list">${B.map(b=>`<button class="li" data-b="${b.id}" style="width:100%;text-align:right"><span class="big-e">${emo("📚")}</span><div class="grow"><b>${esc(b.title)}</b>${bankLabel(b)?`<span class="bmeta">${esc(bankLabel(b))}</span>`:""}<small>${b.units.length} وحدة · ${bankCount(b)} سؤال</small></div><span class="chev" style="color:#b6bfd3">‹</span></button>`).join("")||"<p class='hint'>لسه مفيش بنوك</p>"}</div>
     <div class="row" style="margin-top:12px"><button class="btn pri" id="nbGo">➕ بنك جديد (مادة وصف)</button></div>`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
   document.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>openBankEd(b.dataset.b));
-  $("#aiBook").onclick=openAIBook;
+  $("#aiBook").onclick=openAIBook; $("#aiGen").onclick=()=>openAIGen();
   $("#nbGo").onclick=openNewBank;
 }
 function openBankEd(id){
   const b=(S.banks||[]).find(x=>x.id===id); if(!b) return openBanks();
   openSheet(`<h2>📚 ${esc(b.title)}</h2>${bankLabel(b)?`<span class="bmeta">${esc(bankLabel(b))}</span>`:`<button class="btn" id="bkMeta0" style="margin-bottom:6px">🎒 حدّد المادة والصف</button>`}<p class="hint">${b.units.length} وحدة · ${bankCount(b)} سؤال</p>
-    <div class="row" style="margin-bottom:10px"><button class="btn pri" id="bkQ">➕ إضافة سؤال (بالوحدة والدرس)</button></div>
+    <div class="row" style="margin-bottom:10px"><button class="btn pri" id="bkQ">➕ إضافة سؤال (بالوحدة والدرس)</button><button class="btn vio" id="bkAI">✨ أسئلة بجيميني</button></div>
     ${b.units.map(u=>`<div class="unit"><h3>${esc(u.name)} <span class="cnt">${unitCount(u)}</span></h3>${u.lessons.map(l=>`<button class="lrow2" data-l="${u.id}|${l.id}"><span class="grow">${esc(l.name)}</span><span class="cnt">${l.qs.length}</span><span class="chev" style="color:#b6bfd3">‹</span></button>`).join("")}</div>`).join("")||"<p class='hint'>البنك فاضي — استورد أسئلة من تحت 👇</p>"}
     <div class="kcard" style="background:#f6f8fd;box-shadow:none"><h3>📥 إضافة أسئلة كتير مرة واحدة</h3>
       <p class="hint" style="margin-top:0">الصق بالشكل ده، أو اختار ملف .txt / .json:<br><span class="codeb"># الوحدة الأولى: الماء<br>## الدرس 1: حالات الماء<br>كم حالة للماء؟ = 3<br>تحول الماء من سائل إلى غاز يسمى = التبخر | التكثف | التجمد | الانصهار</span><br>الخيارات بعد | معناها سؤال اختيار من متعدد.</p>
@@ -2031,7 +2100,7 @@ function openBankEd(id){
   $("#bkFile").onchange=e=>readFile(e.target).then(imp).catch(()=>toast("تعذّر قراءة الملف"));
   $("#bkCopy").onclick=()=>copyText(bankToText(b),"📋 اتنسخ البنك");
   $("#bkRen").onclick=()=>openBankMeta(id); if($("#bkMeta0")) $("#bkMeta0").onclick=()=>openBankMeta(id);
-  $("#bkQ").onclick=()=>openAddQ(id);
+  $("#bkQ").onclick=()=>openAddQ(id); $("#bkAI").onclick=()=>openAIGen({bank:id});
   $("#bkDel").onclick=()=>ask("حذف بنك «"+b.title+"» بكل أسئلته؟",()=>{ S.banks=S.banks.filter(x=>x.id!==id); saveBanks(); openBanks(); });
   $("#bkBack").onclick=openBanks;
   document.querySelectorAll("[data-l]").forEach(x=>x.onclick=()=>{ const [ui,li]=x.dataset.l.split("|"); openLessonEd(id,ui,li); });
