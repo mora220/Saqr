@@ -380,6 +380,8 @@ body:has(#kid.show) .ov,body:has(#par.show) .ov{padding-bottom:0}
 .opt.ok{border-color:#22b573;background:#ddf7ea}
 .codeb{display:block;background:#fff;border-radius:12px;padding:8px 10px;margin:6px 0;font-weight:700;color:#27407a;line-height:1.8;unicode-bidi:plaintext}
 .bsel{width:100%;padding:10px;border-radius:12px;border:2px solid #e3e8f3;font-weight:700;background:#fafbff;margin:4px 0}
+.bmeta{display:inline-block;background:#eef4ff;color:#27407a;border-radius:10px;padding:1px 10px;font-weight:800;font-size:.8rem;margin:2px 0}
+.aqw{display:grid;gap:6px}
 .unit{background:#f6f8fd;border-radius:18px;padding:10px 12px;margin-bottom:8px}.unit h3{margin:0 0 6px;font-size:1.05rem}
 .lrow2{display:flex;align-items:center;gap:8px;padding:8px 6px;border-top:1px solid #e9edf6;width:100%;background:none;text-align:right;font-weight:700;color:var(--ink)}
 .lrow2 .grow{flex:1}.cnt{background:#e7e0ff;color:#5a46b8;border-radius:10px;padding:1px 9px;font-weight:800;font-size:.85rem}
@@ -1715,7 +1717,8 @@ async function aiUpload(file,key,onStep){
 async function aiBuildBank(part,key,opt){
   const schema={type:"OBJECT",properties:{title:{type:"STRING"},units:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},lessons:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},
     qs:{type:"ARRAY",items:{type:"OBJECT",properties:{q:{type:"STRING"},a:{type:"STRING"},wrong:{type:"ARRAY",items:{type:"STRING"}}},required:["q","a"]}}},required:["name","qs"]}}},required:["name","lessons"]}}},required:["units"]};
-  const prompt=`أنت معلم خبير في المنهج السعودي. الملف المرفق كتاب مدرسي.
+  const M=opt.meta||{}, who=[M.subject&&("مادة "+M.subject),M.grade&&("الصف "+M.grade),M.term].filter(Boolean).join(" — ");
+  const prompt=`أنت معلم خبير في المنهج السعودي. الملف المرفق كتاب مدرسي${who?` (${who})`:""}.${opt.scope?`\nالمطلوب فقط الجزء ده من الكتاب: «${opt.scope}» — تجاهل باقي الوحدات والدروس.`:""}
 المطلوب: استخرج فهرس الكتاب بالوحدات والدروس بنفس عناوين الكتاب بالظبط وبنفس الترتيب${opt.range?`، وركّز فقط على الصفحات ${opt.range}`:""}.
 لكل درس اكتب ${opt.n} أسئلة متنوعة من محتوى الدرس نفسه (فهم وتطبيق ومسائل)، بالعربية الفصحى المبسطة المناسبة لمستوى الطلاب.
 ${opt.mcq?"اجعل أغلب الأسئلة اختيار من متعدد: ضع الإجابة الصحيحة في a وثلاث إجابات خاطئة معقولة في wrong.":"اجعل الأسئلة قصيرة الإجابة: الإجابة الصحيحة في a واترك wrong فارغة."}
@@ -1745,19 +1748,22 @@ ${opt.mcq?"اجعل أغلب الأسئلة اختيار من متعدد: ضع �
 }
 function openAIBook(){
   if(!aiKey()){ toast("أضف مفتاح Gemini الأول ✨"); openAIKey(); return; }
-  let file=null, n=5, mcq=true;
+  let file=null, n=5, mcq=true; const m=openAIBook.m=openAIBook.m||{subject:"",grade:"",term:""}; let scope=openAIBook.scope||"";
   const draw=()=>{ openSheet(`<h2>✨ تحويل الكتاب لبنك أسئلة</h2>
     <label class="drop ${file?"has":""}">${emo(file?"✅":"📚")}<b>${file?esc(file.name):"اختار ملف الكتاب (PDF)"}</b><small class="hint">${file?(file.size/1048576).toFixed(1)+" MB":"لحد 50 MB"}</small><input type="file" id="aiF" accept="application/pdf,.pdf" hidden></label>
     <b style="display:block;margin-top:12px">عدد الأسئلة لكل درس</b><div class="seg2">${[3,5,8,10].map(k=>`<button data-n="${k}" class="${k===n?"on":""}">${k}</button>`).join("")}</div>
     <b>نوع الأسئلة</b><div class="seg2"><button data-m="1" class="${mcq?"on":""}">اختيار من متعدد</button><button data-m="0" class="${!mcq?"on":""}">إجابة قصيرة</button></div>
-    <b>الصفحات (اختياري)</b><input class="field" id="aiR" placeholder="مثلاً: 10-85 — سيبها فاضية للكتاب كله" dir="rtl">
+    ${metaFormHTML(m)}
+    <b style="display:block;margin-top:10px">📂 وحدة أو درس معيّن (اختياري)</b><input class="field" id="aiS" maxlength="100" placeholder="مثلاً: الوحدة الثالثة — أو: درس الكسور العشرية" value="${esc(scope)}">
+    <b style="display:block;margin-top:10px">الصفحات (اختياري)</b><input class="field" id="aiR" placeholder="مثلاً: 10-85 — سيبها فاضية للكتاب كله" dir="rtl">
     <p class="hint">💡 لو الكتاب كبير، حوّله على أجزاء (وحدة أو وحدتين كل مرة) عشان النتيجة تبقى أدق.</p>
     <div class="row" style="justify-content:center;margin-top:8px"><button class="btn pri" id="aiGo" ${file?"":"disabled style='opacity:.5'"}>✨ ابدأ التحويل</button></div>`, ()=>setTab("home"));
     gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    bindMetaForm(m); $("#aiS").oninput=e=>{ scope=openAIBook.scope=e.target.value; };
     $("#aiF").onchange=e=>{ const f=e.target.files[0]; if(!f) return; if(f.size>50*1048576){ toast("الملف أكبر من 50 MB — قسّمه"); return; } file=f; draw(); };
     document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{ n=+b.dataset.n; draw(); });
     document.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{ mcq=b.dataset.m==="1"; draw(); });
-    $("#aiGo").onclick=()=>{ if(file) runAI(file,{n,mcq,range:$("#aiR").value.trim()}); };
+    $("#aiGo").onclick=()=>{ if(file) runAI(file,{n,mcq,range:$("#aiR").value.trim(),scope:scope.trim(),meta:{...m}}); };
   };
   draw();
 }
@@ -1776,7 +1782,7 @@ async function runAI(file,opt){
     const t=setTimeout(()=>{ cur=3; paint(); },25000);
     const res=await aiBuildBank(part,key,{...opt,onStatus:t=>{ const el=$("#aiStat"); if(el) el.textContent=t; }}); clearTimeout(t); cur=4; paint();
     if(!res.units.length) throw new Error("مالقيتش دروس في الملف — اتأكد إنه كتاب فيه نص");
-    aiPreview(res, file.name.replace(/\.pdf$/i,""));
+    res.meta=opt.meta; aiPreview(res, file.name.replace(/\.pdf$/i,""));
   }catch(e){ openSheet(`<h2>❌ التحويل ماكملش</h2><p class="hint" style="font-size:1rem">${esc(e.message||"حصل خطأ")}</p>
     <div class="row"><button class="btn pri" id="aiRetry">جرّب تاني</button><button class="btn" id="aiKeyB">المفتاح</button></div>`);
     $("#aiRetry").onclick=openAIBook; $("#aiKeyB").onclick=openAIKey; }
@@ -1785,10 +1791,10 @@ function aiPreview(res,fname){
   const total=res.units.reduce((a,u)=>a+u.lessons.reduce((x,l)=>x+l.qs.length,0),0), B=S.banks=S.banks||[];
   openSheet(`<h2>🎉 البنك جاهز!</h2><p class="hint">${res.units.length} وحدة · ${res.units.reduce((a,u)=>a+u.lessons.length,0)} درس · ${total} سؤال</p>
     ${res.units.map(u=>`<div class="unit"><h3>${esc(u.name)}</h3>${u.lessons.map(l=>`<div class="lrow2"><span class="grow">${esc(l.name)}</span><span class="cnt">${l.qs.length}</span></div>`).join("")}</div>`).join("")}
-    <b>احفظه في:</b><select class="bsel" id="apB"><option value="__new">بنك جديد: ${esc(res.title||fname)}</option>${B.map(b=>`<option value="${b.id}">${esc(b.title)}</option>`).join("")}</select>
+    <b>احفظه في:</b><select class="bsel" id="apB"><option value="__new">بنك جديد: ${esc(res.meta&&res.meta.subject?autoBankTitle(res.meta):(res.title||fname))}</option>${B.map(b=>`<option value="${b.id}">${esc(b.title)}</option>`).join("")}</select>
     <div class="row" style="margin-top:10px"><button class="btn pri" id="apSave">💾 حفظ البنك</button></div>`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); SFX.level(); confetti(innerWidth/2,innerHeight/3,120);
-  $("#apSave").onclick=()=>{ const v=$("#apB").value; let b=B.find(x=>x.id===v); if(!b){ b={id:uid(),title:(res.title||fname).slice(0,60),units:[]}; B.push(b); }
+  $("#apSave").onclick=()=>{ const v=$("#apB").value; let b=B.find(x=>x.id===v); if(!b){ const M=res.meta||{}; b={id:uid(),title:(M.subject?autoBankTitle(M):(res.title||fname)).slice(0,60),subject:M.subject||"",grade:M.grade||"",term:M.term||"",units:[]}; B.push(b); }
     const n=mergeInto(b,res.units); saveBanks(); toast(`✅ اتحفظ ${n} سؤال`); openBankEd(b.id); };
 }
 
@@ -1908,26 +1914,98 @@ function mergeInto(bank,units){ let n=0; units.forEach(U=>{ let u=bank.units.fin
 function bankToText(b){ return b.units.map(u=>`# ${u.name}\n`+u.lessons.map(l=>`## ${l.name}\n`+l.qs.map(q=>`${q.q} = ${q.a}${q.ch?" | "+q.ch.filter(x=>x!==q.a).join(" | "):""}`).join("\n")).join("\n")).join("\n\n"); }
 function readFile(input){ return new Promise((res,rej)=>{ const f=input.files&&input.files[0]; if(!f) return rej(); const r=new FileReader(); r.onload=()=>res(String(r.result)); r.onerror=rej; r.readAsText(f,"utf-8"); }); }
 
+/* ---------- bank details: subject, grade, term + adding a single question by unit/lesson ---------- */
+const SUBJECTS=["لغتي","رياضيات","علوم","لغة إنجليزية","دراسات إسلامية","قرآن كريم","دراسات اجتماعية","حاسب وتقنية رقمية","مهارات حياتية","تربية فنية","فيزياء","كيمياء","أحياء"];
+const GRADES=["الأول الابتدائي","الثاني الابتدائي","الثالث الابتدائي","الرابع الابتدائي","الخامس الابتدائي","السادس الابتدائي","الأول المتوسط","الثاني المتوسط","الثالث المتوسط","الأول الثانوي","الثاني الثانوي","الثالث الثانوي"];
+const TERMS=["الفصل الأول","الفصل الثاني","الفصل الثالث"];
+const bankLabel=b=>[b.subject,b.grade,b.term].filter(Boolean).join(" · ");
+const autoBankTitle=m=>[m.subject,m.grade&&m.grade.replace(/^ال/,"").replace(" الابتدائي"," ابتدائي").replace(" المتوسط"," متوسط").replace(" الثانوي"," ثانوي"),m.term&&m.term.replace("الفصل ","ف").replace("الأول","1").replace("الثاني","2").replace("الثالث","3")].filter(Boolean).join(" ")||"بنك أسئلة";
+function metaFormHTML(m){
+  return `<b>📖 المادة</b><div class="chips2" id="bmS">${SUBJECTS.map(x=>`<button type="button" data-v="${esc(x)}" class="${m.subject===x?"on":""}">${esc(x)}</button>`).join("")}</div>
+    <input class="field" id="bmSx" maxlength="30" placeholder="مادة تانية؟ اكتبها هنا" value="${m.subject&&!SUBJECTS.includes(m.subject)?esc(m.subject):""}" style="margin-top:4px">
+    <div class="row" style="gap:6px;margin-top:10px"><div style="flex:1.4"><b>🎒 الصف</b><select class="bsel" id="bmG"><option value="">— اختار الصف —</option>${GRADES.map(g=>`<option ${m.grade===g?"selected":""}>${g}</option>`).join("")}</select></div>
+      <div style="flex:1"><b>🗓️ الفصل الدراسي</b><select class="bsel" id="bmT"><option value="">—</option>${TERMS.map(t=>`<option ${m.term===t?"selected":""}>${t}</option>`).join("")}</select></div></div>`; }
+function bindMetaForm(m,onChange){
+  $("#bmS").onclick=e=>{ const b=e.target.closest("[data-v]"); if(!b) return; m.subject=b.dataset.v; $("#bmSx").value=""; document.querySelectorAll("#bmS button").forEach(x=>x.classList.toggle("on",x===b)); onChange&&onChange(); };
+  $("#bmSx").oninput=e=>{ const v=e.target.value.trim(); if(v){ m.subject=v.slice(0,30); document.querySelectorAll("#bmS button").forEach(x=>x.classList.remove("on")); } onChange&&onChange(); };
+  $("#bmG").onchange=e=>{ m.grade=e.target.value; onChange&&onChange(); };
+  $("#bmT").onchange=e=>{ m.term=e.target.value; onChange&&onChange(); };
+}
+function openNewBank(){ const m={subject:"",grade:"",term:""}; let touched=false;
+  openSheet(`<h2>➕ بنك أسئلة جديد</h2><p class="hint">حدّد المادة والصف، وبعدين ضيف الأسئلة بالوحدة والدرس</p>
+    ${metaFormHTML(m)}
+    <b style="display:block;margin-top:10px">🏷️ اسم البنك</b><input class="field" id="bmN" maxlength="60" placeholder="بيتكتب لوحده من المادة والصف">
+    <div class="row" style="margin-top:12px"><button class="btn pri" id="bmGo">➕ إنشاء البنك</button><button class="btn" id="bmBack">↩ رجوع</button></div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  $("#bmN").oninput=()=>touched=!!$("#bmN").value.trim();
+  bindMetaForm(m,()=>{ if(!touched) $("#bmN").value=autoBankTitle(m)==="بنك أسئلة"?"":autoBankTitle(m); });
+  $("#bmBack").onclick=openBanks;
+  $("#bmGo").onclick=()=>{ if(!m.subject){ toast("اختار المادة الأول"); return; } if(!m.grade){ toast("اختار الصف"); return; }
+    const b={id:uid(),title:($("#bmN").value.trim()||autoBankTitle(m)).slice(0,60),subject:m.subject,grade:m.grade,term:m.term,units:[]};
+    S.banks=S.banks||[]; S.banks.push(b); saveBanks(); SFX.pos(); toast("📚 اتعمل البنك — ضيف أول سؤال"); openAddQ(b.id); };
+}
+function openBankMeta(id){ const b=(S.banks||[]).find(x=>x.id===id); if(!b) return; const m={subject:b.subject||"",grade:b.grade||"",term:b.term||""};
+  openSheet(`<h2>✏️ بيانات البنك</h2><b>🏷️ اسم البنك</b><input class="field" id="bmN" maxlength="60" value="${esc(b.title)}" style="margin-bottom:10px">${metaFormHTML(m)}
+    <div class="row" style="margin-top:12px"><button class="btn pri" id="bmGo">حفظ</button><button class="btn" id="bmBack">↩ رجوع</button></div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); bindMetaForm(m);
+  $("#bmBack").onclick=()=>openBankEd(id);
+  $("#bmGo").onclick=()=>{ b.title=$("#bmN").value.trim().slice(0,60)||b.title; Object.assign(b,m); saveBanks(); toast("✅ اتحفظت البيانات"); openBankEd(id); };
+}
+// add one question: choose (or create) the unit and the lesson
+function openAddQ(bid, ui, li, keep){ const b=(S.banks||[]).find(x=>x.id===bid); if(!b) return openBanks();
+  const st=keep||{ui:ui||(b.units[0]&&b.units[0].id)||"__new",li:li||"",newU:"",newL:"",mcq:true};
+  if(st.ui!=="__new" && !b.units.find(u=>u.id===st.ui)) st.ui=(b.units[0]&&b.units[0].id)||"__new";
+  const u=b.units.find(x=>x.id===st.ui); if(u && (!st.li || (st.li!=="__new" && !u.lessons.find(l=>l.id===st.li)))) st.li=(u.lessons[0]&&u.lessons[0].id)||"__new"; if(!u) st.li="__new";
+  openSheet(`<h2>➕ إضافة سؤال</h2>${bankLabel(b)?`<p class="hint">📚 ${esc(b.title)} · ${esc(bankLabel(b))}</p>`:`<p class="hint">📚 ${esc(b.title)}</p>`}
+    <div class="row" style="gap:6px"><div style="flex:1"><b>📂 الوحدة</b><select class="bsel" id="aqU">${b.units.map(x=>`<option value="${x.id}" ${x.id===st.ui?"selected":""}>${esc(x.name)}</option>`).join("")}<option value="__new" ${st.ui==="__new"?"selected":""}>➕ وحدة جديدة</option></select></div>
+      <div style="flex:1"><b>📄 الدرس</b><select class="bsel" id="aqL">${(u?u.lessons:[]).map(x=>`<option value="${x.id}" ${x.id===st.li?"selected":""}>${esc(x.name)}</option>`).join("")}<option value="__new" ${st.li==="__new"?"selected":""}>➕ درس جديد</option></select></div></div>
+    ${st.ui==="__new"?`<input class="field" id="aqNU" maxlength="80" placeholder="اسم الوحدة — مثلاً: الوحدة الأولى: الماء" value="${esc(st.newU)}" style="margin-top:4px">`:""}
+    ${st.li==="__new"?`<input class="field" id="aqNL" maxlength="80" placeholder="اسم الدرس — مثلاً: حالات المادة" value="${esc(st.newL)}" style="margin-top:4px">`:""}
+    <b style="display:block;margin-top:10px">نوع السؤال</b><div class="seg2" id="aqM"><button data-m="1" class="${st.mcq?"on":""}">اختيار من متعدد</button><button data-m="0" class="${!st.mcq?"on":""}">إجابة قصيرة</button></div>
+    <b>❓ السؤال</b><textarea class="field" id="aqQ" maxlength="300" style="min-height:70px" placeholder="اكتب السؤال"></textarea>
+    <b style="display:block;margin-top:8px">✅ الإجابة الصحيحة</b><input class="field" id="aqA" maxlength="120" placeholder="الإجابة الصحيحة">
+    ${st.mcq?`<b style="display:block;margin-top:8px">❌ اختيارات غلط</b><div class="aqw">${[0,1,2].map(i=>`<input class="field" id="aqW${i}" maxlength="120" placeholder="اختيار غلط ${i+1}">`).join("")}</div>`:""}
+    <div class="row" style="margin-top:12px"><button class="btn pri" id="aqGo">💾 حفظ وإضافة سؤال تاني</button><button class="btn" id="aqDone">✔ خلصت</button></div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  const grab=()=>{ if($("#aqNU")) st.newU=$("#aqNU").value; if($("#aqNL")) st.newL=$("#aqNL").value; };
+  $("#aqU").onchange=e=>{ grab(); st.ui=e.target.value; st.li=""; openAddQ(bid,null,null,st); };
+  $("#aqL").onchange=e=>{ grab(); st.li=e.target.value; openAddQ(bid,null,null,st); };
+  $("#aqM").onclick=e=>{ const x=e.target.closest("[data-m]"); if(!x) return; grab(); st.mcq=x.dataset.m==="1"; const q=$("#aqQ").value, a=$("#aqA").value; openAddQ(bid,null,null,st); $("#aqQ").value=q; $("#aqA").value=a; };
+  const save=()=>{ grab(); const q=$("#aqQ").value.trim(), a=$("#aqA").value.trim();
+    if(st.ui==="__new" && !st.newU.trim()){ toast("اكتب اسم الوحدة"); return false; }
+    if(st.li==="__new" && !st.newL.trim()){ toast("اكتب اسم الدرس"); return false; }
+    if(!q){ toast("اكتب السؤال"); return false; } if(!a){ toast("اكتب الإجابة الصحيحة"); return false; }
+    const w=st.mcq?[0,1,2].map(i=>$("#aqW"+i).value.trim()).filter(x=>x&&x!==a):[];
+    if(st.mcq && !w.length){ toast("اكتب اختيار غلط واحد على الأقل، أو اختار «إجابة قصيرة»"); return false; }
+    let U=b.units.find(x=>x.id===st.ui); if(!U){ U={id:uid(),name:st.newU.trim().slice(0,80),lessons:[]}; b.units.push(U); st.ui=U.id; st.newU=""; }
+    let L=U.lessons.find(x=>x.id===st.li); if(!L){ L={id:uid(),name:st.newL.trim().slice(0,80),qs:[]}; U.lessons.push(L); st.li=L.id; st.newL=""; }
+    L.qs.push(w.length?{q:q.slice(0,300),a:a.slice(0,120),ch:[a.slice(0,120),...w]}:{q:q.slice(0,300),a:a.slice(0,120)}); saveBanks(); SFX.pos();
+    toast(`✅ اتضاف — «${L.name}» فيه ${L.qs.length} سؤال`); return {U,L}; };
+  $("#aqGo").onclick=()=>{ if(save()){ openAddQ(bid,null,null,st); setTimeout(()=>$("#aqQ")&&$("#aqQ").focus(),250); } };
+  $("#aqDone").onclick=()=>{ const has=$("#aqQ").value.trim()||$("#aqA").value.trim(); if(has){ const r=save(); if(!r) return; openLessonEd(bid,r.U.id,r.L.id); return; } openBankEd(bid); };
+}
+
 function openBanks(){
   migrateQs(); const B=S.banks=S.banks||[];
   openSheet(`<h2>📚 بنوك الأسئلة والمنهج</h2>
     <button class="aibtn" id="aiBook"><span class="aiic">✨</span><span class="grow"><b>حوّل كتاب المنهج لبنك أسئلة</b><small>ارفع ملف الكتاب PDF، والذكاء الاصطناعي يرتّبه وحدات ودروس ويطلّع أسئلة لكل درس</small></span><span class="chev">‹</span></button>
-    <div class="list">${B.map(b=>`<button class="li" data-b="${b.id}" style="width:100%;text-align:right"><span class="big-e">${emo("📚")}</span><div class="grow"><b>${esc(b.title)}</b><small>${b.units.length} وحدة · ${bankCount(b)} سؤال</small></div><span class="chev" style="color:#b6bfd3">‹</span></button>`).join("")||"<p class='hint'>لسه مفيش بنوك</p>"}</div>
-    <div class="row" style="margin-top:12px"><input class="field" id="nbT" placeholder="اسم البنك — مثلاً: علوم خامس ف1" style="flex:1"><button class="btn pri" id="nbGo">➕ إنشاء</button></div>`, ()=>setTab("home"));
+    <div class="list">${B.map(b=>`<button class="li" data-b="${b.id}" style="width:100%;text-align:right"><span class="big-e">${emo("📚")}</span><div class="grow"><b>${esc(b.title)}</b>${bankLabel(b)?`<span class="bmeta">${esc(bankLabel(b))}</span>`:""}<small>${b.units.length} وحدة · ${bankCount(b)} سؤال</small></div><span class="chev" style="color:#b6bfd3">‹</span></button>`).join("")||"<p class='hint'>لسه مفيش بنوك</p>"}</div>
+    <div class="row" style="margin-top:12px"><button class="btn pri" id="nbGo">➕ بنك جديد (مادة وصف)</button></div>`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
   document.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>openBankEd(b.dataset.b));
   $("#aiBook").onclick=openAIBook;
-  $("#nbGo").onclick=()=>{ const t=$("#nbT").value.trim(); if(!t){ toast("اكتب اسم البنك"); return; } const b={id:uid(),title:t.slice(0,60),units:[]}; B.push(b); saveBanks(); openBankEd(b.id); };
+  $("#nbGo").onclick=openNewBank;
 }
 function openBankEd(id){
   const b=(S.banks||[]).find(x=>x.id===id); if(!b) return openBanks();
-  openSheet(`<h2>📚 ${esc(b.title)}</h2><p class="hint">${b.units.length} وحدة · ${bankCount(b)} سؤال</p>
+  openSheet(`<h2>📚 ${esc(b.title)}</h2>${bankLabel(b)?`<span class="bmeta">${esc(bankLabel(b))}</span>`:`<button class="btn" id="bkMeta0" style="margin-bottom:6px">🎒 حدّد المادة والصف</button>`}<p class="hint">${b.units.length} وحدة · ${bankCount(b)} سؤال</p>
+    <div class="row" style="margin-bottom:10px"><button class="btn pri" id="bkQ">➕ إضافة سؤال (بالوحدة والدرس)</button></div>
     ${b.units.map(u=>`<div class="unit"><h3>${esc(u.name)} <span class="cnt">${unitCount(u)}</span></h3>${u.lessons.map(l=>`<button class="lrow2" data-l="${u.id}|${l.id}"><span class="grow">${esc(l.name)}</span><span class="cnt">${l.qs.length}</span><span class="chev" style="color:#b6bfd3">‹</span></button>`).join("")}</div>`).join("")||"<p class='hint'>البنك فاضي — استورد أسئلة من تحت 👇</p>"}
-    <div class="kcard" style="background:#f6f8fd;box-shadow:none"><h3>📥 إضافة أسئلة</h3>
-      <p class="hint" style="margin-top:0">الصق بالشكل ده، أو اختار ملف .txt / .json:<br><span class="codeb"># الوحدة الأولى: القيمة المنزلية<br>## الدرس 1: الملايين<br>قيمة الرقم 5 في 512,000 = 500,000<br>ناتج 6 × 7 = 42 | 36 | 48 | 49</span><br>الخيارات بعد | معناها سؤال اختيار من متعدد.</p>
+    <div class="kcard" style="background:#f6f8fd;box-shadow:none"><h3>📥 إضافة أسئلة كتير مرة واحدة</h3>
+      <p class="hint" style="margin-top:0">الصق بالشكل ده، أو اختار ملف .txt / .json:<br><span class="codeb"># الوحدة الأولى: الماء<br>## الدرس 1: حالات الماء<br>كم حالة للماء؟ = 3<br>تحول الماء من سائل إلى غاز يسمى = التبخر | التكثف | التجمد | الانصهار</span><br>الخيارات بعد | معناها سؤال اختيار من متعدد.</p>
       <textarea class="field" id="bkIn" style="min-height:120px"></textarea>
       <div class="row" style="margin-top:8px"><button class="btn pri" id="bkAdd">➕ إضافة</button><label class="btn" style="cursor:pointer">📄 من ملف<input type="file" id="bkFile" accept=".txt,.json,text/plain,application/json" hidden></label></div></div>
-    <div class="row" style="margin-top:12px"><button class="btn" id="bkCopy">📋 نسخ البنك كنص</button><button class="btn" id="bkRen">✏️ تغيير الاسم</button><span class="spacer"></span><button class="btn red" id="bkDel">حذف البنك</button></div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="bkCopy">📋 نسخ البنك كنص</button><button class="btn" id="bkRen">✏️ البيانات (الاسم، المادة، الصف)</button><span class="spacer"></span><button class="btn red" id="bkDel">حذف البنك</button></div>
     <div class="row" style="margin-top:8px"><button class="btn" id="bkBack">↩ كل البنوك</button></div>`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
   const imp=txt=>{ const units=parseBank(txt); if(units===null){ toast("ملف JSON غير صالح"); return; } if(!units.length){ toast("مالقيتش أسئلة — اتأكد من الشكل: السؤال = الإجابة"); return; }
@@ -1935,8 +2013,8 @@ function openBankEd(id){
   $("#bkAdd").onclick=()=>imp($("#bkIn").value);
   $("#bkFile").onchange=e=>readFile(e.target).then(imp).catch(()=>toast("تعذّر قراءة الملف"));
   $("#bkCopy").onclick=()=>copyText(bankToText(b),"📋 اتنسخ البنك");
-  $("#bkRen").onclick=()=>{ openSheet(`<h2>✏️ اسم البنك</h2><input class="field" id="rnT" value="${esc(b.title)}"><div class="row" style="margin-top:10px"><button class="btn pri" id="rnGo">حفظ</button></div>`);
-    $("#rnGo").onclick=()=>{ b.title=$("#rnT").value.trim().slice(0,60)||b.title; saveBanks(); openBankEd(id); }; };
+  $("#bkRen").onclick=()=>openBankMeta(id); if($("#bkMeta0")) $("#bkMeta0").onclick=()=>openBankMeta(id);
+  $("#bkQ").onclick=()=>openAddQ(id);
   $("#bkDel").onclick=()=>ask("حذف بنك «"+b.title+"» بكل أسئلته؟",()=>{ S.banks=S.banks.filter(x=>x.id!==id); saveBanks(); openBanks(); });
   $("#bkBack").onclick=openBanks;
   document.querySelectorAll("[data-l]").forEach(x=>x.onclick=()=>{ const [ui,li]=x.dataset.l.split("|"); openLessonEd(id,ui,li); });
@@ -1945,10 +2023,11 @@ function openLessonEd(bid,ui,li){
   const b=S.banks.find(x=>x.id===bid), u=b&&b.units.find(x=>x.id===ui), l=u&&u.lessons.find(x=>x.id===li); if(!l) return openBankEd(bid);
   openSheet(`<h2>📖 ${esc(l.name)}</h2><p class="hint">${esc(u.name)} · ${l.qs.length} سؤال</p>
     <div class="list">${l.qs.map((q,i)=>`<div class="li"><div class="grow"><b>${esc(q.q)}</b><small>✅ ${esc(q.a)}${q.ch?" · اختيارات: "+q.ch.length:""}</small></div><button class="btn" data-dq="${i}">🗑️</button></div>`).join("")}</div>
-    <div class="row" style="margin-top:12px"><button class="btn" id="lsBack">↩ ${esc(b.title)}</button><span class="spacer"></span><button class="btn red" id="lsDel">حذف الدرس</button></div>`, ()=>setTab("home"));
+    <div class="row" style="margin-top:12px"><button class="btn pri" id="lsAdd">➕ سؤال في الدرس ده</button></div>
+    <div class="row" style="margin-top:8px"><button class="btn" id="lsBack">↩ ${esc(b.title)}</button><span class="spacer"></span><button class="btn red" id="lsDel">حذف الدرس</button></div>`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
   document.querySelectorAll("[data-dq]").forEach(x=>x.onclick=()=>{ l.qs.splice(+x.dataset.dq,1); saveBanks(); openLessonEd(bid,ui,li); });
-  $("#lsBack").onclick=()=>openBankEd(bid);
+  $("#lsBack").onclick=()=>openBankEd(bid); $("#lsAdd").onclick=()=>openAddQ(bid,ui,li);
   $("#lsDel").onclick=()=>ask("حذف درس «"+l.name+"»؟",()=>{ u.lessons=u.lessons.filter(x=>x.id!==li); if(!u.lessons.length) b.units=b.units.filter(x=>x.id!==ui); saveBanks(); openBankEd(bid); });
 }
 
@@ -1973,7 +2052,7 @@ function srcPicker(){ migrateQs(); const B=S.banks||[];
   if(GSET.src==="bank"&&!B.find(x=>x.id===GSET.bank)) GSET.bank=B[0]&&B[0].id;
   const b=B.find(x=>x.id===GSET.bank), u=b&&b.units.find(x=>x.id===GSET.unit);
   return `<div class="seg2"><button data-src="oral" class="${GSET.src==="oral"?"on":""}">🎤 أسئلة المعلم</button><button data-src="bank" class="${GSET.src==="bank"?"on":""}">📚 بنك الأسئلة (${B.reduce((a,x)=>a+bankCount(x),0)})</button></div>
-  ${GSET.src==="bank"&&b?`<select class="bsel" id="gsB">${B.map(x=>`<option value="${x.id}" ${x.id===b.id?"selected":""}>${esc(x.title)} (${bankCount(x)})</option>`).join("")}</select>
+  ${GSET.src==="bank"&&b?`<select class="bsel" id="gsB">${B.map(x=>`<option value="${x.id}" ${x.id===b.id?"selected":""}>${esc(x.title)}${bankLabel(x)&&!x.title.includes(x.subject||"#")?" — "+esc(bankLabel(x)):""} (${bankCount(x)})</option>`).join("")}</select>
     <div class="row" style="gap:6px"><select class="bsel" id="gsU" style="flex:1"><option value="*">كل الوحدات</option>${b.units.map(x=>`<option value="${x.id}" ${x.id===GSET.unit?"selected":""}>${esc(x.name)} (${unitCount(x)})</option>`).join("")}</select>
     <select class="bsel" id="gsL" style="flex:1"><option value="*">كل الدروس</option>${(u?u.lessons:[]).map(x=>`<option value="${x.id}" ${x.id===GSET.lesson?"selected":""}>${esc(x.name)} (${x.qs.length})</option>`).join("")}</select></div>`:""}`; }
 function bindSrc(redraw){ document.querySelectorAll("[data-src]").forEach(b=>b.onclick=()=>{ if(b.dataset.src==="bank"&&!hasBankQs()){ toast("ضيف أسئلة في بنك الأسئلة الأول"); openBanks(); return; } GSET.src=b.dataset.src; redraw(); });
@@ -2845,7 +2924,7 @@ function openNewHw(){ migrateQs(); const B=S.banks||[];
   const draw=()=>{ const b=B.find(x=>x.id===st.bank), u=b&&b.units.find(x=>x.id===st.unit), P=pool().length;
     openSheet(`<h2>➕ واجب جديد</h2>
       <b>من فين الأسئلة؟</b>
-      <select class="bsel" id="nhB">${B.filter(x=>bankCount(x)).map(x=>`<option value="${x.id}" ${x.id===st.bank?"selected":""}>${esc(x.title)} (${bankCount(x)})</option>`).join("")}</select>
+      <select class="bsel" id="nhB">${B.filter(x=>bankCount(x)).map(x=>`<option value="${x.id}" ${x.id===st.bank?"selected":""}>${esc(x.title)}${bankLabel(x)&&!x.title.includes(x.subject||"#")?" — "+esc(bankLabel(x)):""} (${bankCount(x)})</option>`).join("")}</select>
       <div class="row" style="gap:6px"><select class="bsel" id="nhU" style="flex:1"><option value="*">كل الوحدات</option>${(b?b.units:[]).filter(unitCount).map(x=>`<option value="${x.id}" ${x.id===st.unit?"selected":""}>${esc(x.name)} (${unitCount(x)})</option>`).join("")}</select>
       <select class="bsel" id="nhL" style="flex:1"><option value="*">كل الدروس</option>${(u?u.lessons:[]).filter(l=>l.qs.length).map(x=>`<option value="${x.id}" ${x.id===st.lesson?"selected":""}>${esc(x.name)} (${x.qs.length})</option>`).join("")}</select></div>
       <b style="display:block;margin-top:10px">عدد الأسئلة</b><div class="chips2" id="nhC">${[5,10,15,20].map(k=>`<button class="${st.count===k?"on":""}" data-v="${k}" ${k>P&&k!==5?"disabled":""}>${k}</button>`).join("")}<button class="${st.count===0?"on":""}" data-v="0">الكل (${P})</button></div>
