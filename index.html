@@ -646,9 +646,59 @@ body.board .wscene{min-height:72vh}
 .empty{text-align:center;color:var(--muted);padding:40px 10px}
 .empty .av{width:160px;height:160px;margin:0 auto}
 
+/* ---------- homework ---------- */
+.chips2{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}
+.chips2 button{padding:8px 14px;border-radius:12px;background:#eef1f8;font-weight:700;color:var(--ink);transition:.15s}
+.chips2 button.on{background:var(--violet);color:#fff;box-shadow:0 4px 12px rgba(123,92,214,.3)}
+.chips2 button:disabled{opacity:.35}
+.hwlist{display:flex;flex-direction:column;gap:8px}
+.hwrow{display:flex;align-items:center;gap:12px;background:#f6f8fd;border-radius:18px;padding:10px 12px;text-align:right;width:100%}
+.hwic{width:50px;height:50px;border-radius:16px;background:linear-gradient(135deg,#dbe9ff,#b9d3ff);display:grid;place-items:center;flex:none}.hwic .fe{width:30px;height:30px}
+.hwic.over{filter:grayscale(.8);opacity:.7}
+.hwrow .grow{flex:1;min-width:0}.hwrow .grow b{display:block;font-size:1.1rem}.hwrow .grow small{color:var(--muted);font-weight:600}
+.hwbar{height:8px;margin:6px 0 0}
+.hwstat{text-align:center;flex:none;min-width:58px}.hwstat b{display:block;font-size:1.2rem}.hwstat small{display:block;color:var(--muted);font-weight:600;font-size:.75rem}
+.hwkpi{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.hwkpi>div{background:linear-gradient(135deg,#f6f3ff,#eef4ff);border-radius:16px;padding:10px 6px;text-align:center}
+.hwkpi b{display:block;font-size:1.15rem}.hwkpi small{color:var(--muted);font-weight:600;font-size:.75rem}
+.hwmiss{display:flex;gap:10px;align-items:center;background:#fff4f4;border-radius:14px;padding:8px 12px;margin-bottom:6px}.hwmiss .grow{flex:1;min-width:0}.hwmiss small{display:block;color:#14935b;font-weight:700}
+.hwst{width:100%;text-align:right}
+.hwrev{display:flex;gap:10px;align-items:center;border-radius:14px;padding:8px 12px;background:#f2fbf6}.hwrev.no{background:#fff4f4}
+.hwrev .grow{flex:1;min-width:0}.hwrev small{display:block;color:var(--muted);font-weight:600}
+.hwmk{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:800;background:var(--pos);flex:none}.hwrev.no .hwmk{background:var(--neg)}
+.hwk{display:flex;align-items:center;gap:10px;background:#f6f8fd;border-radius:16px;padding:8px 12px;margin-top:8px}
+.hwk.todo{background:linear-gradient(135deg,#fff8ec,#fff1dd);box-shadow:inset 0 0 0 2px #ffdcae}
+.hwk .grow{flex:1;min-width:0}.hwk .grow b{display:block}.hwk .grow small{color:var(--muted);font-weight:600}
+.hwgo{padding:8px 14px;flex:none;animation:hwpulse 1.6s infinite}
+@keyframes hwpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,138,61,.5)}50%{box-shadow:0 0 0 8px rgba(255,138,61,0)}}
+.hwtodo{background:#ff5d5d!important;color:#fff!important}
+.hwtop{display:flex;align-items:baseline;gap:10px;padding-left:46px}.hwtop b{font-size:1.15rem;flex:1}.hwtop small{color:var(--muted);font-weight:700}
+.hwtrack{position:relative;height:14px;border-radius:8px;background:#eef1f8;margin:30px 4px 18px}
+.hwtrack>i{position:absolute;inset:0 0 0 auto;border-radius:8px;background:linear-gradient(90deg,#22b573,#7ee0b0);transition:width .5s}
+.hwfal{position:absolute;top:-30px;width:44px;height:44px;transition:right .5s cubic-bezier(.3,1.4,.5,1)}
+.hwq{font-size:1.45rem;font-weight:800;text-align:center;line-height:1.6;padding:16px 10px;background:linear-gradient(135deg,#f6f3ff,#eef6ff);border-radius:22px;margin-bottom:12px;white-space:pre-wrap}
+.hwopts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:420px){.hwopts{grid-template-columns:1fr}}
+.hwopt{display:flex;align-items:center;gap:10px;padding:14px;border-radius:18px;background:#fff;border:2px solid #e3e8f3;font-weight:700;font-size:1.1rem;text-align:right;transition:.15s;box-shadow:0 4px 0 #e3e8f3}
+.hwopt i{font-style:normal;width:32px;height:32px;border-radius:10px;background:#eef1f8;display:grid;place-items:center;flex:none;color:var(--violet)}
+.hwopt:not([disabled]):active{transform:translateY(3px);box-shadow:0 1px 0 #e3e8f3}
+.hwopt.ok{border-color:var(--pos);background:#e8faf1;box-shadow:0 4px 0 #9fe3c2}.hwopt.ok i{background:var(--pos);color:#fff}
+.hwopt.no{border-color:var(--neg);background:#fff0f0;box-shadow:0 4px 0 #ffb8b8}.hwopt.no i{background:var(--neg);color:#fff}
+.hwopt.dim{opacity:.5}
+.hwfree{display:flex;gap:8px}.hwfree .field{font-size:1.2rem;text-align:center}
+.hwfb{margin-top:12px;padding:10px 14px;border-radius:16px;font-weight:700;text-align:center;font-size:1.1rem}
+.hwfb.ok{background:#e8faf1;color:#14935b}.hwfb.no{background:#fff0f0;color:#c93a3a}
+.hwnext{font-size:1.1rem;padding:12px 26px}
+.hwdone{text-align:center;position:relative;padding-top:10px}
+.hwlot{position:absolute;inset:-20px 0 auto;height:260px;pointer-events:none}
+.hwav{width:150px;height:150px;margin:0 auto}
+.hwstars{display:flex;justify-content:center;gap:6px;font-size:3rem;line-height:1}
+.hwstars span{color:#e3e8f3;text-shadow:0 3px 0 #d0d6e4}.hwstars span.on{color:#ffc93c;text-shadow:0 3px 0 #e09a00}
+.hwsc b{font-size:3.4rem;font-weight:800;color:var(--accent)}.hwsc span{font-size:1.5rem;font-weight:700;color:var(--muted)}
 /* ---------- messages ---------- */
 .mwrap{position:relative;display:inline-grid}
 .mbadge{position:absolute;top:-5px;left:-5px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#ff5d5d;color:#fff;font-size:.72rem;font-weight:800;display:grid;place-items:center;box-shadow:0 0 0 2px var(--sky1);pointer-events:none}
+.mbadge[hidden],.kchat[hidden]{display:none}
 .mbadge:not([hidden]){animation:mpop .5s cubic-bezier(.3,1.8,.5,1)}
 @keyframes mpop{from{transform:scale(0)}to{transform:scale(1)}}
 .av.sm{width:46px;height:46px;flex:none}
@@ -768,6 +818,7 @@ body.board .wscene{min-height:72vh}
       <div class="kpts"><b id="kPts">0</b><span>نقطة</span></div>
       <div class="klv" id="kLv"></div><div class="bar kbar"><i id="kBar"></i></div><div class="knext" id="kNext"></div>
       <button class="btn pri" id="kStyle" style="margin-top:12px">🎨 غيّر شكل صقرك</button></div>
+    <div class="kcard" id="kHwCard" hidden></div>
     <div class="kcard kchat" id="kChatCard" hidden></div>
     <div class="kcard"><h3>🏅 الأوسمة <span class="cnt" id="kBdgN" style="float:left"></span></h3><div class="bdg sm" id="kBdg"></div></div>
     <div class="kcard" id="kShopCard" hidden><h3>🎁 متجر المكافآت <span class="cnt" id="kBal" style="float:left"></span></h3><div id="kShop"></div></div>
@@ -964,7 +1015,8 @@ function kidPayloads(){ const m=new Map(), teacher=(USER&&USER.displayName)||"";
   S.classes.forEach(c=>c.students.forEach(s=>{ if(!s.code) return;
     m.set(s.code,{cid:c.id,className:c.name,teacher,name:s.name,points:s.points,pos:s.pos,neg:s.neg,look:s.look,lookAt:s.lookAt||0,
       recent:c.log.filter(l=>l.sid===s.id).slice(-12).reverse().map(l=>({k:l.k,v:l.v,t:l.t,e:l.e||skillOf(l.k).e,nm:l.nm||skillOf(l.k).t})), att:monthAtt(c,s.id), today:attOf(c,todayKey(),s.id)||"",
-      week:weekOf(c,s.id), note:s.note||"", noteAt:s.noteAt||0, balance:balance(s), rewards:rewardsOf(c).map(r=>({e:r.e,t:r.t,c:r.c})), anns:(c.anns||[]).slice(0,3).map(a=>({t:a.text,at:a.at})), badges:Object.keys(s.badges||{})}); }));
+      week:weekOf(c,s.id), note:s.note||"", noteAt:s.noteAt||0, balance:balance(s), rewards:rewardsOf(c).map(r=>({e:r.e,t:r.t,c:r.c})), anns:(c.anns||[]).slice(0,3).map(a=>({t:a.text,at:a.at})), badges:Object.keys(s.badges||{}),
+      hw:(c.hw||[]).filter(h=>h.due>Date.now()-3*DAY).slice(0,6).map(h=>({id:h.id,t:h.title,due:h.due,n:h.n,pts:h.pts,s:(s.hwd||{})[h.id]||null}))}); }));
   return m; }
 function fixCur(){ if(!S.cur || !S.classes.find(c=>c.id===S.cur)) S.cur = S.classes[0] && S.classes[0].id; }
 function save(){
@@ -1321,6 +1373,7 @@ function stopMic(){ if(mic){ cancelAnimationFrame(mic.raf); mic.stream.getTracks
 
 /* ---------- icon set (hand-drawn SVG, stroke style) ---------- */
 const ICONS={
+  book:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="m9 9 2 2 4-4"/>',
   chat:'<path d="M4 6.5A3.5 3.5 0 0 1 7.5 3h9A3.5 3.5 0 0 1 20 6.5v6a3.5 3.5 0 0 1-3.5 3.5H11l-4.6 3.8c-.4.3-.9 0-.9-.4V16A3.5 3.5 0 0 1 4 12.5z"/><path d="M8.5 8.3h7M8.5 11.2h4.4"/>',
   send:'<path d="M20.5 3.6 3.9 10.2c-.8.3-.8 1.4 0 1.7l6.4 2.1 2.1 6.4c.3.8 1.4.8 1.7 0L20.5 3.6z"/><path d="m10.3 14 4.6-4.6"/>',
   users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18 13.8c2.1.8 3.5 2.9 3.5 5.2"/>',
@@ -1369,13 +1422,13 @@ document.addEventListener("fullscreenchange",()=>{ if(!document.fullscreenElemen
 function setTab(t){ document.querySelectorAll(".tb").forEach(b=>b.classList.toggle("on",b.dataset.tab===t)); }
 function openKit(){
   const T=[["random","dice","اختيار عشوائي","#ff8a3d"],["timer","timer","المؤقت","#3d8be0"],["groups","flock","الأسراب","#22b573"],["noise","noise","مقياس الهدوء","#2e9c9a"],
-    ["all","star","نقطة للفصل كله","#f5b301"],["select","check","تحديد عدة طلاب","#7b5cd6"],["skills","sliders","المهارات والنقاط","#e0609a"],["shop","gift","متجر المكافآت","#ff5d9a"],["seat","seat","ترتيب الجلوس","#8a5a2b"],["ann","megaphone","إعلان لأولياء الأمور","#7b5cd6"],["board","tv","وضع السبورة","#1b2a4a"]];
+    ["hw","book","الواجبات","#3d8be0"],["all","star","نقطة للفصل كله","#f5b301"],["select","check","تحديد عدة طلاب","#7b5cd6"],["skills","sliders","المهارات والنقاط","#e0609a"],["shop","gift","متجر المكافآت","#ff5d9a"],["seat","seat","ترتيب الجلوس","#8a5a2b"],["ann","megaphone","إعلان لأولياء الأمور","#7b5cd6"],["board","tv","وضع السبورة","#1b2a4a"]];
   openSheet(`<h2>🪄 أدوات الحصة</h2><div class="kit">${T.map(([k,ic,t,c])=>`<button class="kt" data-k="${k}"><span class="bx" style="background:${c}">${icon(ic)}</span>${t}</button>`).join("")}</div>`, ()=>setTab("home"));
   gsap.from(".kt",{y:20,opacity:0,scale:.9,stagger:.04,duration:.35,ease:"back.out(1.7)"});
   document.querySelectorAll(".kt").forEach(b=>b.onclick=()=>{ const k=b.dataset.k; ac();
     if(k==="random") randomPick(); else if(k==="timer") openTimer(); else if(k==="groups") openGroups(); else if(k==="noise") openNoise();
     else if(k==="all") openStudent("__all"); else if(k==="select"){ closeSheet(); toggleSel(true); toast("دوس على الطلاب اللي عايز تحددهم"); }
-    else if(k==="skills") openSkills(); else if(k==="add") openAdd(); else if(k==="board"){ closeSheet(); setBoard(!BOARD); } else if(k==="shop") openShop(); else if(k==="seat") openSeating(); else if(k==="ann") openAnn(); });
+    else if(k==="skills") openSkills(); else if(k==="add") openAdd(); else if(k==="board"){ closeSheet(); setBoard(!BOARD); } else if(k==="shop") openShop(); else if(k==="seat") openSeating(); else if(k==="ann") openAnn(); else if(k==="hw") openHomework(); });
 }
 document.querySelectorAll(".tb").forEach(b=>b.onclick=()=>{ ac(); const t=b.dataset.tab;
   if(t==="home"){ closeSheet(); window.scrollTo({top:0,behavior:"smooth"}); }
@@ -2682,6 +2735,181 @@ $("#classMenu").onclick=openClassMenu;
 $("#soundBtn").onclick=()=>{ S.sound=!S.sound; save(); $("#soundBtn").innerHTML=icon(S.sound?"sound":"mute"); if(S.sound) SFX.pos(); };
 
 
+/* ---------- homework: questions from the bank, solved at home from the student page ---------- */
+const HWQ={}, HWDONE=new Set(), KHW={};
+const normA=v=>String(v??"").trim().toLowerCase().replace(/[ً-ْـ]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي")
+  .replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[۰-۹]/g,d=>"۰۱۲۳۴۵۶۷۸۹".indexOf(d)).replace(/\s+/g," ").replace(/[.,،؛!?؟]+$/,"");
+const hwRight=(q,a)=>a!=null && a!=="" && normA(a)===normA(q.a);
+const hwScore=(qs,ans)=>qs.reduce((n,q,i)=>n+(hwRight(q,(ans||[])[i])?1:0),0);
+const hwPts=(h,sc,tot)=>tot&&sc?Math.max(1,Math.round((h.pts||3)*sc/tot)):0;
+const DAY=864e5;
+function dueLabel(due){ const left=due-Date.now(); if(left<0) return "انتهى الموعد";
+  const end=new Date(due), today=new Date(); const d=Math.round((new Date(end.toDateString())-new Date(today.toDateString()))/DAY);
+  return d<=0?"آخر يوم النهارده":d===1?"لحد بكرة":`باقي ${d} أيام`; }
+const pct=x=>Math.round(x*100)+"%";
+function hwCloudOnly(){ openSheet(`<h2>📘 الواجبات</h2><div class="mempty">${emo("📘")}<b>واجبات من البيت بتتصحح لوحدها</b><p class="hint">سجّل دخولك عشان تبعت واجبات من بنك الأسئلة، والطلاب يحلّوها من صفحتهم وياخدوا نقاط أوتوماتيك.</p><button class="btn pri" id="hwIn">تسجيل الدخول</button></div>`);
+  $("#hwIn").onclick=()=>{ closeSheet(); showLogin(); }; }
+function openHomework(){
+  if(MODE!=="cloud"){ hwCloudOnly(); return; }
+  const c=cls(); if(!c) return; c.hw=c.hw||[]; const n=c.students.length;
+  openSheet(`<h2>📘 واجبات «${esc(c.name)}»</h2><p class="hint">الطالب بيحل من صفحته (بكوده)، والصقر بيصحح ويضيف النقاط لوحده</p>
+    <div class="row" style="margin-bottom:12px"><button class="btn pri" id="hwNew">➕ واجب جديد</button></div>
+    <div class="hwlist">${c.hw.map(h=>{ const done=Math.min(h.done||0,n), over=Date.now()>h.due, av=h.done?(h.sum||0)/h.done:0;
+      return `<button class="hwrow" data-h="${esc(h.id)}"><span class="hwic ${over?"over":""}">${emo("📘")}</span><div class="grow"><b>${esc(h.title)}</b>
+        <small>${h.n} سؤال · ${esc(dueLabel(h.due))} · ⭐ لحد ${h.pts}</small><div class="bar hwbar"><i style="width:${n?100*done/n:0}%"></i></div></div>
+        <div class="hwstat"><b>${done}/${n}</b><small>حلّوا</small>${h.done?`<span class="chip ${av>=.6?"p":"n"}">${pct(av)}</span>`:""}</div></button>`; }).join("")
+      || `<div class="mempty">${emo("📝")}<b>لسه مفيش واجبات</b><p class="hint">اعمل أول واجب من بنك الأسئلة في ثواني</p></div>`}</div>`, ()=>setTab("home"));
+  gsap.from(".hwrow",{y:16,opacity:0,stagger:.05,duration:.3});
+  $("#hwNew").onclick=openNewHw;
+  document.querySelectorAll(".hwrow").forEach(b=>b.onclick=()=>openHwResults(b.dataset.h));
+}
+function openNewHw(){ migrateQs(); const B=S.banks||[];
+  if(!hasBankQs()){ openSheet(`<h2>➕ واجب جديد</h2><div class="mempty">${emo("📚")}<b>محتاج أسئلة في البنك الأول</b><p class="hint">ارفع كتاب المادة أو اكتب أسئلتك في بنك الأسئلة، وبعدين اختار منها الواجب.</p><button class="btn pri" id="hwBk">📚 بنك الأسئلة</button></div>`);
+    $("#hwBk").onclick=openBanks; return; }
+  const st={bank:(B.find(b=>bankCount(b))||B[0]).id,unit:"*",lesson:"*",count:10,days:1,pts:3,title:""};
+  const pool=()=>{ const b=B.find(x=>x.id===st.bank); if(!b) return []; const out=[]; b.units.filter(u=>st.unit==="*"||u.id===st.unit).forEach(u=>u.lessons.filter(l=>st.lesson==="*"||l.id===st.lesson).forEach(l=>out.push(...l.qs))); return out; };
+  const autoTitle=()=>{ const b=B.find(x=>x.id===st.bank), u=b&&b.units.find(x=>x.id===st.unit), l=u&&u.lessons.find(x=>x.id===st.lesson); return l?l.name:u?u.name:b?b.title:"واجب"; };
+  const draw=()=>{ const b=B.find(x=>x.id===st.bank), u=b&&b.units.find(x=>x.id===st.unit), P=pool().length;
+    openSheet(`<h2>➕ واجب جديد</h2>
+      <b>من فين الأسئلة؟</b>
+      <select class="bsel" id="nhB">${B.filter(x=>bankCount(x)).map(x=>`<option value="${x.id}" ${x.id===st.bank?"selected":""}>${esc(x.title)} (${bankCount(x)})</option>`).join("")}</select>
+      <div class="row" style="gap:6px"><select class="bsel" id="nhU" style="flex:1"><option value="*">كل الوحدات</option>${(b?b.units:[]).filter(unitCount).map(x=>`<option value="${x.id}" ${x.id===st.unit?"selected":""}>${esc(x.name)} (${unitCount(x)})</option>`).join("")}</select>
+      <select class="bsel" id="nhL" style="flex:1"><option value="*">كل الدروس</option>${(u?u.lessons:[]).filter(l=>l.qs.length).map(x=>`<option value="${x.id}" ${x.id===st.lesson?"selected":""}>${esc(x.name)} (${x.qs.length})</option>`).join("")}</select></div>
+      <b style="display:block;margin-top:10px">عدد الأسئلة</b><div class="chips2" id="nhC">${[5,10,15,20].map(k=>`<button class="${st.count===k?"on":""}" data-v="${k}" ${k>P&&k!==5?"disabled":""}>${k}</button>`).join("")}<button class="${st.count===0?"on":""}" data-v="0">الكل (${P})</button></div>
+      <b style="display:block;margin-top:10px">آخر موعد للتسليم</b><div class="chips2" id="nhD">${[[0,"النهارده"],[1,"بكرة"],[2,"بعد يومين"],[7,"بعد أسبوع"]].map(([k,t])=>`<button class="${st.days===k?"on":""}" data-v="${k}">${t}</button>`).join("")}</div>
+      <b style="display:block;margin-top:10px">النقاط للدرجة النهائية</b><div class="chips2" id="nhP">${[1,2,3,5].map(k=>`<button class="${st.pts===k?"on":""}" data-v="${k}">⭐ ${k}</button>`).join("")}</div>
+      <b style="display:block;margin-top:10px">العنوان</b><input class="field" id="nhT" maxlength="60" value="${esc(st.title||autoTitle())}">
+      <p class="hint" style="margin-top:10px">📝 ${Math.min(st.count||P,P)} سؤال ${st.count&&P>st.count?"عشوائي من "+P:""} — كل طالب بيحل مرة واحدة، وبيشوف الإجابة الصح بعد كل سؤال</p>
+      <div class="row"><button class="btn pri" id="nhGo" ${P?"":"disabled"}>📤 إرسال الواجب للفصل</button></div>`);
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    $("#nhB").onchange=e=>{ st.bank=e.target.value; st.unit=st.lesson="*"; st.title=""; draw(); };
+    $("#nhU").onchange=e=>{ st.unit=e.target.value; st.lesson="*"; st.title=""; draw(); };
+    $("#nhL").onchange=e=>{ st.lesson=e.target.value; st.title=""; draw(); };
+    $("#nhT").oninput=e=>st.title=e.target.value;
+    [["#nhC","count"],["#nhD","days"],["#nhP","pts"]].forEach(([id,k])=>$(id).onclick=e=>{ const b=e.target.closest("button[data-v]"); if(!b||b.disabled) return; st[k]=+b.dataset.v; draw(); });
+    $("#nhGo").onclick=async()=>{ const all=pool(); if(!all.length) return; const qs=[...all].sort(()=>Math.random()-.5).slice(0,st.count||all.length).map(q=>({q:q.q,a:q.a,...(q.ch?{ch:q.ch}:{})}));
+      const c=cls(), id=uid()+uid(), d=new Date(); d.setDate(d.getDate()+st.days); d.setHours(23,59,0,0);
+      const title=(st.title||autoTitle()).trim().slice(0,60)||"واجب", meta={id,title,due:+d,at:Date.now(),pts:st.pts,n:qs.length,done:0,sum:0};
+      $("#nhGo").disabled=true;
+      try{ await Promise.race([Cloud.saveHw(id,{cid:c.id,cls:c.name,title,qs,due:meta.due,at:meta.at,pts:st.pts}), new Promise(r=>setTimeout(r,2500))]); HWQ[id]={id,owner:USER.uid,cid:c.id,title,qs,due:meta.due,pts:st.pts};
+        c.hw=[meta,...(c.hw||[])].slice(0,40); save(); SFX.level(); confetti(innerWidth/2,innerHeight/3,90); toast("📘 اتبعت الواجب — هيظهر للطلاب وأولياء الأمور"); openHomework(); }
+      catch(e){ toast("تعذّر إرسال الواجب: "+(e.code||e.message)); $("#nhGo").disabled=false; } };
+  };
+  draw();
+}
+function openHwResults(hid){ const c=cls(), h=(c.hw||[]).find(x=>x.id===hid); if(!h) return;
+  let subs=[], un=null;
+  const draw=()=>{ const q=HWQ[hid], by={}; subs.forEach(s=>by[s.code]=s);
+    const scoreOf=s=>q?hwScore(q.qs,s.ans):s.score, done=c.students.filter(s=>by[s.code]), over=Date.now()>h.due;
+    const avg=done.length?done.reduce((a,s)=>a+scoreOf(by[s.code])/h.n,0)/done.length:0;
+    const miss=q&&subs.length?q.qs.map((x,i)=>({x,w:subs.filter(s=>!hwRight(x,(s.ans||[])[i])).length/subs.length})).filter(m=>m.w>0).sort((a,b)=>b.w-a.w).slice(0,3):[];
+    const rows=[...c.students].sort((a,b)=>(by[b.code]?scoreOf(by[b.code]):-1)-(by[a.code]?scoreOf(by[a.code]):-1));
+    const el=$("#hwR"); if(!el) return;
+    el.innerHTML=`<div class="hwkpi"><div><b>${done.length}/${c.students.length}</b><small>حلّوا</small></div><div><b>${done.length?pct(avg):"—"}</b><small>متوسط الدرجات</small></div><div><b>${esc(dueLabel(h.due))}</b><small>${new Date(h.due).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"short"})}</small></div></div>
+      ${miss.length?`<div class="rsec"><h3>🎯 أكتر الأسئلة غلط</h3>${miss.map(m=>`<div class="hwmiss"><div class="grow"><b>${esc(m.x.q)}</b><small>الإجابة: ${esc(m.x.a)}</small></div><span class="chip n">${pct(m.w)} غلط</span></div>`).join("")}</div>`:""}
+      <div class="rsec"><h3>👥 الطلاب</h3><div class="list">${rows.map(s=>{ const sb=by[s.code]; const sc=sb?scoreOf(sb):0, r=sb?sc/h.n:0;
+        return `<button class="li hwst" ${sb?`data-sub="${esc(s.code)}"`:""}><span class="av sm">${avatar(s)}</span><div class="grow"><b>${esc(s.name)}</b><small>${sb?"سلّم "+esc(msgWhen(sb.at))+(sb.pts?` · ⭐ +${sb.pts}`:""):over?"❌ ماسلّمش":"⏳ لسه"}</small></div>
+          ${sb?`<span class="chip ${r>=.6?"p":"n"}">${sc}/${h.n}</span>`:""}</button>`; }).join("")}</div></div>
+      <div class="row" style="margin-top:12px"><button class="btn" id="hwRem">📋 تذكير للي لسه</button><span class="spacer"></span><button class="btn red" id="hwDel">🗑️ حذف</button></div>`;
+    el.querySelectorAll("[data-sub]").forEach(b=>b.onclick=()=>hwReview(by[b.dataset.sub], q, h, ()=>openHwResults(hid)));
+    $("#hwRem").onclick=()=>{ const left=c.students.filter(s=>!by[s.code]).map(s=>s.name); if(!left.length){ toast("الكل سلّم 👏"); return; }
+      copyText(`📘 تذكير بواجب «${h.title}» — ${dueLabel(h.due)}\nلسه ماسلّموش: ${left.join("، ")}\nالحل من صفحة الطالب في صقر: ${location.origin+location.pathname}`,"📋 اتنسخ التذكير"); };
+    $("#hwDel").onclick=()=>ask(`حذف واجب «${h.title}»؟ الحلول كمان هتتمسح.`,async()=>{ c.hw=c.hw.filter(x=>x.id!==hid); save(); Cloud.delHw(hid).catch(()=>{}); openHomework(); });
+  };
+  openSheet(`<h2>📘 ${esc(h.title)}</h2><div id="hwR"><p class="hint">…</p></div>`, ()=>{ if(un) un(); setTab("home"); });
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  if(!HWQ[hid]) Cloud.getHw(hid).then(q=>{ if(q){ HWQ[hid]=q; draw(); } }).catch(()=>{});
+  un=Cloud.listenHwSubs(hid,l=>{ subs=l; draw(); });
+  draw();
+}
+function hwReview(sb, q, h, back){
+  if(!q){ toast("لحظة… الأسئلة بتتحمّل"); return; }
+  const sc=hwScore(q.qs,sb.ans);
+  openSheet(`<h2>📝 ${esc(sb.name||"")} — ${sc}/${q.qs.length}</h2><p class="hint">${esc(h.title)}</p>
+    <div class="list">${q.qs.map((x,i)=>{ const a=(sb.ans||[])[i], ok=hwRight(x,a);
+      return `<div class="hwrev ${ok?"ok":"no"}"><span class="hwmk">${ok?"✓":"✗"}</span><div class="grow"><b>${esc(x.q)}</b><small>${ok?"":`إجابته: ${esc(a==null||a===""?"—":a)} · `}الصح: ${esc(x.a)}</small></div></div>`; }).join("")}</div>
+    ${back?`<div class="row" style="margin-top:12px"><button class="btn" id="hrBack">↩ رجوع</button></div>`:""}`);
+  if(back) $("#hrBack").onclick=back;
+}
+// teacher: grade new submissions and give the points
+async function processSubs(list){
+  for(const sb of list){
+    if(HWDONE.has(sb.id)) continue; HWDONE.add(sb.id);
+    const c=S.classes.find(x=>x.id===sb.cid), h=c&&(c.hw||[]).find(x=>x.id===sb.hw), s=c&&c.students.find(x=>x.code===sb.code);
+    if(!c||!h||!s||c.log.some(l=>l.sub===sb.id)){ Cloud.markAwarded(sb.id,0).catch(()=>{}); continue; }
+    let q=HWQ[h.id]; if(!q){ try{ q=HWQ[h.id]=await Cloud.getHw(h.id); }catch(e){} }
+    if(!q){ HWDONE.delete(sb.id); continue; }
+    const sc=hwScore(q.qs,sb.ans), tot=q.qs.length, v=hwPts(h,sc,tot), before=levelOf(s.points).idx;
+    if(v){ s.points+=v; s.pos++; c.log.push({sid:s.id,k:"hw",v,t:Date.now(),e:"📘",nm:"واجب: "+h.title,sub:sb.id}); if(c.log.length>5000) c.log=c.log.slice(-5000); }
+    h.done=(h.done||0)+1; h.sum=(h.sum||0)+sc/tot;
+    s.hwd=s.hwd||{}; s.hwd[h.id]=[sc,tot]; const hk=Object.keys(s.hwd); if(hk.length>40) delete s.hwd[hk[0]];
+    checkBadges(s,c,true); save();
+    if(c.id===S.cur && !$("#ov").classList.contains("show")){ refreshCard(s.id); if(v) animateCard(s.id,{e:"📘",v,t:"واجب"}); }
+    if($("#sheet .hwlist")) openHomework();
+    toast(`📘 ${s.name} حلّ «${h.title}» — ${sc}/${tot}${v?` (+${v} ⭐)`:""}`); if(v) SFX.pos();
+    if(levelOf(s.points).idx>before && c.id===S.cur) setTimeout(()=>levelUp(s.id),900);
+    Cloud.markAwarded(sb.id,v).catch(()=>{});
+  }
+}
+// student / parent: homework card on the kid page
+function drawKidHw(){ const el=$("#kHwCard"); if(!el||!KID) return; const code=PVIEW||KCODE, list=(KID.hw||[]);
+  el.hidden=!list.length; if(!list.length) return;
+  list.forEach(h=>{ if(h.s && !KHW[h.id+code]) KHW[h.id+code]={score:h.s[0],total:h.s[1]}; });
+  const miss=list.filter(h=>KHW[h.id+code]===undefined);
+  if(miss.length && window.Cloud) miss.forEach(h=>{ KHW[h.id+code]=null; Cloud.getSub(h.id,code).then(s=>{ KHW[h.id+code]=s||false; drawKidHw(); }).catch(()=>{ delete KHW[h.id+code]; }); });
+  const todo=list.filter(h=>!KHW[h.id+code] && Date.now()<=h.due).length;
+  el.innerHTML=`<h3>📘 ${PVIEW?"الواجبات":"واجباتي"} ${todo?`<span class="cnt hwtodo" style="float:left">${todo} مطلوب</span>`:""}</h3>`+list.map(h=>{ const s=KHW[h.id+code], over=Date.now()>h.due;
+    const right= s ? `<span class="chip ${s.score/(s.total||1)>=.6?"p":"n"}">✅ ${s.score}/${s.total}</span>`
+      : s===null ? `<span class="cnt">…</span>` : over ? `<span class="chip n">انتهى</span>` : PVIEW ? `<span class="chip" style="background:#fff2d9;color:#b77400">⏳ لسه</span>` : `<button class="btn pri hwgo" data-h="${esc(h.id)}">ابدأ ✍️</button>`;
+    return `<div class="hwk ${!s&&!over?"todo":""}"><span class="big-e">${emo("📘")}</span><div class="grow"><b>${esc(h.t)}</b><small>${h.n} سؤال · ${esc(dueLabel(h.due))} · ⭐ لحد ${h.pts}</small></div>${right}</div>`; }).join("");
+  el.querySelectorAll(".hwgo").forEach(b=>b.onclick=()=>solveHw(b.dataset.h));
+}
+async function solveHw(hid){
+  const code=KCODE; if(!code) return;
+  openSheet(`<div class="hwsolve"><p class="hint" style="text-align:center;margin:40px 0">لحظة… بنجهّز الواجب ✍️</p></div>`);
+  let hw; try{ hw=await Cloud.getHw(hid); }catch(e){}
+  if(!hw){ openSheet(`<div class="mempty">${emo("⚠️")}<b>الواجب ده مش موجود</b><p class="hint">يمكن المعلم مسحه</p></div>`); return; }
+  try{ const s=await Cloud.getSub(hid,code); if(s){ KHW[hid+code]=s; drawKidHw(); hwReview(s,hw,{title:hw.title}); return; } }catch(e){}
+  if(Date.now()>hw.due){ openSheet(`<div class="mempty">${emo("⌛")}<b>الموعد خلص</b><p class="hint">الواجب ده انتهى وقته</p></div>`); return; }
+  const key="saqr.hw."+hid+code; let st; try{ st=JSON.parse(lsGet(key)); }catch(e){}
+  st=st&&st.ans?st:{i:0,ans:[]};
+  const order=hw.qs.map(q=>q.ch?[...q.ch].sort(()=>Math.random()-.5):null);
+  const look=KID.look||{body:BODY[0],acc:"none"};
+  const draw=()=>{ const i=st.i, q=hw.qs[i], n=hw.qs.length, answered=st.ans[i]!==undefined, ok=answered&&hwRight(q,st.ans[i]);
+    openSheet(`<div class="hwsolve"><div class="hwtop"><b>${esc(hw.title)}</b><small>سؤال ${i+1} من ${n}</small></div>
+      <div class="hwtrack"><i style="width:${100*(i+(answered?1:0))/n}%"></i><span class="hwfal" style="right:calc(${100*(i+(answered?1:0))/n}% - 22px)">${falconSVG({level:levelOf(KID.points).lv,body:look.body,acc:look.acc,mood:answered?(ok?"happy":"idle"):"idle"})}</span></div>
+      <div class="hwq">${esc(q.q)}</div>
+      ${q.ch?`<div class="hwopts">${order[i].map((o,k)=>{ const cls2=answered?(normA(o)===normA(q.a)?"ok":(normA(o)===normA(st.ans[i])?"no":"dim")):""; return `<button class="hwopt ${cls2}" data-o="${k}" ${answered?"disabled":""}><i>${"أبجد"[k]||k+1}</i>${esc(o)}</button>`; }).join("")}</div>`
+        :`<form id="hwF" class="hwfree"><input class="field" id="hwIn" ${answered?"disabled":""} value="${answered?esc(st.ans[i]):""}" placeholder="اكتب إجابتك هنا" autocomplete="off"><button class="btn pri" ${answered?"disabled":""}>تأكيد</button></form>`}
+      ${answered?`<div class="hwfb ${ok?"ok":"no"}">${ok?"👏 إجابة صحيحة!":`الإجابة الصح: <b>${esc(q.a)}</b>`}</div>
+        <div class="row" style="justify-content:center;margin-top:12px"><button class="btn pri hwnext" id="hwNext">${i+1<n?"السؤال التالي ←":"🏁 تسليم الواجب"}</button></div>`:""}</div>`);
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    if(!answered) gsap.from(".hwq,.hwopt,.hwfree",{y:14,opacity:0,stagger:.05,duration:.3});
+    const pick=a=>{ st.ans[i]=a; lsSet(key,JSON.stringify(st)); const good=hwRight(q,a); good?SFX.pos():SFX.neg(); draw();
+      if(good){ const r=$(".hwfb").getBoundingClientRect(); confetti(r.left+r.width/2,r.top,40); } else gsap.fromTo(".hwfb",{x:-8},{x:0,duration:.5,ease:"elastic.out(1,.3)"}); };
+    document.querySelectorAll(".hwopt:not([disabled])").forEach(b=>b.onclick=()=>pick(order[i][+b.dataset.o]));
+    if($("#hwF")) { $("#hwF").onsubmit=e=>{ e.preventDefault(); const v=$("#hwIn").value.trim(); if(!v){ toast("اكتب إجابتك الأول"); return; } pick(v); }; if(!answered) setTimeout(()=>$("#hwIn")&&$("#hwIn").focus(),250); }
+    if($("#hwNext")) $("#hwNext").onclick=()=>{ if(i+1<n){ st.i++; lsSet(key,JSON.stringify(st)); draw(); } else finish(); };
+  };
+  const finish=async()=>{ const sc=hwScore(hw.qs,st.ans), n=hw.qs.length, ans=hw.qs.map((q,i)=>st.ans[i]==null?"":String(st.ans[i]).slice(0,200));
+    $("#hwNext").disabled=true; $("#hwNext").textContent="جاري التسليم…";
+    try{ await Promise.race([Cloud.submitHw(hw,code,KID.name,ans,sc), new Promise(r=>setTimeout(r,3000))]); }
+    catch(e){ toast(e.code==="permission-denied"?"تعذّر التسليم — يمكن الموعد خلص أو اتسلّم قبل كده":"تعذّر التسليم — اتأكد من النت وجرّب تاني"); $("#hwNext").disabled=false; $("#hwNext").textContent="🏁 تسليم الواجب"; return; }
+    lsSet(key,null); KHW[hid+code]={score:sc,total:n,ans}; drawKidHw();
+    const r=sc/n, stars=r>=.9?3:r>=.6?2:sc?1:0, pts=hwPts({pts:hw.pts},sc,n);
+    openSheet(`<div class="hwdone"><div class="hwlot" id="hwLot"></div><div class="av hwav">${falconSVG({level:levelOf(KID.points).lv,body:look.body,acc:look.acc,mood:"happy"})}</div>
+      <div class="hwstars">${[1,2,3].map(k=>`<span class="${k<=stars?"on":""}">★</span>`).join("")}</div>
+      <div class="hwsc"><b>${sc}</b><span>/ ${n}</span></div><h2 style="justify-content:center">${r===1?"ممتاز! الدرجة النهائية 🏆":r>=.6?"شغل جامد! 👏":"كويس إنك حاولت 💪"}</h2>
+      ${pts?`<p class="hint" style="text-align:center">هتاخد <b>+${pts} ⭐</b> لصقرك أول ما المعلم يفتح صقر</p>`:""}
+      <div class="row" style="justify-content:center"><button class="btn pri" onclick="closeSheet()">تمام 🦅</button><button class="btn" id="hwRv">📝 راجع إجاباتك</button></div></div>`);
+    $("#hwRv").onclick=()=>hwReview({name:KID.name,ans},hw,{title:hw.title});
+    const f=document.querySelector(".hwav .fal"); f&&f.classList.add("flap");
+    gsap.fromTo(".hwav",{scale:.3,y:40},{scale:1,y:0,duration:.8,ease:"elastic.out(1,.5)"}); gsap.from(".hwstars span",{scale:0,rotate:-90,stagger:.18,delay:.3,duration:.5,ease:"back.out(3)"});
+    if(stars){ SFX.level(); confetti(innerWidth/2,innerHeight/3,120+stars*40); playLottie($("#hwLot"),r===1?"trophy":"stars"); } else SFX.done();
+  };
+  draw();
+}
+
 /* ---------- messages: teacher ↔ parents (one thread per student) ---------- */
 let THREADS=[], CHAT=null, PTH={};
 const QR_T=["شكراً لمتابعتك 🌟","متميّز النهارده ما شاء الله 👏","نرجو متابعة الواجب في البيت 📘","ياريت نتواصل بخصوص مستواه 🤝","تم، وهتابع الموضوع 👍"];
@@ -2827,7 +3055,7 @@ let gotFirst=false;
 let WANT=null, PARENT=null, PKIDS={}, PCODES=[], PVIEW=null, PDATA={};
 const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
 const isStandalone=()=>matchMedia("(display-mode: standalone)").matches || navigator.standalone===true;
-const NTYPES=[["ann","📢 إعلانات المعلم للفصل"],["pos","⭐ لما ياخد نقطة أو يترقّى"],["neg","✋ لما ياخد ملاحظة سلبية"],["att","📋 الغياب والتأخير"],["note","📝 رسائل المعلم"]];
+const NTYPES=[["ann","📢 إعلانات المعلم للفصل"],["pos","⭐ لما ياخد نقطة أو يترقّى"],["neg","✋ لما ياخد ملاحظة سلبية"],["att","📋 الغياب والتأخير"],["hw","📘 الواجبات الجديدة"],["note","📝 رسائل المعلم"]];
 async function drawBell(){
   const el=$("#pBell"); if(!el) return;
   const myTok=lsGet("saqr.push"), on = myTok && (PDATA.tokens||[]).includes(myTok) && window.Notification && Notification.permission==="granted";
@@ -2851,7 +3079,7 @@ function enableNotif(){
     drawBell(); });
 }
 function openNotifSettings(){
-  const pr={ann:true,pos:true,neg:true,att:true,note:true,...(PDATA.notif||{})};
+  const pr={ann:true,pos:true,neg:true,att:true,note:true,hw:true,...(PDATA.notif||{})};
   const draw=()=>{ openSheet(`<h2>🔔 الإشعارات</h2><p class="hint">اختار التنبيهات اللي عايزها توصلك</p>
     ${NTYPES.map(([k,t])=>`<div class="tg">${t}<button class="sw2 ${pr[k]?"on":""}" data-k="${k}" aria-label="${t}"></button></div>`).join("")}
     <div class="row" style="margin-top:14px"><button class="btn red" id="nOff">إيقاف الإشعارات على الجهاز ده</button></div>`);
@@ -2976,6 +3204,7 @@ function startCloud(user){
         L.classes.forEach(c=>{ if(carry.includes(c)) c.migrated=true }); store.save(L); }
       if(!list.length) list=[{id:uid(),name:"فصلي الأول",created:Date.now(),students:[],log:[]}];
       S.classes=list; fixCur(); save(); firstRender();
+      Cloud.listenNewSubs(processSubs);
       Cloud.listenThreads(l=>{ const before=liveThreads().filter(tUnread).length; THREADS=l; drawMsgBadge();
         if(liveThreads().filter(tUnread).length>before && !CHAT) SFX.msg(); });
       Cloud.listenMe((d,local)=>{ if(local) return; S.banks=d.banks||[]; if(d.geminiKey!==undefined){ S.geminiKey=d.geminiKey; if(d.geminiKey) lsSet(AI_KEY,d.geminiKey); } migrateQs(); });
@@ -3092,7 +3321,7 @@ function drawKid(prev){
     else if(k.points<prev.points){ SFX.neg(); gsap.fromTo(".khero",{x:-8},{x:0,duration:.5,ease:"elastic.out(1,.3)"}); }
   } else gsap.from(".khero,.kcard",{y:30,opacity:0,stagger:.08,duration:.5,ease:"back.out(1.5)"});
   setTimeout(()=>{ if(f) f.classList.remove("flap"); },1500);
-  drawKidChat();
+  drawKidChat(); drawKidHw();
 }
 function kidStyle(){
   let look={...(KID.look||{body:BODY[0],acc:"none"})}; const pts=KID.points;

@@ -34,6 +34,10 @@ function buildMessages(b, a) {
   if (an && an.at && (!bn || an.at !== bn.at)) {
     out.push({ type: "ann", title: `📢 إعلان من ${a.teacher ? "أ. " + a.teacher : "المعلم"} — ${a.className || ""}`, body: String(an.t).slice(0, 180), tag: `ann-${a.cid}-${an.at}` });
   }
+  const oldHw = new Set((b.hw || []).map(h => h.id));
+  (a.hw || []).filter(h => !oldHw.has(h.id)).slice(0, 2).forEach(h => {
+    out.push({ type: "hw", title: `📘 واجب جديد لـ ${name}`, body: `«${h.t}» — ${h.n} سؤال، يتحل من صفحة الطالب في صقر`, tag: `hw-${h.id}` });
+  });
   if (a.note && a.noteAt && a.noteAt !== b.noteAt) {
     out.push({ type: "note", title: `📝 رسالة من ${a.teacher ? "أ. " + a.teacher : "المعلم"}`, body: String(a.note).slice(0, 180) });
   }

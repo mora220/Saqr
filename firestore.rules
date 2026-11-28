@@ -28,6 +28,36 @@ service cloud.firestore {
       }
     }
 
+    // الواجبات: الأسئلة في hw/{id}، والطالب بيقرأها بالـ id من صفحته
+    match /hw/{hid} {
+      allow get: if true;
+      allow list: if request.auth != null && resource.data.owner == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.owner == request.auth.uid;
+      allow update: if request.auth != null && resource.data.owner == request.auth.uid && request.resource.data.owner == request.auth.uid;
+      allow delete: if request.auth != null && resource.data.owner == request.auth.uid;
+    }
+
+    // حل الطالب: subs/{hw}_{code} — الطالب بيسلّم مرة واحدة من غير حساب، قبل الموعد، والمعلم بيصحح ويدي النقاط
+    function hwOf(hid) { return get(/databases/$(database)/documents/hw/$(hid)).data; }
+    match /subs/{sid} {
+      allow get: if true;
+      allow list: if request.auth != null && resource.data.owner == request.auth.uid;
+      allow create: if sid == request.resource.data.hw + '_' + request.resource.data.code
+        && request.resource.data.keys().hasOnly(['owner', 'hw', 'cid', 'code', 'name', 'ans', 'score', 'total', 'at', 'awarded'])
+        && exists(/databases/$(database)/documents/hw/$(request.resource.data.hw))
+        && hwOf(request.resource.data.hw).owner == request.resource.data.owner
+        && hwOf(request.resource.data.hw).cid == request.resource.data.cid
+        && request.time.toMillis() <= hwOf(request.resource.data.hw).due
+        && kidExists(request.resource.data.code)
+        && kidDoc(request.resource.data.code).data.cid == request.resource.data.cid
+        && request.resource.data.awarded == false
+        && request.resource.data.ans is list && request.resource.data.ans.size() <= 100
+        && request.resource.data.name is string && request.resource.data.name.size() <= 40;
+      allow update: if request.auth != null && resource.data.owner == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['awarded', 'pts']);
+      allow delete: if request.auth != null && resource.data.owner == request.auth.uid;
+    }
+
     // فصول المعلم: يشوفها ويعدّلها صاحبها بس
     match /classes/{classId} {
       allow read, delete: if request.auth != null && resource.data.owner == request.auth.uid;

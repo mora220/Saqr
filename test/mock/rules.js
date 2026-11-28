@@ -51,5 +51,31 @@ export function check(op, path, before, after, auth, get) {
     if (op === "delete") return isKidOwner(code) ? "" : deny();
     return deny("msg update");
   }
+  if (p[0] === "hw" && p.length === 2) {
+    if (op === "get") return "";
+    if (op === "list") return uid && before && before.owner === uid ? "" : deny("list hw");
+    if (op === "create") return uid && after.owner === uid ? "" : deny("hw create");
+    if (op === "update") return uid && before.owner === uid && after.owner === uid ? "" : deny();
+    if (op === "delete") return uid && before.owner === uid ? "" : deny();
+  }
+  if (p[0] === "subs" && p.length === 2) {
+    if (op === "get") return "";
+    if (op === "list") return uid && before && before.owner === uid ? "" : deny("list subs");
+    if (op === "create") {
+      const d = after, hw = get("hw/" + d.hw), k = kid(d.code);
+      const allowed = ["owner", "hw", "cid", "code", "name", "ans", "score", "total", "at", "awarded"];
+      if (p[1] !== d.hw + "_" + d.code) return "bad id";
+      if (!Object.keys(d).every(x => allowed.includes(x))) return "extra keys";
+      if (!hw) return "no hw"; if (hw.owner !== d.owner) return "owner"; if (hw.cid !== d.cid) return "cid";
+      if (Date.now() > hw.due) return "past due";
+      if (!k || k.cid !== d.cid) return "kid cid";
+      if (d.awarded !== false) return "awarded";
+      if (!Array.isArray(d.ans) || d.ans.length > 100) return "ans";
+      if (typeof d.name !== "string" || d.name.length > 40) return "name";
+      return "";
+    }
+    if (op === "update") return uid && before.owner === uid && onlyKeys(before, after, ["awarded", "pts"]) ? "" : deny("sub update");
+    if (op === "delete") return uid && before.owner === uid ? "" : deny();
+  }
   return "no rule for " + path;
 }
