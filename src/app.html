@@ -466,6 +466,76 @@ body.board .x{width:52px;height:52px;font-size:1.6rem;top:18px;left:18px}
 .aistep.on i{background:#7b5cd6;color:#fff;animation:pulse 1s ease-in-out infinite}.aistep.done i{background:#22b573;color:#fff}
 @keyframes pulse{50%{transform:scale(1.15)}}
 .aifal{width:120px;height:120px;margin:0 auto}
+/* ===== games overhaul ===== */
+.scene{position:absolute;inset:0;width:100%;height:100%;display:block}
+.scene .drift1{animation:sdrift 40s linear infinite}.scene .drift2{animation:sdrift 26s linear infinite reverse}
+@keyframes sdrift{0%{transform:translateX(0)}50%{transform:translateX(-90px)}100%{transform:translateX(0)}}
+.gcards2{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.gc2{position:relative;height:190px;border-radius:24px;overflow:hidden;text-align:right;color:#fff;background:linear-gradient(160deg,var(--c1),var(--c2));box-shadow:0 12px 26px rgba(0,0,0,.16);transition:transform .15s}
+.gc2:active{transform:scale(.96)}
+.gc2 .gsky{position:absolute;inset:0;opacity:.95}.gc2 .gsky .scene{height:62%}
+.gc2 .gface{position:absolute;top:18px;left:50%;transform:translateX(-50%);filter:drop-shadow(0 8px 10px rgba(0,0,0,.25));animation:bob2 2.4s ease-in-out infinite}
+.gc2 .gface .fe{width:64px;height:64px}.gc2 .gface .fet{font-size:3.4rem}
+@keyframes bob2{50%{transform:translateX(-50%) translateY(-8px) rotate(-4deg)}}
+.gc2 .gtxt{position:absolute;inset:auto 0 0 0;padding:10px 12px 12px;background:linear-gradient(180deg,transparent,var(--c2) 30%)}
+.gc2 b{display:block;font-size:1.15rem}.gc2 small{display:block;font-size:.72rem;opacity:.92;line-height:1.45;font-weight:600}
+.btn.big{font-size:1.15rem;padding:14px 26px;border-radius:18px}
+.gprev{position:relative;height:150px;border-radius:20px;overflow:hidden;margin-bottom:10px}
+.gprev-f{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-around}.gprev-f span{width:70px;height:70px}
+.gprev-c{position:absolute;inset:0}.gprev-c .pc{position:absolute;top:28%;background:#fff;border-radius:40px;padding:8px 18px;font-weight:800;font-size:1.3rem;color:#27407a;box-shadow:0 6px 12px rgba(0,0,0,.12);animation:float 3s ease-in-out infinite}
+.gprev-c .pc:nth-child(1){right:12%}.gprev-c .pc:nth-child(2){right:44%;top:46%}.gprev-c .pc:nth-child(3){right:74%}
+@keyframes float{50%{transform:translateY(-12px)}}
+.ghud{position:absolute;top:10px;left:10px;right:10px;display:flex;gap:8px;z-index:3;flex-wrap:wrap}
+.hb2{background:rgba(255,255,255,.88);border-radius:14px;padding:4px 10px;font-weight:800;color:#1f2a44;box-shadow:0 4px 10px rgba(0,0,0,.1)}.hb2 .fe{width:1.2em;height:1.2em}
+.qcard{background:#fff;border-radius:20px;box-shadow:0 8px 22px rgba(27,42,74,.12);padding:6px 12px;margin:10px 0}
+/* quiz stage */
+.stage{position:relative;height:clamp(200px,30vh,250px);border-radius:24px;overflow:hidden;margin:6px 0}
+.stage .lights{position:absolute;inset:0;z-index:1;background:radial-gradient(ellipse 40% 70% at 50% 100%,rgba(255,240,170,.55),transparent 70%);pointer-events:none}
+.stg-st{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:12px}
+.stg-st .av{width:150px;height:150px;filter:drop-shadow(0 10px 14px rgba(0,0,0,.35))}
+.stg-nm{background:rgba(255,255,255,.95);color:#1f2a44;font-weight:800;font-size:1.5rem;border-radius:16px;padding:2px 18px;margin-top:-6px}
+.qring{position:absolute;top:12px;left:12px;width:70px;height:70px;z-index:3}.qring svg{width:100%;height:100%;transform:rotate(-90deg)}.qring b{position:absolute;inset:0;display:grid;place-items:center;color:#fff;font-size:1.5rem;font-weight:800}
+.ktiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0}
+.kt2{min-height:76px;border-radius:18px;color:#fff;font-weight:800;font-size:clamp(1.1rem,3.8vw,1.6rem);display:flex;align-items:center;gap:10px;padding:10px 14px;text-align:right;box-shadow:0 6px 0 rgba(0,0,0,.18);transition:transform .1s,opacity .3s;unicode-bidi:plaintext}
+.kt2 span{font-size:1.4rem;opacity:.85}.kt2:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.kt2.win{outline:5px solid #fff;box-shadow:0 0 0 9px #22b573,0 10px 24px rgba(0,0,0,.25);transform:scale(1.03)}.kt2.dim{opacity:.3}
+body.board .stage{height:46vh}body.board .stg-st .av{width:min(30vh,240px);height:min(30vh,240px)}body.board .stg-nm{font-size:2.6rem}body.board .kt2{min-height:16vh;font-size:clamp(1.6rem,3.4vw,3rem)}
+/* race */
+.rscene{position:relative;height:clamp(240px,46vh,520px);border-radius:24px;overflow:hidden;margin:6px 0}
+.rscene .fin{position:absolute;left:3%;top:4%;bottom:12%;width:16px;background:repeating-linear-gradient(0deg,#1f2a44 0 12px,#fff 12px 24px);border-radius:4px;box-shadow:0 0 0 3px rgba(255,255,255,.6);z-index:1}
+.rscene .fin span{position:absolute;top:-6px;left:-6px;font-size:1.6rem}
+.rlane{position:absolute;left:0;right:0;z-index:2;border-bottom:2px dashed rgba(255,255,255,.55)}
+.rtag{position:absolute;right:8px;top:3px;font-size:.72rem!important;color:#fff;font-weight:800;border-radius:12px;padding:2px 10px;font-size:.85rem;box-shadow:0 4px 10px rgba(0,0,0,.2);z-index:3}
+.rtag b{background:rgba(255,255,255,.3);border-radius:8px;padding:0 6px;margin-inline-start:4px}
+.rbird{position:absolute;top:50%;width:clamp(54px,9vh,96px);height:clamp(54px,9vh,96px);margin-top:calc(clamp(54px,9vh,96px) / -2);z-index:4;filter:drop-shadow(0 6px 6px rgba(0,0,0,.25))}
+.trail{position:absolute;top:50%;height:8px;margin-top:-4px;border-radius:8px;z-index:3}
+.cdown{position:absolute;inset:0;display:grid;place-items:center;z-index:6;font-size:clamp(3rem,12vh,8rem);font-weight:800;color:#fff;text-shadow:0 6px 0 rgba(0,0,0,.25),0 0 30px rgba(255,200,60,.8);pointer-events:none}
+.podium{position:relative;height:300px;border-radius:24px;overflow:hidden;display:flex;align-items:flex-end;justify-content:center;gap:10px;padding-bottom:0}
+.podium .lbg{position:absolute;inset:-20px;z-index:1;pointer-events:none}
+.pd{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;width:28%}.pdb{width:90px;height:90px;margin-bottom:-6px}
+.pdk{width:100%;border-radius:14px 14px 0 0;color:#fff;text-align:center;padding:8px 4px;box-shadow:inset 0 -8px 0 rgba(0,0,0,.15)}.pdk b{display:block;font-size:2rem;line-height:1}.pdk small{font-weight:800}
+.pd.p1 .pdk{height:120px}.pd.p2 .pdk{height:85px}.pd.p3 .pdk{height:60px}.pd.p1 .pdb{width:110px;height:110px}
+/* cloud catch */
+.cgame{position:relative;height:clamp(380px,62vh,700px);border-radius:24px;overflow:hidden;margin-top:6px}
+.cq{position:absolute;top:52px;left:50%;transform:translateX(-50%);z-index:3;background:#fff;border-radius:20px;padding:10px 20px;font-weight:800;font-size:clamp(1.3rem,4.5vw,2.4rem);box-shadow:0 10px 24px rgba(0,0,0,.15);max-width:92%;text-align:center;unicode-bidi:plaintext}
+.cloud{position:absolute;left:var(--x);top:var(--y);width:clamp(120px,22vw,240px);margin-left:calc(clamp(120px,22vw,240px) / -2);aspect-ratio:2/1.1;background:none;z-index:2;animation:float 3.2s ease-in-out infinite;animation-delay:var(--d);filter:drop-shadow(0 10px 10px rgba(40,90,150,.25));transition:filter .3s}
+.cloud svg{position:absolute;inset:0;width:100%;height:100%}.cloud b{position:relative;display:grid;place-items:center;height:100%;padding-top:8%;font-size:clamp(1.1rem,3.6vw,2.2rem);font-weight:800;color:#27407a;unicode-bidi:plaintext}
+.cloud.rain svg g{fill:#9aa7bd}.cloud.rain::after{content:"💧 💧 💧";position:absolute;left:0;right:0;bottom:-26px;text-align:center;font-size:1rem;animation:drop .8s ease-in infinite}
+@keyframes drop{from{transform:translateY(-6px);opacity:1}to{transform:translateY(18px);opacity:0}}
+.cloud.glow{filter:drop-shadow(0 0 16px #ffd84d) drop-shadow(0 0 30px #22b573)}
+.cbird{position:absolute;right:6%;bottom:6%;width:clamp(80px,14vh,140px);height:clamp(80px,14vh,140px);z-index:4}
+.cpop{position:absolute;left:50%;top:44%;transform:translateX(-50%);z-index:5;background:#22b573;color:#fff;font-weight:800;font-size:1.6rem;border-radius:18px;padding:6px 18px;box-shadow:0 8px 20px rgba(0,0,0,.2)}
+.cend{position:relative;height:260px;border-radius:24px;overflow:hidden}.cend .lbg{position:absolute;inset:-20px;pointer-events:none}
+.cstars{position:absolute;top:18px;left:0;right:0;display:flex;justify-content:center;gap:10px;z-index:2}.cs .fe{width:58px;height:58px;filter:grayscale(1) opacity(.35)}.cs.on .fe{filter:drop-shadow(0 6px 8px rgba(0,0,0,.25))}.cs:nth-child(2) .fe{width:74px;height:74px;margin-top:-10px}
+.cfal{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);width:130px;height:130px;z-index:2}
+/* wheel */
+.wheelbox{position:relative;border-radius:24px;overflow:hidden;padding:14px 0 6px;margin:6px 0}
+.wheelw{position:relative;width:min(84vw,360px);aspect-ratio:1;margin:0 auto;z-index:2}
+.wheel{width:100%;height:100%;filter:drop-shadow(0 12px 18px rgba(0,0,0,.3))}
+.whub{position:absolute;left:50%;top:50%;width:26%;height:26%;transform:translate(-50%,-50%);background:#fff;border-radius:50%;box-shadow:0 0 0 6px #1b2a4a,0 6px 12px rgba(0,0,0,.3);padding:4px}
+.wptr{position:absolute;top:-8px;left:50%;margin-left:-18px;width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-top:34px solid #e8384f;filter:drop-shadow(0 4px 4px rgba(0,0,0,.3));transform-origin:50% 0}
+.wres{background:#fff;border-radius:22px;padding:12px;margin-top:10px;box-shadow:0 10px 24px rgba(0,0,0,.12);border-top:8px solid var(--c);text-align:center;font-size:1.2rem}
+body.board .wheelw{width:min(62vh,600px)}body.board .cgame{height:78vh}body.board .rscene{height:56vh}
 /* ---------- fx ---------- */
 #fx{position:fixed;inset:0;pointer-events:none;z-index:80}
 .float{direction:ltr;position:fixed;font-weight:800;font-size:2.2rem;z-index:90;pointer-events:none;text-shadow:0 3px 0 rgba(0,0,0,.12)}
@@ -1656,16 +1726,52 @@ function bindSrc(redraw){ document.querySelectorAll("[data-src]").forEach(b=>b.o
   document.querySelectorAll("[data-lv]").forEach(b=>b.onclick=()=>{ GSET.lvl=b.dataset.lv; redraw(); }); }
 function stillOpen(id){ return $("#ov").classList.contains("show") && document.getElementById(id); }
 
+/* ===== game scene engine (illustrated Saudi sky & desert) ===== */
+function sceneSVG(opt={}){ const id="sc"+(++gradN), night=opt.night;
+  return `<svg class="scene" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+  <defs><linearGradient id="${id}s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${night?"#1b2a5a":"#5bb8ff"}"/><stop offset=".65" stop-color="${night?"#4a3d8f":"#bfe6ff"}"/><stop offset="1" stop-color="${night?"#c67bb0":"#fff3d6"}"/></linearGradient>
+    <radialGradient id="${id}u" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#fff7c2"/><stop offset=".45" stop-color="#ffd84d"/><stop offset="1" stop-color="#ffd84d" stop-opacity="0"/></radialGradient>
+    <linearGradient id="${id}d1" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f7cf86"/><stop offset="1" stop-color="#e8ad55"/></linearGradient>
+    <linearGradient id="${id}d2" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eebb66"/><stop offset="1" stop-color="#d4913b"/></linearGradient>
+    <g id="${id}c"><ellipse cx="0" cy="0" rx="48" ry="22" fill="#fff"/><ellipse cx="-30" cy="6" rx="30" ry="17" fill="#fff"/><ellipse cx="32" cy="6" rx="32" ry="17" fill="#fff"/><ellipse cx="0" cy="12" rx="62" ry="13" fill="#eaf4ff"/></g>
+    <g id="${id}p"><path d="M0 0 C2 -40 4 -80 0 -118" stroke="#8a5a2b" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <g fill="#3f9a4f"><path d="M0 -118 Q-40 -132 -66 -108 Q-36 -118 0 -112Z"/><path d="M0 -118 Q38 -136 66 -110 Q34 -120 0 -112Z"/><path d="M0 -118 Q-26 -150 -52 -150 Q-24 -138 0 -114Z"/><path d="M0 -118 Q24 -152 54 -148 Q22 -138 0 -114Z"/><path d="M0 -118 Q-6 -152 6 -164 Q4 -140 2 -116Z"/></g></g></defs>
+  <rect width="800" height="450" fill="url(#${id}s)"/>
+  ${night?`<g fill="#fff">${Array.from({length:40},(_,i)=>`<circle cx="${(i*197)%800}" cy="${(i*73)%220}" r="${i%3?1.2:2}" opacity=".8"/>`).join("")}</g><circle cx="640" cy="80" r="34" fill="#fff6d0"/><circle cx="654" cy="70" r="30" fill="#2c3570"/>`
+   :`<circle cx="650" cy="90" r="110" fill="url(#${id}u)"/><circle cx="650" cy="90" r="42" fill="#ffe066"/>`}
+  <g class="drift1" opacity=".95"><use href="#${id}c" x="120" y="70"/><use href="#${id}c" x="520" y="120" transform="scale(.8)"/></g>
+  <g class="drift2" opacity=".85"><use href="#${id}c" x="340" y="40" transform="scale(.6)"/><use href="#${id}c" x="900" y="60" transform="scale(.7)"/></g>
+  <path d="M0 300 L90 250 L170 285 L260 230 L360 290 L450 245 L560 295 L660 240 L800 290 L800 450 L0 450Z" fill="${night?"#5b4f9a":"#a9c3e6"}" opacity=".8"/>
+  <path d="M0 340 Q140 290 300 330 T600 320 T800 330 L800 450 L0 450Z" fill="url(#${id}d1)"/>
+  <path d="M0 385 Q180 345 360 385 T800 375 L800 450 L0 450Z" fill="url(#${id}d2)"/>
+  <use href="#${id}p" x="70" y="372"/><use href="#${id}p" x="110" y="384" transform="translate(110 384) scale(.7) translate(-110 -384)"/><use href="#${id}p" x="740" y="380" transform="translate(740 380) scale(.85) translate(-740 -380)"/>
+  </svg>`; }
+function gameHUD(items){ return `<div class="ghud">${items.map(([e,t,id])=>`<span class="hb2">${emo(e)} <b ${id?`id="${id}"`:""}>${t}</b></span>`).join("")}</div>`; }
+const KCOL=[{c:"#e8384f",s:"▲"},{c:"#2d7ff9",s:"◆"},{c:"#f5b301",s:"●"},{c:"#22b573",s:"■"}];
+// choices for any question: bank choices, else distractors from math or from other answers
+function withChoices(q){
+  if(q.ch&&q.ch.length>1) return q;
+  const a=q.a, n=Number(String(a).replace(/[,٬\s]/g,""));
+  let w=[];
+  if(!isNaN(n)&&String(a).trim()!==""){ const cand=[n+1,n-1,n+10,n-10,n+2,n*10,Math.round(n/10),n+5,n-5,n+100,n-100,Number(String(Math.abs(n)).split("").reverse().join(""))].filter(x=>x>=0&&x!==n&&Number.isFinite(x));
+    const fmt=x=>String(a).includes(",")?x.toLocaleString("en-US"):String(x);
+    w=[...new Set(cand.map(fmt))].sort(()=>Math.random()-.5).slice(0,3); }
+  else { const pool=[...new Set(bankPool().map(x=>x.a).filter(x=>x&&x!==a))]; w=pool.sort(()=>Math.random()-.5).slice(0,3); }
+  if(!w.length) return q;
+  return {...q, ch:[a,...w].sort(()=>Math.random()-.5)};
+}
+
 function openGames(){
-  openSheet(`<h2>🎮 الألعاب التعليمية</h2><p class="hint">العب مع الفصل على السبورة، والنقاط بتتسجّل للطلاب تلقائياً 🦅</p>
-    <div class="gcards">
-      <button class="gc" data-g="race" style="background:linear-gradient(135deg,#22b573,#139a8a)"><span class="gi">${emo("🏁")}</span><div><b>سباق الأسراب</b><small>الفصل يتقسم أسراب، وكل إجابة صح الصقر بتاع السرب يتقدّم. أول سرب يوصل يكسب!</small></div></button>
-      <button class="gc" data-g="quiz" style="background:linear-gradient(135deg,#7b5cd6,#5a46b8)"><span class="gi">${emo("🎯")}</span><div><b>سؤال الصقر</b><small>الصقر يختار طالب عشوائي ويطلعله سؤال. يجاوب صح؟ ياخد نقطة!</small></div></button>
-      <button class="gc" data-g="sprint" style="background:linear-gradient(135deg,#ff8a3d,#ff5d5d)"><span class="gi">${emo("⚡")}</span><div><b>الحساب الذهني السريع</b><small>مسائل ورا بعض بعدّاد وقت — مين يجاوب الأول؟</small></div></button>
-      <button class="gc" data-g="bank" style="background:linear-gradient(135deg,#3d8be0,#27407a)"><span class="gi">${emo("📚")}</span><div><b>بنك الأسئلة</b><small>أسئلة المنهج مقسّمة بالوحدات والدروس (${(S.banks||[]).reduce((a,x)=>a+bankCount(x),0)} سؤال)</small></div></button>
-    </div>`, ()=>setTab("home"));
-  gsap.from(".gc",{x:40,opacity:0,stagger:.07,duration:.4,ease:"back.out(1.5)"});
-  document.querySelectorAll(".gc").forEach(b=>b.onclick=()=>{ ac(); const g=b.dataset.g; g==="race"?raceSetup():g==="quiz"?quizGame():g==="sprint"?sprintGame():openBanks(); });
+  const G=[["cloud","☁️","صيد الغيوم","الإجابات طايرة في السما — الطالب يطلع يلمس الغيمة الصح والصقر يطير يصطادها!","#4fb3ff","#2d7ff9"],
+    ["race","🏁","سباق الأسراب","الفصل أسراب بتتسابق فوق الصحرا — كل إجابة صح الصقر ينطلق قدام!","#22b573","#0f8c6e"],
+    ["wheel","🎡","عجلة الصقر","لفّ العجلة: نقاط، أسئلة مضاعفة، مفاجآت… والصقر يختار مين يجاوب!","#ff8a3d","#e8384f"],
+    ["quiz","🎯","سؤال الصقر","الصقر يختار طالب وسط تشويق، وسؤال بأربع اختيارات ملونة وعدّاد وقت","#7b5cd6","#4b37a8"],
+    ["sprint","⚡","الحساب الذهني","مسائل ورا بعض بعدّاد — مين يحسب الأسرع؟","#f5b301","#e08a00"],
+    ["bank","📚","بنوك الأسئلة",`أسئلة المنهج بالوحدات والدروس (${(S.banks||[]).reduce((a,x)=>a+bankCount(x),0)} سؤال)`,"#5b6b8c","#27407a"]];
+  openSheet(`<h2>🎮 الألعاب التعليمية</h2><p class="hint">اعرض اللعبة على السبورة (📺) والعب مع الفصل — النقاط بتتسجّل تلقائياً 🦅</p>
+    <div class="gcards2">${G.map(([k,e,t,d,c1,c2])=>`<button class="gc2" data-g="${k}" style="--c1:${c1};--c2:${c2}"><span class="gsky">${k==="bank"?"":sceneSVG({night:k==="quiz"})}</span><span class="gface">${emo(e)}</span><span class="gtxt"><b>${t}</b><small>${d}</small></span></button>`).join("")}</div>`, ()=>setTab("home"));
+  gsap.from(".gc2",{y:30,opacity:0,stagger:.06,duration:.45,ease:"back.out(1.6)"});
+  document.querySelectorAll(".gc2").forEach(b=>b.onclick=()=>{ ac(); const g=b.dataset.g; ({cloud:cloudSetup,race:raceSetup,wheel:wheelGame,quiz:quizGame,sprint:sprintGame,bank:openBanks})[g](); });
 }
 
 function sprintGame(){
@@ -1690,82 +1796,223 @@ function sprintGame(){
   draw(); run();
 }
 
+
+/* ===== سؤال الصقر — stage, drumroll pick, coloured answer tiles, timer ===== */
 function quizGame(){
   const c=cls(); const here=c.students.filter(s=>!isOut(s.id)); if(!here.length){ toast("مفيش طلاب حاضرين"); return; }
-  let last=null, cur=null, q=null, shown=false, asked=0, right=0;
-  const pick=()=>{ let pool=here.filter(s=>s.id!==last); if(!pool.length) pool=here; cur=pool[rnd(0,pool.length-1)]; last=cur.id; q=nextQ(); shown=false; };
-  pick();
-  const draw=()=>{ openSheet(`<h2>🎯 سؤال الصقر</h2>${srcPicker()}
-    <div class="seg2"><span style="align-self:center;font-weight:700">النقاط للإجابة الصح:</span>${[1,2,3].map(v=>`<button data-pts="${v}" class="${GSET.pts===v?"on":""}">${v}</button>`).join("")}</div>
-    <div class="spot"><div class="av" id="qzAv" style="width:150px;height:150px">${avatar(cur,"idle")}</div><div class="big" style="font-size:2rem">${esc(cur.name)}</div></div>
-    <div id="qzQ">${qHTML(q)}</div><div class="qans" id="qzA">${shown?esc(q.a):""}</div>
-    <div class="tbtns"><button style="background:#22b573" id="qzOk">✅ صح (${sgn(GSET.pts)})</button><button style="background:#ff5d5d" id="qzNo">❌ غلط</button></div>
-    <div class="row" style="justify-content:center;margin-top:10px"><button class="btn vio" id="qzShow">👀 الإجابة</button><button class="btn" id="qzSkip">🔄 طالب تاني</button></div>
-    <p class="hint" style="text-align:center">إجابات صح: ${right} من ${asked}</p>`);
+  let last=null, cur=null, q=null, done=false, asked=0, right=0, tid=null, sec=20, left=sec;
+  const C=2*Math.PI*30;
+  const stop=()=>{ clearInterval(tid); tid=null; };
+  const pickNew=()=>{ let pool=here.filter(s=>s.id!==last); if(!pool.length) pool=here; cur=pool[rnd(0,pool.length-1)]; last=cur.id; q=withChoices(nextQ()); done=false; left=sec; };
+  const draw=(intro)=>{ openSheet(`<h2>🎯 سؤال الصقر</h2>${srcPicker()}
+    <div class="seg2"><span style="align-self:center;font-weight:700">النقاط:</span>${[1,2,3].map(v=>`<button data-pts="${v}" class="${GSET.pts===v?"on":""}">${v}</button>`).join("")}<span style="align-self:center;font-weight:700;margin-inline-start:8px">الوقت:</span>${[10,20,30].map(v=>`<button data-sec="${v}" class="${sec===v?"on":""}">${v}ث</button>`).join("")}</div>
+    <div class="stage"><span class="lights"></span>${sceneSVG({night:true})}
+      <div class="stg-st"><div class="av" id="qzAv">${avatar(cur,"idle")}</div><div class="stg-nm" id="qzNm">${esc(cur.name)}</div></div>
+      <div class="qring"><svg viewBox="0 0 70 70"><circle cx="35" cy="35" r="30" stroke="rgba(255,255,255,.25)" stroke-width="7" fill="none"/><circle id="qzArc" cx="35" cy="35" r="30" stroke="#ffd84d" stroke-width="7" fill="none" stroke-linecap="round" stroke-dasharray="${C}"/></svg><b id="qzT">${left}</b></div></div>
+    <div class="qcard" id="qzQ">${q.math?`<div class="qbig">${esc(q.q)}</div>`:`<div class="qtext">${esc(q.q)}</div>`}</div>
+    ${q.ch?`<div class="ktiles">${q.ch.map((o,i)=>`<button class="kt2" data-o="${esc(o)}" style="background:${KCOL[i].c}"><span>${KCOL[i].s}</span>${esc(o)}</button>`).join("")}</div>`
+      :`<div class="qans" id="qzA"></div><div class="tbtns"><button style="background:#22b573" id="qzOk">✅ صح</button><button style="background:#e8384f" id="qzNo">❌ غلط</button></div><div class="row" style="justify-content:center;margin-top:8px"><button class="btn vio" id="qzShow">👀 الإجابة</button></div>`}
+    <div class="row" style="justify-content:space-between;margin-top:10px"><button class="btn" id="qzSkip">🔄 طالب تاني</button><span class="hint" style="margin:0">صح ${right} من ${asked}</span></div>`, stop);
     gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
-    const f=$("#qzAv .fal"); if(f) f.classList.add("flap"); gsap.fromTo("#qzAv",{y:-80,opacity:0},{y:0,opacity:1,duration:.6,ease:"bounce.out"});
-    setTimeout(()=>{ const f2=$("#qzAv .fal"); if(f2) f2.classList.remove("flap"); },900);
-    bindSrc(()=>{ q=nextQ(); shown=false; draw(); });
-    document.querySelectorAll("[data-pts]").forEach(b=>b.onclick=()=>{ GSET.pts=+b.dataset.pts; draw(); });
-    $("#qzShow").onclick=()=>{ shown=true; $("#qzA").textContent=q.a; markOk(); SFX.pick(); };
-    $("#qzSkip").onclick=()=>{ pick(); SFX.whoosh(); draw(); };
-    $("#qzOk").onclick=()=>{ asked++; right++; const sid=cur.id; awardQuiet([sid],{...GAME_OK,v:GSET.pts}); $("#qzAv").innerHTML=avatar(stu(sid),"happy");
-      const r=$("#qzAv").getBoundingClientRect(); confetti(r.left+r.width/2,r.top+r.height/2,90); SFX.pos(); setTimeout(()=>{ if(stillOpen("qzAv")){ pick(); draw(); } },1300); };
-    $("#qzNo").onclick=()=>{ asked++; SFX.neg(); shown=true; $("#qzA").textContent=q.a; markOk(); $("#qzAv").innerHTML=avatar(cur,"sad"); setTimeout(()=>{ if(stillOpen("qzAv")){ pick(); draw(); } },1800); };
+    bindSrc(()=>{ q=withChoices(nextQ()); done=false; left=sec; draw(); run(); });
+    document.querySelectorAll("[data-pts]").forEach(b=>b.onclick=()=>{ GSET.pts=+b.dataset.pts; draw(); run(); });
+    document.querySelectorAll("[data-sec]").forEach(b=>b.onclick=()=>{ sec=+b.dataset.sec; left=sec; draw(); run(); });
+    $("#qzSkip").onclick=()=>{ stop(); roll(); };
+    gsap.from(".kt2",{y:40,opacity:0,stagger:.08,duration:.45,ease:"back.out(1.8)",delay:intro?.6:0});
+    const finish=(ok,btn)=>{ if(done) return; done=true; stop(); asked++;
+      document.querySelectorAll(".kt2").forEach(t=>{ if(t.dataset.o===q.a) t.classList.add("win"); else t.classList.add("dim"); });
+      if(ok){ right++; awardQuiet([cur.id],{...GAME_OK,v:GSET.pts}); $("#qzAv").innerHTML=avatar(stu(cur.id),"happy"); SFX.pos();
+        const r=(btn||$("#qzAv")).getBoundingClientRect(); burstAt(r.left+r.width/2,r.top+r.height/2,"stars",220); confetti(r.left+r.width/2,r.top,90);
+        gsap.fromTo("#qzAv",{y:0},{y:-24,duration:.25,yoyo:true,repeat:3}); }
+      else { SFX.neg(); $("#qzAv").innerHTML=avatar(cur,"sad"); if(btn) gsap.fromTo(btn,{x:-10},{x:0,duration:.5,ease:"elastic.out(1,.3)"}); const a=$("#qzA"); if(a) a.textContent=q.a; }
+      setTimeout(()=>{ if(stillOpen("qzAv")) roll(); },ok?1900:2400); };
+    document.querySelectorAll(".kt2").forEach(b=>b.onclick=()=>finish(b.dataset.o===q.a,b));
+    if($("#qzOk")) $("#qzOk").onclick=()=>finish(true); if($("#qzNo")) $("#qzNo").onclick=()=>finish(false);
+    if($("#qzShow")) $("#qzShow").onclick=()=>{ $("#qzA").textContent=q.a; SFX.pick(); };
   };
-  draw();
+  const run=()=>{ stop(); tid=setInterval(()=>{ if(!stillOpen("qzT")){ stop(); return; } left--; $("#qzT").textContent=Math.max(0,left); $("#qzArc").style.strokeDashoffset=C*(1-left/sec);
+      if(left<=5&&left>0) SFX.tick(); if(left<=0){ stop(); SFX.alarm(); document.querySelectorAll(".kt2").forEach(t=>t.dataset.o===q.a?t.classList.add("win"):t.classList.add("dim")); const a=$("#qzA"); if(a) a.textContent=q.a; done=true; asked++; setTimeout(()=>{ if(stillOpen("qzAv")) roll(); },2400); } },1000); };
+  // drumroll: shuffle through faces then land on the chosen student
+  const roll=()=>{ pickNew(); draw(true); const av=$("#qzAv"), nm=$("#qzNm"); let k=0; const n=Math.min(14,here.length*2+4);
+    const step=()=>{ if(!stillOpen("qzAv")) return; if(k<n){ const r=here[rnd(0,here.length-1)]; av.innerHTML=avatar(r); nm.textContent=r.name; SFX.tick(); k++; setTimeout(step,60+k*12); }
+      else { av.innerHTML=avatar(cur,"happy"); nm.textContent=cur.name; SFX.pick(); gsap.fromTo(av,{scale:.5},{scale:1,duration:.6,ease:"elastic.out(1,.5)"}); const f=av.querySelector(".fal"); if(f) f.classList.add("flap"); run(); } };
+    step(); };
+  roll();
 }
+
 // award without re-rendering the grid animations (used inside games)
 function awardQuiet(ids, skill){ const c=cls(), t=Date.now();
   ids.forEach(id=>{ const s=stu(id); if(!s) return; s.points+=skill.v; s.pos++; c.log.push({sid:id,k:skill.k,v:skill.v,t,e:skill.e,nm:skill.t}); });
   if(c.log.length>5000) c.log=c.log.slice(-5000); ids.forEach(id=>{ const s=stu(id); if(s) checkBadges(s,c); }); save(); render(); }
 
+
+/* ===== سباق الأسراب — cinematic race over the desert ===== */
 let RACE=null;
+const TEAMS=[{n:"سرب الصقور",c:"#ff8a3d"},{n:"سرب النسور",c:"#2d7ff9"},{n:"سرب الشواهين",c:"#22b573"},{n:"سرب العقبان",c:"#7b5cd6"}];
 function raceSetup(){
   const c=cls(), here=c.students.filter(s=>!isOut(s.id)); if(here.length<2){ toast("محتاج طالبين حاضرين على الأقل"); return; }
   let n=Math.min(4,Math.max(2,Math.round(here.length/5))), goal=10;
-  const draw=()=>{ openSheet(`<h2>🏁 سباق الأسراب</h2><b>عدد الأسراب</b><div class="seg2">${[2,3,4].map(k=>`<button data-n="${k}" class="${k===n?"on":""}">${k}</button>`).join("")}</div>
+  const draw=()=>{ openSheet(`<h2>🏁 سباق الأسراب</h2>
+    <div class="gprev">${sceneSVG()}<div class="gprev-f">${TEAMS.slice(0,n).map(t=>`<span>${falconSVG({level:1,body:t.c,mood:"happy"})}</span>`).join("")}</div></div>
+    <b>عدد الأسراب</b><div class="seg2">${[2,3,4].map(k=>`<button data-n="${k}" class="${k===n?"on":""}">${k}</button>`).join("")}</div>
     <b>خط النهاية</b><div class="seg2">${[5,10,15].map(k=>`<button data-gl="${k}" class="${k===goal?"on":""}">${k} إجابات</button>`).join("")}</div>
     <b>الأسئلة</b>${srcPicker()}
-    <div class="row" style="margin-top:12px"><button class="btn pri" id="rcGo">🏁 ابدأ السباق</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    <div class="row" style="margin-top:12px;justify-content:center"><button class="btn pri big" id="rcGo">🏁 يلا نبدأ السباق</button></div>`, ()=>setTab("home"));
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); document.querySelectorAll(".gprev .fal").forEach(f=>f.classList.add("flap"));
     document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{ n=+b.dataset.n; draw(); });
     document.querySelectorAll("[data-gl]").forEach(b=>b.onclick=()=>{ goal=+b.dataset.gl; draw(); });
     bindSrc(draw);
-    $("#rcGo").onclick=()=>{ const arr=[...here].sort(()=>Math.random()-.5), teams=Array.from({length:n},(_,i)=>({name:["سرب الصقور","سرب النسور","سرب الشواهين","سرب العقبان"][i],color:["#ff8a3d","#3d8be0","#22b573","#7b5cd6"][i],members:[],score:0}));
-      arr.forEach((s,i)=>teams[i%n].members.push(s.id)); RACE={teams,goal,q:nextQ(),shown:false,done:false}; raceView(); };
+    $("#rcGo").onclick=()=>{ const arr=[...here].sort(()=>Math.random()-.5), teams=TEAMS.slice(0,n).map(t=>({name:t.n,color:t.c,members:[],score:0}));
+      arr.forEach((s,i)=>teams[i%n].members.push(s.id)); RACE={teams,goal,q:withChoices(nextQ()),shown:false,done:false}; raceView(true); };
   };
   draw();
 }
-function raceView(){
-  const R=RACE; const pct=t=>Math.min(1,t.score/R.goal);
+function raceView(countdown){
+  const R=RACE, pos=t=>Math.min(1,t.score/R.goal);
   openSheet(`<h2>🏁 سباق الأسراب</h2>
-    <div class="lanes">${R.teams.map((t,i)=>`<div><div class="lnm" style="color:${t.color}">${t.name} · ${t.members.length} طلاب <b style="float:left" dir="ltr">${t.score} / ${R.goal}</b></div><div class="lane"><span class="fin"></span>
-      <span class="rf" id="rf${i}" style="right:calc(${pct(t)*100}% * .82)">${falconSVG({level:t.score>=R.goal?2:1,body:t.color,mood:t.score>=R.goal?"happy":"idle"})}</span></div></div>`).join("")}</div>
-    ${R.done?"":`<div id="rcQ">${qHTML(R.q)}</div><div class="qans" id="rcA">${R.shown?esc(R.q.a):""}</div>
+    <div class="rscene">${sceneSVG()}<div class="fin"><span>🏁</span></div>
+      ${R.teams.map((t,i)=>`<div class="rlane" style="top:${8+i*(84/R.teams.length)}%;height:${84/R.teams.length}%"><span class="rtag" style="background:${t.color}">${t.name.replace("سرب ","")} <b>${t.score}</b></span>
+        <span class="rbird" id="rb${i}" style="right:calc(${pos(t)*84}% + 4%)">${falconSVG({level:t.score>=R.goal?2:1,body:t.color,mood:"happy"})}</span></div>`).join("")}
+      <div class="cdown" id="cdown"></div></div>
+    ${R.done?"":`<div class="qcard">${R.q.math?`<div class="qbig">${esc(R.q.q)}</div>`:`<div class="qtext">${esc(R.q.q)}</div>`}
+      ${R.q.ch?`<div class="opts">${R.q.ch.map((o,i)=>`<div class="opt" ${o===R.q.a?"data-ok":""}><i style="background:${KCOL[i].c}">${KCOL[i].s}</i>${esc(o)}</div>`).join("")}</div>`:""}<div class="qans" id="rcA">${R.shown?esc(R.q.a):""}</div></div>
     <p class="hint" style="text-align:center;margin:4px 0 8px">مين جاوب صح؟ دوس على السرب 👇</p>
     <div class="tbtns">${R.teams.map((t,i)=>`<button style="background:${t.color}" data-tm="${i}">${t.name}</button>`).join("")}</div>
     <div class="row" style="justify-content:center;margin-top:10px"><button class="btn vio" id="rcShow">👀 الإجابة</button><button class="btn" id="rcNext">سؤال تاني ⬅</button><button class="btn" id="rcMem">👥 الأعضاء</button></div>`}`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
-  document.querySelectorAll(".lane .fal").forEach(f=>f.classList.add("flap"));
+  document.querySelectorAll(".rbird .fal").forEach(f=>f.classList.add("flap"));
+  document.querySelectorAll(".rbird").forEach((b,i)=>gsap.to(b,{y:-6,duration:.7+i*.13,yoyo:true,repeat:-1,ease:"sine.inOut"}));
+  if(countdown){ const el=$("#cdown"); const seq=["3","2","1","انطلق!"]; let k=0;
+    const tick=()=>{ if(!stillOpen("cdown")) return; if(k<seq.length){ el.textContent=seq[k]; k===3?SFX.level():SFX.tick(); gsap.fromTo(el,{scale:2.4,opacity:0},{scale:1,opacity:1,duration:.45,ease:"back.out(2)"}); k++; setTimeout(tick,750); } else gsap.to(el,{opacity:0,duration:.3}); };
+    tick(); }
   if(R.done) return;
   $("#rcShow").onclick=()=>{ R.shown=true; $("#rcA").textContent=R.q.a; markOk(); SFX.pick(); };
-  $("#rcNext").onclick=()=>{ R.q=nextQ(); R.shown=false; raceView(); };
+  $("#rcNext").onclick=()=>{ R.q=withChoices(nextQ()); R.shown=false; raceView(); };
   $("#rcMem").onclick=()=>{ openSheet(`<h2>👥 أعضاء الأسراب</h2><div class="groups">${R.teams.map(t=>`<div class="grp" style="border-top:6px solid ${t.color}"><h3>${t.name}</h3>${t.members.map(id=>stu(id)).filter(Boolean).map(s=>`<div class="m"><span class="av">${avatar(s)}</span>${esc(s.name)}</div>`).join("")}</div>`).join("")}</div>
-    <div class="row" style="margin-top:12px"><button class="btn pri" id="rcBack">↩ رجوع للسباق</button></div>`); $("#rcBack").onclick=raceView; };
-  document.querySelectorAll("[data-tm]").forEach(b=>b.onclick=()=>{ const t=R.teams[+b.dataset.tm]; t.score++; SFX.whoosh(); SFX.pos();
-    if(t.score>=R.goal){ R.done=true; raceWin(t); return; }
-    R.q=nextQ(); R.shown=false; raceView(); const el=$("#rf"+b.dataset.tm); if(el) gsap.fromTo(el,{y:0},{y:-14,duration:.25,yoyo:true,repeat:1}); });
+    <div class="row" style="margin-top:12px"><button class="btn pri" id="rcBack">↩ رجوع للسباق</button></div>`); $("#rcBack").onclick=()=>raceView(); };
+  document.querySelectorAll("[data-tm]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.tm, t=R.teams[i]; if(R.lock) return; R.lock=true; t.score++; SFX.whoosh(); SFX.pos();
+    const bird=$("#rb"+i), lane=bird.parentElement; const trail=document.createElement("span"); trail.className="trail"; trail.style.background=`linear-gradient(90deg,transparent,${t.color})`; trail.style.right=bird.style.right; lane.appendChild(trail);
+    gsap.to(bird,{right:`calc(${pos(t)*84}% + 4%)`,duration:.9,ease:"power3.out"}); gsap.fromTo(bird,{rotate:0},{rotate:-12,duration:.3,yoyo:true,repeat:1});
+    gsap.fromTo(trail,{opacity:.9,width:0},{width:140,opacity:0,duration:1.1,onComplete:()=>trail.remove()});
+    lane.querySelector(".rtag b").textContent=t.score;
+    setTimeout(()=>{ R.lock=false; if(t.score>=R.goal){ R.done=true; raceWin(t); return; } R.q=withChoices(nextQ()); R.shown=false; raceView(); },1100); });
 }
 function raceWin(t){
-  raceView(); SFX.level(); confetti(innerWidth/2,innerHeight/3,200,[t.color,"#ffc93c","#fff","#ff5d9a"]);
-  setTimeout(()=>{ openSheet(`<div class="levelup"><div class="lstage"><div class="lbg" id="rwL"></div><div class="av" id="rwAv">${falconSVG({level:2,body:t.color,mood:"happy"})}</div></div><div class="big" style="color:${t.color}">🏆 ${t.name} كسب!</div>
-      <p class="hint">${t.members.map(id=>stu(id)).filter(Boolean).map(s=>esc(s.name)).join("، ")}</p>
-      <div class="row" style="justify-content:center"><button class="btn pri" id="rwGive">⭐ ${sgn(1)} نقطة لكل أعضاء السرب</button><button class="btn" id="rwAgain">🔁 سباق جديد</button></div></div>`, ()=>setTab("home"));
-    playLottie($("#rwL"),"trophy",{loop:true});
-    const f=$("#rwAv .fal"); if(f) f.classList.add("flap"); gsap.fromTo("#rwAv",{scale:.2,rotate:-20},{scale:1,rotate:0,duration:.9,ease:"elastic.out(1,.5)"});
-    $("#rwGive").onclick=()=>{ awardQuiet(t.members,RACE_WIN); SFX.pos(); toast(`🏁 اتسجّلت نقطة لـ ${t.members.length} طالب`); $("#rwGive").disabled=true; };
-    $("#rwAgain").onclick=raceSetup; },1200);
+  const R=RACE, top=[...R.teams].sort((a,b)=>b.score-a.score);
+  SFX.level(); confetti(innerWidth/2,innerHeight/3,220,[t.color,"#ffc93c","#fff","#ff5d9a"]);
+  openSheet(`<h2>🏆 نهاية السباق!</h2>
+    <div class="podium">${sceneSVG()}<div class="lbg" id="rwL"></div>
+      ${[1,0,2].filter(i=>top[i]).map(i=>`<div class="pd p${i+1}"><span class="pdb">${falconSVG({level:i===0?2:1,body:top[i].color,mood:"happy"})}</span><div class="pdk" style="background:${top[i].color}"><b>${i+1}</b><small>${top[i].name.replace("سرب ","")}</small></div></div>`).join("")}</div>
+    <div class="big" style="color:${t.color};text-align:center;font-size:1.8rem;font-weight:800;margin-top:8px">🎉 ${t.name} كسب!</div>
+    <p class="hint" style="text-align:center">${t.members.map(id=>stu(id)).filter(Boolean).map(s=>esc(s.name)).join("، ")}</p>
+    <div class="row" style="justify-content:center"><button class="btn pri" id="rwGive">⭐ ${sgn(1)} نقطة لكل أعضاء السرب</button><button class="btn" id="rwAgain">🔁 سباق جديد</button></div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  document.querySelectorAll(".pd .fal").forEach(f=>f.classList.add("flap"));
+  gsap.from(".pdk",{scaleY:0,transformOrigin:"bottom",stagger:.2,duration:.7,ease:"back.out(1.6)"}); gsap.from(".pdb",{y:-80,opacity:0,stagger:.2,delay:.4,duration:.8,ease:"bounce.out"});
+  playLottie($("#rwL"),"trophy",{loop:true});
+  $("#rwGive").onclick=()=>{ awardQuiet(t.members,RACE_WIN); SFX.pos(); toast(`🏁 اتسجّلت نقطة لـ ${t.members.length} طالب`); $("#rwGive").disabled=true; };
+  $("#rwAgain").onclick=raceSetup;
+}
+
+/* ===== صيد الغيوم — tap the right cloud, the falcon swoops to catch it ===== */
+let CG=null;
+function cloudSetup(){
+  let rounds=10, who="class";
+  const draw=()=>{ openSheet(`<h2>☁️ صيد الغيوم</h2>
+    <div class="gprev">${sceneSVG()}<div class="gprev-c">${["12","☁️","7"].map((x,i)=>`<span class="pc" style="animation-delay:-${i*.7}s">${x==="☁️"?"؟":x}</span>`).join("")}</div></div>
+    <p class="hint">السؤال بيظهر فوق، والإجابات جوه غيوم طايرة. الطالب يطلع السبورة ويلمس الغيمة الصح، والصقر يطير يصطادها 🦅</p>
+    <b>عدد الجولات</b><div class="seg2">${[5,10,15].map(k=>`<button data-r="${k}" class="${k===rounds?"on":""}">${k}</button>`).join("")}</div>
+    <b>النقاط في الآخر</b><div class="seg2"><button data-w="class" class="${who==="class"?"on":""}">للفصل كله</button><button data-w="none" class="${who==="none"?"on":""}">بدون نقاط</button></div>
+    <b>الأسئلة</b>${srcPicker()}
+    <div class="row" style="margin-top:12px;justify-content:center"><button class="btn pri big" id="cgGo">☁️ ابدأ اللعب</button></div>`, ()=>setTab("home"));
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    document.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{ rounds=+b.dataset.r; draw(); });
+    document.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{ who=b.dataset.w; draw(); });
+    bindSrc(draw);
+    $("#cgGo").onclick=()=>{ CG={rounds,who,round:0,score:0,streak:0}; cloudRound(); };
+  };
+  draw();
+}
+function cloudRound(){
+  const G=CG; if(G.round>=G.rounds) return cloudEnd();
+  let q=withChoices(nextQ()); if(!q.ch){ q=withChoices(mathQ("mix","easy")); }
+  G.round++; let locked=false;
+  openSheet(`<h2>☁️ صيد الغيوم</h2>
+    <div class="cgame" id="cgame">${sceneSVG()}
+      ${gameHUD([["🎯",`${G.round} / ${G.rounds}`],["⭐",G.score,"cgS"],["🔥",G.streak,"cgK"]])}
+      <div class="cq">${q.math?`<span dir="ltr">${esc(q.q)}</span>`:esc(q.q)}</div>
+      ${q.ch.map((o,i)=>`<button class="cloud" data-o="${esc(o)}" style="--x:${[27,73,30,68][i]}%;--y:${[34,30,58,56][i]}%;--d:${i*.6}s"><svg viewBox="0 0 200 110"><g fill="#fff"><ellipse cx="100" cy="62" rx="88" ry="38"/><ellipse cx="62" cy="48" rx="44" ry="36"/><ellipse cx="128" cy="40" rx="50" ry="40"/></g><ellipse cx="100" cy="86" rx="80" ry="12" fill="#dbeeff"/></svg><b>${esc(o)}</b></button>`).join("")}
+      <span class="cbird" id="cbird">${falconSVG({level:1,body:"#9a6235",mood:"idle"})}</span>
+    </div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  gsap.from(".cloud",{scale:0,opacity:0,stagger:.12,duration:.6,ease:"back.out(1.8)"}); gsap.from(".cq",{y:-40,opacity:0,duration:.5});
+  document.querySelectorAll(".cloud").forEach(b=>b.onclick=()=>{ if(locked) return; locked=true; const ok=b.dataset.o===q.a, box=$("#cgame").getBoundingClientRect(), r=b.getBoundingClientRect(), bird=$("#cbird");
+    if(ok){ G.score++; G.streak++; SFX.whoosh(); bird.innerHTML=falconSVG({level:1,body:"#9a6235",mood:"happy"}); bird.querySelector(".fal").classList.add("flap");
+      const bx=bird.getBoundingClientRect(); gsap.to(bird,{x:(r.left+r.width/2)-(bx.left+bx.width/2),y:(r.top+r.height/2)-(bx.top+bx.height/2),duration:.55,ease:"power2.in",onComplete:()=>{
+        SFX.pos(); burstAt(r.left+r.width/2,r.top+r.height/2,"stars",240); confetti(r.left+r.width/2,r.top+r.height/2,70,["#fff","#ffd84d","#7ec8ff"]);
+        gsap.to(b,{scale:1.4,opacity:0,duration:.35}); $("#cgS").textContent=G.score; $("#cgK").textContent=G.streak;
+        const pop=document.createElement("div"); pop.className="cpop"; pop.textContent=G.streak>=3?`🔥 ${G.streak} ورا بعض!`:["ممتاز!","برافو!","صح عليك!","أحسنت!"][rnd(0,3)]; $("#cgame").appendChild(pop);
+        gsap.fromTo(pop,{scale:.3,opacity:0},{scale:1,opacity:1,duration:.4,ease:"back.out(2)"}); } });
+      setTimeout(()=>{ if(stillOpen("cgame")) cloudRound(); },1700); }
+    else { G.streak=0; SFX.neg(); b.classList.add("rain"); gsap.fromTo(b,{x:-12},{x:0,duration:.6,ease:"elastic.out(1,.3)"}); $("#cgK").textContent=0;
+      bird.innerHTML=falconSVG({level:1,body:"#9a6235",mood:"sad"});
+      setTimeout(()=>{ document.querySelectorAll(".cloud").forEach(c=>{ if(c.dataset.o===q.a){ c.classList.add("glow"); gsap.fromTo(c,{scale:1},{scale:1.15,yoyo:true,repeat:3,duration:.25}); } }); },500);
+      setTimeout(()=>{ if(stillOpen("cgame")) cloudRound(); },2600); } });
+}
+function cloudEnd(){
+  const G=CG, pct=G.score/G.rounds, stars=pct>=.9?3:pct>=.6?2:pct>=.3?1:0;
+  openSheet(`<h2>☁️ خلصت اللعبة!</h2>
+    <div class="cend">${sceneSVG()}<div class="lbg" id="ceL"></div><div class="cstars">${[0,1,2].map(i=>`<span class="cs ${i<stars?"on":""}">${emo("⭐")}</span>`).join("")}</div>
+      <div class="cfal">${falconSVG({level:stars===3?2:1,body:"#9a6235",mood:stars?"happy":"sad"})}</div></div>
+    <div style="text-align:center;font-size:2rem;font-weight:800">${G.score} / ${G.rounds}</div>
+    <p class="hint" style="text-align:center">${["محتاجين نراجع شوية 💪","بداية حلوة 👍","شغل ممتاز 👏","أبطال! الصقر فخور بيكم 🦅"][stars]}</p>
+    <div class="row" style="justify-content:center">${G.who==="class"&&stars?`<button class="btn pri" id="ceGive">⭐ ${sgn(stars)} للفصل كله</button>`:""}<button class="btn" id="ceAgain">🔁 العب تاني</button></div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); const f=$(".cfal .fal"); if(f) f.classList.add("flap");
+  gsap.from(".cs",{scale:0,rotate:-90,stagger:.25,duration:.6,ease:"back.out(2)",delay:.2,onStart:()=>SFX.pick()});
+  if(stars>=2){ playLottie($("#ceL"),"fireworks",{loop:true}); SFX.level(); }
+  if($("#ceGive")) $("#ceGive").onclick=()=>{ const ids=cls().students.filter(s=>!isOut(s.id)).map(s=>s.id); awardQuiet(ids,{...GAME_OK,v:stars}); toast(`⭐ اتسجّل ${stars} لكل الحاضرين`); $("#ceGive").disabled=true; };
+  $("#ceAgain").onclick=cloudSetup;
+}
+
+/* ===== عجلة الصقر — spin the wheel ===== */
+const WSEG=[{t:"+1",e:"⭐",v:1,c:"#ff8a3d"},{t:"+2",e:"🌟",v:2,c:"#2d7ff9"},{t:"سؤال مضاعف",e:"🔥",v:"x2",c:"#e8384f"},{t:"+1",e:"⭐",v:1,c:"#22b573"},
+  {t:"نقطة للفصل",e:"🎉",v:"all",c:"#7b5cd6"},{t:"+3",e:"🏆",v:3,c:"#f5b301"},{t:"مفاجأة",e:"🎁",v:"gift",c:"#e0609a"},{t:"+2",e:"🌟",v:2,c:"#2e9c9a"}];
+let WROT=0;
+function wheelGame(){
+  const c=cls(), here=c.students.filter(s=>!isOut(s.id)); if(!here.length){ toast("مفيش طلاب حاضرين"); return; }
+  const N=WSEG.length, A=360/N;
+  const seg=(i)=>{ const a0=(i*A-90)*Math.PI/180, a1=((i+1)*A-90)*Math.PI/180, r=190, x0=200+r*Math.cos(a0), y0=200+r*Math.sin(a0), x1=200+r*Math.cos(a1), y1=200+r*Math.sin(a1);
+    const mid=((i+.5)*A-90)*Math.PI/180, tx=200+122*Math.cos(mid), ty=200+122*Math.sin(mid), rot=(i+.5)*A;
+    return `<path d="M200 200 L${x0} ${y0} A${r} ${r} 0 0 1 ${x1} ${y1}Z" fill="${WSEG[i].c}" stroke="#fff" stroke-width="4"/>
+      <g transform="translate(${tx} ${ty}) rotate(${rot})"><text y="-6" text-anchor="middle" font-size="34">${WSEG[i].e}</text><text y="26" text-anchor="middle" font-size="${WSEG[i].t.length>4?17:24}" font-weight="800" fill="#fff" font-family="Baloo Bhaijaan 2">${WSEG[i].t}</text></g>`; };
+  openSheet(`<h2>🎡 عجلة الصقر</h2>${srcPicker()}
+    <div class="wheelbox">${sceneSVG()}<div class="wheelw"><svg viewBox="0 0 400 400" class="wheel" id="wheel" style="transform:rotate(${WROT}deg)">${WSEG.map((_,i)=>seg(i)).join("")}
+      <circle cx="200" cy="200" r="194" fill="none" stroke="#1b2a4a" stroke-width="8"/>${Array.from({length:N},(_,i)=>{ const a=(i*A-90)*Math.PI/180; return `<circle cx="${200+194*Math.cos(a)}" cy="${200+194*Math.sin(a)}" r="6" fill="#ffd84d"/>`; }).join("")}</svg>
+      <div class="whub">${falconSVG({level:2,body:"#f2b01e",mood:"happy"})}</div><div class="wptr"></div></div></div>
+    <div class="row" style="justify-content:center"><button class="btn pri big" id="wSpin">🎡 لفّ العجلة</button></div><div id="wRes"></div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  bindSrc(wheelGame);
+  $("#wSpin").onclick=()=>{ const b=$("#wSpin"); b.disabled=true; $("#wRes").innerHTML=""; const k=rnd(0,N-1);
+    const target=WROT+360*rnd(5,7)+(360-(k*A+A/2))-(WROT%360); let lastSeg=-1; const o={r:WROT};
+    gsap.to(o,{r:target,duration:5.2,ease:"power4.out",onUpdate:()=>{ $("#wheel").style.transform=`rotate(${o.r}deg)`; const sIdx=Math.floor(((o.r%360)+360)%360/A); if(sIdx!==lastSeg){ lastSeg=sIdx; SFX.tick(); gsap.fromTo(".wptr",{rotate:-18},{rotate:0,duration:.15}); } },
+      onComplete:()=>{ WROT=target%360; b.disabled=false; wheelResult(WSEG[k],here); }}); };
+}
+function wheelResult(sg,here){
+  SFX.pick(); const box=$("#wRes"); if(!box) return;
+  if(sg.v==="all"){ const ids=here.map(s=>s.id); awardQuiet(ids,{k:"wheel",e:"🎡",t:"عجلة الصقر",v:1}); SFX.level(); confetti(innerWidth/2,innerHeight/3,160);
+    box.innerHTML=`<div class="wres" style="--c:${sg.c}">${emo(sg.e)} <b>نقطة لكل الفصل!</b> (${ids.length} طالب)</div>`; return; }
+  const s=here[rnd(0,here.length-1)]; let val=sg.v==="x2"?2*GSET.pts:sg.v==="gift"?rnd(1,3):sg.v; const q=withChoices(nextQ());
+  box.innerHTML=`<div class="wres" style="--c:${sg.c}"><div class="who" style="justify-content:center"><div class="av" style="width:90px;height:90px">${avatar(s,"happy")}</div><div class="info"><b>${esc(s.name)}</b><span>${emo(sg.e)} ${sg.t} — على المحك ${sgn(val)}</span></div></div>
+    <div class="qcard">${q.math?`<div class="qbig">${esc(q.q)}</div>`:`<div class="qtext">${esc(q.q)}</div>`}</div>
+    ${q.ch?`<div class="ktiles">${q.ch.map((o,i)=>`<button class="kt2" data-o="${esc(o)}" style="background:${KCOL[i].c}"><span>${KCOL[i].s}</span>${esc(o)}</button>`).join("")}</div>`
+      :`<div class="qans" id="wA"></div><div class="tbtns"><button style="background:#22b573" id="wOk">✅ صح</button><button style="background:#e8384f" id="wNo">❌ غلط</button></div>`}</div>`;
+  box.scrollIntoView({behavior:"smooth",block:"start"});
+  gsap.from(".wres",{y:40,opacity:0,duration:.5,ease:"back.out(1.6)"});
+  let done=false; const fin=(ok,btn)=>{ if(done) return; done=true; document.querySelectorAll("#wRes .kt2").forEach(t=>t.dataset.o===q.a?t.classList.add("win"):t.classList.add("dim"));
+    if(ok){ awardQuiet([s.id],{k:"wheel",e:"🎡",t:"عجلة الصقر",v:val}); SFX.pos(); const r=(btn||box).getBoundingClientRect(); burstAt(r.left+r.width/2,r.top+r.height/2,"stars",220); toast(`🎡 ${s.name} ${sgn(val)}`); }
+    else { SFX.neg(); const a=$("#wA"); if(a) a.textContent=q.a; } };
+  document.querySelectorAll("#wRes .kt2").forEach(b=>b.onclick=()=>fin(b.dataset.o===q.a,b));
+  if($("#wOk")) $("#wOk").onclick=()=>fin(true); if($("#wNo")) $("#wNo").onclick=()=>fin(false);
 }
 
 /* ---------- attendance ---------- */
