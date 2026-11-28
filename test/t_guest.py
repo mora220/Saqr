@@ -1,0 +1,12 @@
+from helpers import *
+r = Run()
+p = r.page("guest")
+p.evaluate("localStorage.clear(); sessionStorage.clear()"); p.reload(); p.wait_for_timeout(900)
+p.click("#guestBtn"); p.wait_for_selector("#grid .card", timeout=8000); p.wait_for_timeout(600)
+p.click("#msgBtn"); p.wait_for_timeout(700)
+print("guest sheet:", p.inner_text("#sheet")[:80].replace("\n"," "))
+r.shot(p, "g1_guest_msgs")
+p.click("#sheet .x"); p.wait_for_timeout(300)
+p.click('#grid .card[data-id]:not([data-id="__all"]) >> nth=0'); p.wait_for_timeout(500)
+print("student sheet has msg btn:", p.locator("text=💬 ولي الأمر").count())
+r.close()

@@ -1,6 +1,6 @@
 // صقر – إشعارات أولياء الأمور
 // بتشتغل كل ما صفحة طالب (kids/{code}) تتحدّث، وتبعت إشعار لأولياء الأمور المربوطين بيه
-const { onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const { onDocumentUpdated, onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { setGlobalOptions } = require("firebase-functions/v2");
 const admin = require("firebase-admin");
 
@@ -63,6 +63,26 @@ exports.notifyParents = onDocumentUpdated("kids/{code}", async event => {
       });
     }
     if (bad.size) await p.ref.update({ tokens: admin.firestore.FieldValue.arrayRemove(...bad) });
+  }
+});
+
+// رسالة جديدة من المعلم في المحادثة → إشعار لأولياء أمور الطالب
+exports.notifyChat = onDocumentCreated("threads/{code}/msgs/{id}", async event => {
+  const m = event.data && event.data.data();
+  if (!m || m.by !== "t") return;
+  const db = admin.firestore();
+  const kid = (await db.doc("kids/" + event.params.code).get()).data() || {};
+  const parents = await db.collection("parents").where("kids", "array-contains", event.params.code).get();
+  for (const p of parents.docs) {
+    const d = p.data(), tokens = d.tokens || [];
+    if (!tokens.length || (d.notif || {}).note === false) continue;
+    const res = await admin.messaging().sendEachForMulticast({
+      tokens,
+      notification: { title: `💬 ${m.name ? "أ. " + m.name : "المعلم"} — بخصوص ${kid.name || "ابنك"}`, body: String(m.text).slice(0, 180) },
+      webpush: { notification: { icon: ICON, badge: ICON, lang: "ar", dir: "rtl", tag: "chat-" + event.params.code }, fcmOptions: { link: SITE } }
+    });
+    const bad = res.responses.map((r, i) => (r.error && /not-registered|invalid-registration|invalid-argument/.test(r.error.code) ? tokens[i] : null)).filter(Boolean);
+    if (bad.length) await p.ref.update({ tokens: admin.firestore.FieldValue.arrayRemove(...bad) });
   }
 });
 

@@ -639,6 +639,51 @@ body.board .wscene{min-height:72vh}
 .noise-label{text-align:center;font-size:1.8rem;font-weight:800}
 .empty{text-align:center;color:var(--muted);padding:40px 10px}
 .empty .av{width:160px;height:160px;margin:0 auto}
+
+/* ---------- messages ---------- */
+.mwrap{position:relative;display:inline-grid}
+.mbadge{position:absolute;top:-5px;left:-5px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:#ff5d5d;color:#fff;font-size:.72rem;font-weight:800;display:grid;place-items:center;box-shadow:0 0 0 2px var(--sky1);pointer-events:none}
+.mbadge:not([hidden]){animation:mpop .5s cubic-bezier(.3,1.8,.5,1)}
+@keyframes mpop{from{transform:scale(0)}to{transform:scale(1)}}
+.av.sm{width:46px;height:46px;flex:none}
+.mlist{display:flex;flex-direction:column;gap:8px}
+.mrow{display:flex;align-items:center;gap:10px;background:#f6f8fd;border-radius:18px;padding:8px 12px;text-align:right;width:100%;transition:.15s;position:relative}
+.mrow:active{transform:scale(.98)}
+.mrow.un{background:#fff6ec;box-shadow:inset 0 0 0 2px #ffd9b8}
+.mrow .av{width:52px;height:52px;flex:none}
+.mrow .grow{flex:1;min-width:0}
+.mtop{display:flex;align-items:baseline;gap:8px}.mtop b{font-size:1.1rem;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.mtop small{color:var(--muted);font-weight:600;font-size:.78rem;flex:none}
+.mcls{color:var(--muted);font-weight:600;display:block;font-size:.82rem}
+.mtxt{margin:2px 0 0;color:#46506a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:.95rem}.mtxt i{font-style:normal;color:var(--muted)}
+.mrow.un .mtxt{color:var(--ink);font-weight:700}
+.mdot{width:12px;height:12px;border-radius:50%;background:var(--accent);flex:none;box-shadow:0 0 0 4px #ffe2c9}
+.mempty{text-align:center;padding:26px 10px 10px}.mempty .fet,.cempty .fet{font-size:3rem;display:block}.mempty .fe,.cempty .fe{width:64px;height:64px}.mempty b{display:block;font-size:1.2rem;margin-top:6px}
+.chead{display:flex;align-items:center;gap:10px;padding:2px 0 10px 50px;border-bottom:2px solid #f0f3fa}
+.chead .av{width:52px;height:52px;flex:none}.chead .grow{flex:1;min-width:0}.chead b{display:block;font-size:1.15rem;line-height:1.2}.chead small{color:var(--muted);font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cbox{height:min(52vh,460px);overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding:12px 4px;background:radial-gradient(circle at 20% 10%,#fff7ea 0,transparent 40%),radial-gradient(circle at 90% 80%,#eef4ff 0,transparent 45%),#fbfcff;border-radius:20px;margin:10px 0 8px;overscroll-behavior:contain}
+.cload{margin:auto;color:var(--muted)}
+.cday{align-self:center;background:#e9eef8;color:var(--muted);font-weight:700;font-size:.75rem;padding:2px 12px;border-radius:10px;margin:6px 0}
+.cm{max-width:80%;padding:8px 12px 5px;border-radius:18px;position:relative;box-shadow:0 2px 6px rgba(27,42,74,.07);word-wrap:break-word}
+.cm p{margin:0;line-height:1.6;font-size:1.02rem;white-space:pre-wrap}
+.cm.me{align-self:flex-start;background:linear-gradient(135deg,#ff9d4d,#ff7a2f);color:#fff;border-bottom-right-radius:6px}
+.cm.them{align-self:flex-end;background:#fff;border-bottom-left-radius:6px;border:1px solid #edf0f7}
+.cm .cby{display:block;font-weight:800;color:var(--violet);font-size:.78rem}
+.cm .ct{display:flex;gap:4px;justify-content:flex-end;font-size:.7rem;opacity:.8;font-weight:600;margin-top:1px}
+.tick{letter-spacing:-3px;opacity:.7}.tick.read{color:#d6f3ff;opacity:1;text-shadow:0 0 6px rgba(255,255,255,.6)}
+.cempty{margin:auto;text-align:center;color:var(--muted)}.cempty b{display:block;color:var(--ink);font-size:1.15rem}
+.qr{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}.qr::-webkit-scrollbar{display:none}
+.qr button{flex:none;background:#f1ecff;color:#5a3fc0;border-radius:14px;padding:6px 12px;font-weight:700;font-size:.88rem}
+.cin{display:flex;gap:8px;align-items:flex-end}
+.cin textarea{flex:1;resize:none;border:2px solid #e3e8f3;border-radius:20px;padding:10px 14px;max-height:120px;line-height:1.5;outline:none;background:#fafbff}
+.cin textarea:focus{border-color:#ffc29a}
+.csend{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#ff9d4d,#ff6a3d);color:#fff;display:grid;place-items:center;flex:none;box-shadow:0 6px 14px rgba(255,106,61,.35);transition:.15s}
+.csend .ico{width:24px;height:24px;transform:scaleX(-1)}
+.csend:active{transform:scale(.9)}
+.kchat{display:flex;align-items:center;gap:12px;cursor:pointer;background:linear-gradient(135deg,#fff,#fff6ec);position:relative}
+.kchat .ci{width:54px;height:54px;border-radius:18px;background:linear-gradient(135deg,#ff9d4d,#ff6a3d);display:grid;place-items:center;color:#fff;flex:none}
+.kchat .ci .ico{width:30px;height:30px}
+.kchat .grow{flex:1;min-width:0}.kchat b{display:block;font-size:1.15rem}.kchat small{color:var(--muted);font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kchat .mdot{position:absolute;top:12px;left:14px}
 </style>
 </head>
 <body>
@@ -649,6 +694,7 @@ body.board .wscene{min-height:72vh}
     <div class="brand"><div class="logo" id="logo"></div><div><h1>صقر</h1><small>حلّق بطلابك</small></div></div>
     <div class="spacer"></div>
     <div class="class-pick"><select id="classSel" aria-label="الفصل"></select><button class="icon-btn hdr-x" id="classMenu" title="إدارة الفصول" data-ic="gear"></button></div>
+    <span class="mwrap"><button class="icon-btn" id="msgBtn" title="الرسائل" data-ic="chat"></button><b class="mbadge" id="msgBadge" hidden></b></span>
     <button class="icon-btn hdr-x" id="soundBtn" title="الصوت" data-ic="sound"></button>
     <button class="icon-btn hdr-x" id="acctBtn" title="حساب" data-ic="user"></button>
   </div>
@@ -716,6 +762,7 @@ body.board .wscene{min-height:72vh}
       <div class="kpts"><b id="kPts">0</b><span>نقطة</span></div>
       <div class="klv" id="kLv"></div><div class="bar kbar"><i id="kBar"></i></div><div class="knext" id="kNext"></div>
       <button class="btn pri" id="kStyle" style="margin-top:12px">🎨 غيّر شكل صقرك</button></div>
+    <div class="kcard kchat" id="kChatCard" hidden></div>
     <div class="kcard"><h3>🏅 الأوسمة <span class="cnt" id="kBdgN" style="float:left"></span></h3><div class="bdg sm" id="kBdg"></div></div>
     <div class="kcard" id="kShopCard" hidden><h3>🎁 متجر المكافآت <span class="cnt" id="kBal" style="float:left"></span></h3><div id="kShop"></div></div>
     <div class="kcard"><h3>🪜 رحلة الصقر</h3><div class="kpath" id="kPath"></div></div>
@@ -934,6 +981,8 @@ const SFX = {
   whoosh(){ if(play("whoosh",.6)) return; const a=ac(); if(!a||!S.sound) return; const len=a.sampleRate*.35, b=a.createBuffer(1,len,a.sampleRate), d=b.getChannelData(0);
     for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*Math.sin(Math.PI*i/len)*.5;
     const s=a.createBufferSource(), f=a.createBiquadFilter(), g=a.createGain(); f.type="bandpass"; f.frequency.value=900; g.gain.value=.25; s.buffer=b; s.connect(f).connect(g).connect(a.destination); s.start(); },
+  msg(){ [880,1175,1397].forEach((f,i)=>tone(f,i*.07,.2,"sine",.13)); },
+  sent(){ tone(620,0,.08,"sine",.09); tone(930,.06,.14,"sine",.09); },
   alarm(){ [880,660,880,660].forEach((f,i)=>tone(f,i*.18,.16,"sawtooth",.08)); },
   done(){ if(play("done")) return; [659,784,1047,1319,1568].forEach((f,i)=>tone(f,i*.12,.4,"triangle",.18)); }
 };
@@ -1083,7 +1132,7 @@ function openStudent(id){
     ? `<div class="who"><div class="av">${falconSVG({level:2,body:"#f2b01e",mood:"happy"})}</div><div class="info"><b>الفصل كله</b><span>${cls().students.length} طالب</span></div></div>`
     : `<div class="who"><div class="av">${avatar(s)}</div><div class="info"><b>${esc(s.name)}</b><span>${L.name} · ${s.points} نقطة</span><div class="row" style="margin-top:6px"><button class="btn" onclick="openEdit('${id}')">🎨 تعديل الصقر</button><button class="btn bstrip" onclick="openBadges('${id}')">🏅 ${badgeCount(s)} ${BADGES.filter(b=>s.badges&&s.badges[b.id]).slice(-3).map(b=>emo(b.e)).join("")}</button></div></div></div>`;
   openSheet(`${head}<div class="tabs"><button class="tab p on" data-t="p">👍 إيجابي</button><button class="tab n" data-t="n">✋ يحتاج تحسين</button></div><div class="skills" id="skills"></div>
-    <div class="row" style="justify-content:center;margin-top:12px">${all?"":`<button class="btn vio" id="goShop">🎁 المتجر · رصيد ${balance(s)}</button>`}<button class="btn" id="goSkills">🎚️ تعديل المهارات والنقاط</button></div>`);
+    <div class="row" style="justify-content:center;margin-top:12px">${all?"":`<button class="btn" onclick="msgParent('${id}')">💬 ولي الأمر</button>`}${all?"":`<button class="btn vio" id="goShop">🎁 المتجر · رصيد ${balance(s)}</button>`}<button class="btn" id="goSkills">🎚️ تعديل المهارات والنقاط</button></div>`);
   $("#goSkills").onclick=openSkills; if($("#goShop")) $("#goShop").onclick=()=>openShop(id);
   const draw = t => { const list=t==="p"?posList():negList(); $("#skills").innerHTML = list.map((k,i)=>`<button class="skill ${t}" data-i="${i}" data-t="${t}"><span class="em" data-v="${k.v>0?"+":""}${k.v}">${emo(k.e)}</span>${k.t}</button>`).join("");
     document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",b.dataset.t===t)); };
@@ -1147,7 +1196,7 @@ function openClassMenu(){
 
 /* ---------- student codes (teacher) ---------- */
 const kidLink=s=>location.origin+location.pathname+"?k="+s.code;
-const kidMsg=s=>`🦅 صقر — ${s.name}\n\n🎒 للطالب: افتح الرابط ده وتابع صقرك ونقاطك:\n${kidLink(s)}\n\n👨‍👩‍👦 لولي الأمر: ادخل على ${location.origin+location.pathname}\nواختار «أنا ولي أمر»، سجّل بحسابك، وضيف الكود: ${s.code}`;
+const kidMsg=s=>`🦅 صقر — ${s.name}\n\n🎒 للطالب: افتح الرابط ده وتابع صقرك ونقاطك:\n${kidLink(s)}\n\n👨‍👩‍👦 لولي الأمر: ادخل على ${location.origin+location.pathname}\nواختار «أنا ولي أمر» واكتب الكود: ${s.code}\n(وتقدر تراسل المعلم من صفحة ابنك 💬)`;
 async function copyText(t,ok){ try{ await navigator.clipboard.writeText(t); toast(ok||"📋 اتنسخ"); }catch(e){ toast("النسخ غير متاح هنا"); } }
 function openCodes(){
   const c=cls(); ensureCodes(); save();
@@ -1255,6 +1304,8 @@ function stopMic(){ if(mic){ cancelAnimationFrame(mic.raf); mic.stream.getTracks
 
 /* ---------- icon set (hand-drawn SVG, stroke style) ---------- */
 const ICONS={
+  chat:'<path d="M4 6.5A3.5 3.5 0 0 1 7.5 3h9A3.5 3.5 0 0 1 20 6.5v6a3.5 3.5 0 0 1-3.5 3.5H11l-4.6 3.8c-.4.3-.9 0-.9-.4V16A3.5 3.5 0 0 1 4 12.5z"/><path d="M8.5 8.3h7M8.5 11.2h4.4"/>',
+  send:'<path d="M20.5 3.6 3.9 10.2c-.8.3-.8 1.4 0 1.7l6.4 2.1 2.1 6.4c.3.8 1.4.8 1.7 0L20.5 3.6z"/><path d="m10.3 14 4.6-4.6"/>',
   users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18 13.8c2.1.8 3.5 2.9 3.5 5.2"/>',
   clipboard:'<rect x="5" y="4" width="14" height="17" rx="3"/><path d="M9 4.5V3.8A1.8 1.8 0 0 1 10.8 2h2.4A1.8 1.8 0 0 1 15 3.8v.7"/><path d="m8.5 13 2.5 2.5 4.5-5"/>',
   wand:'<path d="m4 20 10-10"/><path d="m13 6 1.2-3 1.2 3 3 1.2-3 1.2-1.2 3-1.2-3-3-1.2z"/><path d="M19.5 13.5l.6 1.4 1.4.6-1.4.6-.6 1.4-.6-1.4-1.4-.6 1.4-.6z"/><path d="M6 4.5l.5 1 1 .5-1 .5-.5 1-.5-1-1-.5 1-.5z"/>',
@@ -2614,6 +2665,119 @@ $("#classMenu").onclick=openClassMenu;
 $("#soundBtn").onclick=()=>{ S.sound=!S.sound; save(); $("#soundBtn").innerHTML=icon(S.sound?"sound":"mute"); if(S.sound) SFX.pos(); };
 
 
+/* ---------- messages: teacher ↔ parents (one thread per student) ---------- */
+let THREADS=[], CHAT=null, PTH={};
+const QR_T=["شكراً لمتابعتك 🌟","متميّز النهارده ما شاء الله 👏","نرجو متابعة الواجب في البيت 📘","ياريت نتواصل بخصوص مستواه 🤝","تم، وهتابع الموضوع 👍"];
+const QR_P=["شكراً يا أستاذ 🙏","تمام، هتابع معاه في البيت 👍","غايب النهارده بعذر 🤒","ممكن نحدد وقت للتواصل؟ 📞","جزاك الله خير 🌹"];
+const dayKeyOf=t=>new Date(t).toDateString();
+function msgDay(t){ try{ const n=new Date(), y=new Date(); y.setDate(n.getDate()-1);
+  if(dayKeyOf(t)===n.toDateString()) return "النهارده"; if(dayKeyOf(t)===y.toDateString()) return "أمس";
+  return new Date(t).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"long"}); }catch(e){ return ""; } }
+const msgTime=t=>{ try{ return new Date(t).toLocaleTimeString("ar-EG",{hour:"numeric",minute:"2-digit"}); }catch(e){ return ""; } };
+const msgWhen=t=>dayKeyOf(t)===new Date().toDateString()?msgTime(t):msgDay(t);
+function stuByCode(code){ for(const c of S.classes){ const s=c.students.find(x=>x.code===code); if(s) return {s,c}; } return null; }
+const parentsOf=code=>Object.entries(((KIDMETA[code]||{}).parents)||{});
+const tUnread=t=>t.lastBy==="p" && (t.lastAt||0)>(t.tSeen||0);
+const pSeenOf=t=>((t&&t.pSeen)||{})[window.Cloud&&Cloud.myUid()]||0;
+const pUnread=c=>{ const t=PTH[c]; return !!t && t.lastBy==="t" && (t.lastAt||0)>pSeenOf(t); };
+const liveThreads=()=>THREADS.filter(t=>t.lastAt && stuByCode(t.code)).sort((a,b)=>b.lastAt-a.lastAt);
+function drawMsgBadge(){ const b=$("#msgBadge"); if(!b) return; const n=MODE==="cloud"?liveThreads().filter(tUnread).length:0;
+  b.textContent=n>9?"9+":n; b.hidden=!n; if($("#sheet .mlist")) drawInbox(); }
+
+function openInbox(){
+  if(MODE!=="cloud"){ openSheet(`<h2>💬 الرسائل</h2><div class="mempty">${emo("💬")}<b>راسل أولياء الأمور مباشرة</b><p class="hint">سجّل دخولك عشان تبعت رسائل لأولياء الأمور ويوصلك ردهم هنا، من أي جهاز.</p><button class="btn pri" id="mIn">تسجيل الدخول</button></div>`);
+    $("#mIn").onclick=()=>{ closeSheet(); showLogin(); }; return; }
+  openSheet(`<h2>💬 الرسائل</h2><div class="row" style="margin-bottom:12px"><button class="btn pri" id="mNew">✏️ رسالة جديدة</button></div><div class="mlist" id="mList"></div>`);
+  $("#mNew").onclick=openNewMsg; drawInbox();
+  gsap.from("#mList .mrow",{x:-20,opacity:0,stagger:.04,duration:.3});
+}
+function drawInbox(){ const el=$("#mList"); if(!el) return; const list=liveThreads();
+  el.innerHTML=list.map(t=>{ const {s,c}=stuByCode(t.code), un=tUnread(t);
+    return `<button class="mrow ${un?"un":""}" data-code="${esc(t.code)}"><span class="av">${avatar(s)}</span><div class="grow"><div class="mtop"><b>${esc(s.name)}</b><small>${esc(msgWhen(t.lastAt))}</small></div>
+      <small class="mcls">${esc(c.name)}${t.lastBy==="p"&&t.lastName?" · "+esc(t.lastName):""}</small><p class="mtxt">${t.lastBy==="t"?"<i>أنت: </i>":""}${esc(t.lastText||"")}</p></div>${un?`<span class="mdot"></span>`:""}</button>`; }).join("")
+    || `<div class="mempty">${emo("📭")}<b>لسه مفيش رسائل</b><p class="hint">ابدأ محادثة مع ولي أمر أي طالب من «رسالة جديدة»، أو من صفحة الطالب نفسه.</p></div>`;
+  el.querySelectorAll(".mrow").forEach(b=>b.onclick=()=>openChat(b.dataset.code));
+}
+function openNewMsg(){ const c=cls(); if(!c) return; ensureCodes();
+  openSheet(`<h2>✏️ رسالة جديدة</h2><p class="hint">اختار الطالب — الرسالة بتوصل لكل أولياء الأمور المربوطين بيه</p>
+    <div class="list">${c.students.filter(s=>s.code).map(s=>{ const ps=parentsOf(s.code);
+      return `<div class="li"><span class="av sm">${avatar(s)}</span><div class="grow"><b>${esc(s.name)}</b><small>${ps.length?"👨‍👩‍👦 "+ps.map(p=>esc(p[1])).join("، "):"ولي الأمر لسه مادخلش"}</small></div>
+        ${ps.length?`<button class="btn pri" data-go="${esc(s.code)}">مراسلة</button>`:`<button class="btn" data-inv="${esc(s.id)}">📋 دعوة</button>`}</div>`; }).join("")||`<p class="hint">ضيف طلاب الأول</p>`}</div>`);
+  document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>openChat(b.dataset.go));
+  document.querySelectorAll("[data-inv]").forEach(b=>b.onclick=()=>copyText(kidMsg(stu(b.dataset.inv)),"📋 اتنسخت الدعوة — ابعتها لولي الأمر على واتساب"));
+}
+// from the student sheet: chat if a parent is linked, otherwise offer the invite
+function msgParent(id){ const s=stu(id); if(!s) return;
+  if(MODE!=="cloud"){ openInbox(); return; }
+  ensureCodes(); if(parentsOf(s.code).length){ openChat(s.code); return; }
+  openSheet(`<h2>💬 ولي أمر ${esc(s.name)}</h2><div class="mempty">${emo("👨‍👩‍👦")}<b>ولي الأمر لسه مادخلش</b><p class="hint">ابعتله الدعوة دي على واتساب، ولما يدخل بالكود تقدروا تتراسلوا هنا.</p>
+    <button class="btn pri" id="mInv">📋 نسخ الدعوة</button></div>`);
+  $("#mInv").onclick=()=>copyText(kidMsg(s),"📋 اتنسخت الدعوة — ابعتها لولي الأمر");
+}
+function askParentName(then){
+  openSheet(`<h2>👋 اسمك إيه؟</h2><p class="hint">عشان المعلم يعرف مين بيراسله (مثلاً: أم سارة، أبو عمر)</p>
+    <input class="field" id="pnIn" maxlength="30" placeholder="اسمك" value="${esc(lsGet("saqr.pname")||"")}"><div class="row" style="margin-top:12px"><button class="btn pri" id="pnGo">متابعة</button></div>`);
+  setTimeout(()=>$("#pnIn")&&$("#pnIn").focus(),300);
+  $("#pnGo").onclick=()=>{ const n=$("#pnIn").value.trim().slice(0,30); if(!n){ toast("اكتب اسمك الأول"); return; }
+    lsSet("saqr.pname",n); if(PARENT) PARENT.displayName=PARENT.displayName||n; Cloud.setParentName(PCODES,n).catch(()=>{}); then(); };
+}
+function openChat(code){
+  const T=MODE==="cloud";
+  let info, owner;
+  if(T){ const r=stuByCode(code); if(!r) return; info={name:r.s.name, cls:r.c.name, s:r.s}; owner=USER.uid; }
+  else { const k=PKIDS[code]; if(!k) return; if(PLOCAL||!window.Cloud||!Cloud.myUid()){ toast("المراسلة محتاجة تدخل بكود الطالب من جديد"); return; }
+    if(!(PARENT&&PARENT.displayName) && !lsGet("saqr.pname")){ askParentName(()=>openChat(code)); return; }
+    info={name:k.name, cls:k.className, teacher:k.teacher, s:{points:k.points,look:k.look||{body:BODY[0],acc:"none"}}}; owner=k.owner; }
+  if(!owner){ toast("تعذّر فتح المحادثة"); return; }
+  const me=T?"t":"p", myName=T?(USER.displayName||"المعلم"):(lsGet("saqr.pname")||PARENT.displayName||"ولي أمر "+info.name);
+  let unM=null, unT=null, n0=-1;
+  CHAT={code,msgs:[],th:null};
+  const sub=()=>T?(parentsOf(code).map(p=>p[1]).join("، ")||"ولي الأمر لسه مادخلش"):`بخصوص ${info.name} · ${info.cls}`;
+  openSheet(`<div class="chead"><span class="av">${avatar(info.s)}</span><div class="grow"><b>${esc(T?"ولي أمر "+info.name:(info.teacher?"أ. "+info.teacher:"معلم الفصل"))}</b><small id="cSub">${esc(sub())}</small></div>${T&&parentsOf(code).length?`<button class="btn" id="cPar" title="أولياء الأمور">👥</button>`:""}</div>
+    <div class="cbox" id="cBox"><div class="cload">…</div></div>
+    <div class="qr" id="cQr">${(T?QR_T:QR_P).map((q,i)=>`<button type="button" data-q="${i}">${esc(q)}</button>`).join("")}</div>
+    <form class="cin" id="cForm"><textarea id="cTxt" rows="1" maxlength="1000" placeholder="اكتب رسالتك…"></textarea><button class="csend" id="cSend" aria-label="إرسال">${icon("send")}</button></form>`,
+    ()=>{ if(unM) unM(); if(unT) unT(); CHAT=null; if(!T && PVIEW) drawKidChat(); });
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  const paint=()=>{ const box=$("#cBox"); if(!box||!CHAT) return; const th=CHAT.th||{};
+    const other=T?Math.max(0,...Object.values(th.pSeen||{})):(th.tSeen||0); let last="";
+    box.innerHTML=CHAT.msgs.length?CHAT.msgs.map(m=>{ const mine=m.by===me, d=msgDay(m.at), sep=d!==last?(last=d,`<div class="cday">${esc(d)}</div>`):"";
+      return sep+`<div class="cm ${mine?"me":"them"}">${!mine&&T?`<small class="cby">${esc(m.name||"ولي الأمر")}</small>`:""}<p>${esc(m.text)}</p><small class="ct">${esc(msgTime(m.at))}${mine?`<span class="tick ${other>=m.at?"read":""}" title="${other>=m.at?"اتقرت":"اتبعتت"}">✓✓</span>`:""}</small></div>`; }).join("")
+      :`<div class="cempty">${emo("👋")}<b>ابدأ المحادثة</b><small>${T?"الرسالة بتوصل لكل أولياء أمور "+esc(info.name):"رسالتك بتوصل للمعلم مباشرة"}</small></div>`;
+    box.scrollTop=box.scrollHeight;
+    if(n0>=0 && CHAT.msgs.length>n0){ const b=box.querySelectorAll(".cm"), lm=CHAT.msgs[CHAT.msgs.length-1];
+      if(b.length) gsap.from(b[b.length-1],{scale:.6,opacity:0,y:14,duration:.35,ease:"back.out(2)",transformOrigin:lm.by===me?"100% 100%":"0% 100%"});
+      if(lm.by!==me) SFX.msg(); }
+    n0=CHAT.msgs.length;
+    const lm=CHAT.msgs[CHAT.msgs.length-1], seen=T?(th.tSeen||0):pSeenOf(th);
+    if(lm && lm.by!==me && lm.at>seen) Cloud.seenThread(code,me,owner).catch(()=>{}); };
+  unM=Cloud.listenMsgs(code,m=>{ if(!CHAT) return; CHAT.msgs=m; paint(); },e=>{ const box=$("#cBox"); if(box) box.innerHTML=`<div class="cempty">${emo("⚠️")}<b>تعذّر تحميل الرسائل</b><small>${esc(e.code||e.message||"")}</small></div>`; });
+  unT=Cloud.watchThread(code,t=>{ if(!CHAT) return; CHAT.th=t; paint(); });
+  const ta=$("#cTxt"), grow=()=>{ ta.style.height="auto"; ta.style.height=Math.min(120,ta.scrollHeight)+"px"; };
+  ta.oninput=grow;
+  ta.onkeydown=e=>{ if(e.key==="Enter" && !e.shiftKey && !("ontouchstart" in window)){ e.preventDefault(); $("#cForm").requestSubmit(); } };
+  const send=txt=>{ txt=(txt||"").trim().slice(0,1000); if(!txt) return;
+    Cloud.sendMsg(code,me,txt,{owner,kid:info.name,cls:info.cls,name:myName}).catch(e=>toast(e.code==="permission-denied"?"تعذّر الإرسال — ممكن تكون اتشلت من متابعة الطالب":"⚠️ تعذّر الإرسال — هيتبعت لما النت يرجع"));
+    SFX.sent(); ta.value=""; grow(); };
+  $("#cForm").onsubmit=e=>{ e.preventDefault(); send(ta.value); ta.focus(); };
+  $("#cQr").onclick=e=>{ const b=e.target.closest("[data-q]"); if(b) send((T?QR_T:QR_P)[+b.dataset.q]); };
+  if($("#cPar")) $("#cPar").onclick=()=>openChatParents(code);
+}
+function openChatParents(code){ const r=stuByCode(code); if(!r) return;
+  openSheet(`<h2>👥 أولياء أمور ${esc(r.s.name)}</h2><p class="hint">دول اللي دخلوا بكود الطالب وبيوصلهم كل جديد. لو حد مش معروف ليك، شيله.</p>
+    <div class="list">${parentsOf(code).map(([u,n])=>`<div class="li"><div class="grow"><b>👨‍👩‍👦 ${esc(n)}</b></div><button class="btn red" data-rm="${esc(u)}">إزالة</button></div>`).join("")}</div>
+    <div class="row" style="margin-top:12px"><button class="btn" id="cpBack">↩ رجوع للمحادثة</button></div>`);
+  $("#cpBack").onclick=()=>openChat(code);
+  document.querySelectorAll("[data-rm]").forEach(b=>b.onclick=()=>ask("إزالة ولي الأمر ده؟ مش هيقدر يتابع الطالب تاني إلا بالكود.",async()=>{
+    try{ await Cloud.removeParent(code,b.dataset.rm); toast("تم"); }catch(e){ toast("تعذّر الإزالة"); } openChat(code); }));
+}
+// parent: the chat card on the child's page
+function drawKidChat(){ const el=$("#kChatCard"); if(!el) return; el.hidden=!PVIEW; if(!PVIEW) return;
+  const k=PKIDS[PVIEW]||{}, t=PTH[PVIEW], un=pUnread(PVIEW);
+  el.innerHTML=`<span class="ci">${icon("chat")}</span><div class="grow"><b>تواصل مع ${k.teacher?"أ. "+esc(k.teacher):"المعلم"}</b><small>${t&&t.lastText?(t.lastBy==="p"?"أنت: ":"")+esc(t.lastText):"ابعت رسالة للمعلم بخصوص "+esc(k.name||"")}</small></div>${un?`<span class="mdot"></span>`:""}<span class="chip p" style="flex:none">افتح</span>`;
+  el.onclick=()=>openChat(PVIEW); }
+$("#msgBtn").onclick=openInbox;
+
 /* ---------- boot ---------- */
 const cloudReady = new Promise((res,rej)=>{ if(window.Cloud) return res(window.Cloud);
   addEventListener("cloud-ready",()=>res(window.Cloud)); setTimeout(()=>rej(new Error("timeout")),15000); });
@@ -2698,7 +2862,8 @@ function startParent(u){
   hideLogin(); $("#par").classList.add("show"); drawParent(); drawBell();
   Cloud.onForeground(m=>{ const n=m.notification||{}; if(n.title) toast(n.title+(n.body?" — "+n.body:"")); });
   Cloud.listenParent((codes,data)=>{ PDATA=data||{}; PCODES=codes; drawBell(); Object.keys(PKIDS).forEach(c=>{ if(!codes.includes(c)) delete PKIDS[c]; }); drawParent();
-    Cloud.watchMany(codes,(code,data)=>{ const prev=PKIDS[code]; PKIDS[code]=data; if(PVIEW===code && data){ const pv=KID; KID=data; drawKid(pv); } else drawParent(code, prev); }); });
+    Cloud.watchMany(codes,(code,data)=>{ const prev=PKIDS[code]; PKIDS[code]=data; if(PVIEW===code && data){ const pv=KID; KID=data; drawKid(pv); } else drawParent(code, prev); });
+    Cloud.watchThreads(codes,(code,t)=>{ const was=pUnread(code); PTH[code]=t; if(pUnread(code)&&!was&&!CHAT) SFX.msg(); if(PVIEW===code) drawKidChat(); else drawParent(); }); });
 }
 function drawPAnn(){ const el=$("#pAnn"); if(!el) return; const seen=+(lsGet("saqr.annseen")||0), m=new Map();
   PCODES.forEach(c=>{ const k=PKIDS[c]; (k&&k.anns||[]).forEach(a=>{ const key=a.at+"|"+a.t; if(!m.has(key)) m.set(key,{...a,cls:k.className,teacher:k.teacher}); }); });
@@ -2710,7 +2875,7 @@ function drawParent(changed, prev){ drawPAnn();
   const kids=PCODES.map(c=>[c,PKIDS[c]]);
   $("#pGrid").innerHTML = kids.map(([c,k])=>{ if(!k) return `<div class="pkid"><div class="grow"><b>…</b><small dir="ltr">${esc(c)}</small></div></div>`;
     const L=levelOf(k.points), st=k.today, w=k.week||{pos:0,neg:0};
-    return `<button class="pkid" data-c="${esc(c)}">${k.note&&k.noteAt>(seen[c]||0)?`<span class="newnote">📝 رسالة جديدة</span>`:""}
+    return `<button class="pkid" data-c="${esc(c)}">${pUnread(c)?`<span class="newnote">💬 رسالة من المعلم</span>`:k.note&&k.noteAt>(seen[c]||0)?`<span class="newnote">📝 رسالة جديدة</span>`:""}
       <span class="av">${avatar({points:k.points,look:k.look||{body:BODY[0],acc:"none"}})}</span>
       <div class="grow"><b>${esc(k.name)}</b><small>${esc(k.className)}${k.teacher?" · أ. "+esc(k.teacher):""}</small>
         <div class="chips"><span style="background:${st?ATT[st].c:"#c3c9d8"}">${st?emo(ATT[st].e)+" "+ATT[st].t+" اليوم":"لم يُحضَّر اليوم"}</span><span style="background:#7b5cd6">${L.name}</span><span style="background:#22b573">+${w.pos} الأسبوع</span>${(k.badges||[]).length?`<span style="background:#f5b301">🏅 ${(k.badges||[]).length}</span>`:""}</div></div>
@@ -2752,7 +2917,7 @@ function openParentAcct(){
   $("#pOut").onclick=()=>ask(PARENT&&PARENT.isAnonymous||PLOCAL?"الخروج هيشيل أبنائك من الجهاز ده، وتقدر ترجع تضيفهم بالكود تاني. متأكد؟":"تسجيل الخروج؟",doParentOut);
 };
 async function doParentOut(){ closeSheet(); lsSet("saqr.pcodes",null); PLOCAL=false; try{ if(window.Cloud) Cloud.watchMany([],()=>{}); }catch(e){}
-  await Cloud.signOut(); USER=null; PARENT=null; PCODES=[]; PKIDS={}; MODE=null; lsSet(MODE_KEY,null); $("#par").classList.remove("show"); $("#kid").classList.remove("show"); showLogin(); }
+  await Cloud.signOut(); USER=null; PARENT=null; PCODES=[]; PKIDS={}; PTH={}; MODE=null; lsSet(MODE_KEY,null); $("#par").classList.remove("show"); $("#kid").classList.remove("show"); showLogin(); }
 $("#pAcct").onclick=openParentAcct;
 $("#parBtn").onclick=()=>{ ac(); lmsg(""); showPane("parForm"); setTimeout(()=>$("#parCode").focus(),50); };
 let PENDING=null, PLOCAL=false;
@@ -2794,12 +2959,14 @@ function startCloud(user){
         L.classes.forEach(c=>{ if(carry.includes(c)) c.migrated=true }); store.save(L); }
       if(!list.length) list=[{id:uid(),name:"فصلي الأول",created:Date.now(),students:[],log:[]}];
       S.classes=list; fixCur(); save(); firstRender();
+      Cloud.listenThreads(l=>{ const before=liveThreads().filter(tUnread).length; THREADS=l; drawMsgBadge();
+        if(liveThreads().filter(tUnread).length>before && !CHAT) SFX.msg(); });
       Cloud.listenMe((d,local)=>{ if(local) return; S.banks=d.banks||[]; if(d.geminiKey!==undefined){ S.geminiKey=d.geminiKey; if(d.geminiKey) lsSet(AI_KEY,d.geminiKey); } migrateQs(); });
       Cloud.listenKids(kl=>{ kidsReady=true; let changed=false; KIDMETA={}; kl.forEach(k=>KIDMETA[k.code]=k);
         kl.forEach(k=>{ for(const c of S.classes){ const st=c.students.find(x=>x.code===k.code);
           if(st && k.look && (k.lookAt||0)>(st.lookAt||0)){ st.look=k.look; st.lookAt=k.lookAt; changed=true; } } });
         if(changed){ Cloud.sync(S.classes); if(!$("#ov").classList.contains("show")) render(); }
-        Cloud.syncKids(kidPayloads()); });
+        Cloud.syncKids(kidPayloads()); drawMsgBadge(); });
       return;
     }
     if(local) return;                       // our own write: UI already up to date
@@ -2816,7 +2983,7 @@ function openAcct(){
     openSheet(`<h2>👤 حسابك</h2><div class="li"><div class="grow"><b>${esc(USER.displayName||"معلم صقر")}</b><small dir="ltr">${esc(USER.email||"")}</small></div><span class="chip p">☁️ متزامن</span></div>
       <p class="hint">فصولك محفوظة في السحابة، وتقدر تفتحها من أي جهاز بنفس الحساب. وبتشتغل كمان من غير نت وتتزامن لما يرجع.</p>
       <button class="btn red" id="aOut">تسجيل الخروج</button>`);
-    $("#aOut").onclick=async()=>{ closeSheet(); await Cloud.signOut(); USER=null; MODE=null; lsSet(MODE_KEY,null); S.classes=[]; showLogin(); };
+    $("#aOut").onclick=async()=>{ closeSheet(); await Cloud.signOut(); USER=null; MODE=null; THREADS=[]; drawMsgBadge(); lsSet(MODE_KEY,null); S.classes=[]; showLogin(); };
   } else {
     openSheet(`<h2>👤 وضع التجربة</h2><p class="hint">البيانات محفوظة على هذا الجهاز بس. سجّل دخول عشان تتحفظ في السحابة وتفتحها من أي جهاز — وهننقل فصولك الحالية معاك (ما عدا الفصل التجريبي).</p>
       <button class="btn pri" id="aIn">تسجيل الدخول</button>`);
@@ -2908,6 +3075,7 @@ function drawKid(prev){
     else if(k.points<prev.points){ SFX.neg(); gsap.fromTo(".khero",{x:-8},{x:0,duration:.5,ease:"elastic.out(1,.3)"}); }
   } else gsap.from(".khero,.kcard",{y:30,opacity:0,stagger:.08,duration:.5,ease:"back.out(1.5)"});
   setTimeout(()=>{ if(f) f.classList.remove("flap"); },1500);
+  drawKidChat();
 }
 function kidStyle(){
   let look={...(KID.look||{body:BODY[0],acc:"none"})}; const pts=KID.points;

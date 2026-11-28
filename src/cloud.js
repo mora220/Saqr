@@ -3,7 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut,
   signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile , signInAnonymously } from "firebase/auth";
 import { getMessaging, getToken, isSupported as msgSupported, onMessage } from "firebase/messaging";
-import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, onSnapshot, query, where, serverTimestamp, arrayUnion, arrayRemove } from "firebase/firestore";
+import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager, collection, doc, getDoc, setDoc, updateDoc, deleteDoc, deleteField, onSnapshot, query, where, orderBy, limit, serverTimestamp, arrayUnion, arrayRemove } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAMilKT2UhU_o63bXq36gKXHPVPG40Mx3k",
@@ -23,6 +23,8 @@ catch (e) { db = initializeFirestore(app, {}); }
 
 let uid = null, unsub = null, unsubKids = null, unsubKid = null, unsubParent = null;
 const kidWatch = new Map();         // parent side: code -> unsubscribe
+const thWatch = new Map();          // parent side: code -> unsubscribe (message threads)
+let unsubThreads = null;
 const lastKid = new Map();          // code -> JSON last written/seen (teacher side)
 const kidLookAt = new Map();        // code -> lookAt seen from the student doc
 const last = new Map();               // class id -> JSON last written/seen
@@ -82,7 +84,37 @@ const Cloud = {
     for (const [c, u] of kidWatch) if (!codes.includes(c)) { u(); kidWatch.delete(c); }
     for (const c of codes) if (!kidWatch.has(c)) kidWatch.set(c, onSnapshot(doc(db, "kids", c), d => cb(c, d.exists() ? d.data() : null), () => cb(c, null)));
   },
-  async signOut() { if (unsubParent) unsubParent(); unsubParent = null; for (const u of kidWatch.values()) u(); kidWatch.clear(); if (unsub) unsub(); if (unsubKids) unsubKids(); unsub = unsubKids = null; last.clear(); lastKid.clear(); kidLookAt.clear(); await signOut(auth); },
+  async signOut() { if (unsubParent) unsubParent(); unsubParent = null; if (unsubThreads) unsubThreads(); unsubThreads = null; for (const u of thWatch.values()) u(); thWatch.clear(); for (const u of kidWatch.values()) u(); kidWatch.clear(); if (unsub) unsub(); if (unsubKids) unsubKids(); unsub = unsubKids = null; last.clear(); lastKid.clear(); kidLookAt.clear(); await signOut(auth); },
+  // ---- messages: one thread per student code (teacher ↔ linked parents) ----
+  // threads/{code}: owner, kid, cls, lastAt, lastBy ('t'|'p'), lastText, lastName, tSeen, pSeen{uid:ms}
+  // threads/{code}/msgs/{id}: by, uid, name, text, at
+  listenThreads(cb) {
+    if (unsubThreads) unsubThreads();
+    unsubThreads = onSnapshot(query(collection(db, "threads"), where("owner", "==", uid)), snap => cb(snap.docs.map(d => ({ code: d.id, ...d.data() }))), () => cb([]));
+  },
+  watchThreads(codes, cb) {
+    for (const [c, u] of thWatch) if (!codes.includes(c)) { u(); thWatch.delete(c); }
+    for (const c of codes) if (!thWatch.has(c)) thWatch.set(c, onSnapshot(doc(db, "threads", c), d => cb(c, d.exists() ? d.data() : null), () => cb(c, null)));
+  },
+  watchThread: (code, cb) => onSnapshot(doc(db, "threads", code), d => cb(d.exists() ? d.data() : null), () => cb(null)),
+  listenMsgs: (code, cb, onErr) => onSnapshot(query(collection(db, "threads", code, "msgs"), orderBy("at", "desc"), limit(150)),
+    snap => cb(snap.docs.map(d => ({ id: d.id, ...d.data() })).reverse()), e => onErr && onErr(e)),
+  // fire-and-forget: the local cache shows the message at once and syncs when online
+  sendMsg(code, by, text, meta) {
+    const at = Date.now(), name = meta.name || "", ref = doc(collection(db, "threads", code, "msgs"));
+    const p1 = setDoc(ref, { by, uid, name, text, at });
+    const t = { owner: meta.owner, kid: meta.kid || "", cls: meta.cls || "", lastAt: at, lastBy: by, lastText: text.slice(0, 140), lastName: name };
+    if (by === "t") t.tSeen = at; else t.pSeen = { [uid]: at };
+    const p2 = setDoc(doc(db, "threads", code), t, { merge: true });
+    return Promise.all([p1, p2]);
+  },
+  seenThread: (code, by, owner) => setDoc(doc(db, "threads", code), by === "t" ? { owner, tSeen: Date.now() } : { owner, pSeen: { [uid]: Date.now() } }, { merge: true }),
+  removeParent: (code, puid) => updateDoc(doc(db, "kids", code), { ["parents." + puid]: deleteField() }),
+  myUid: () => uid,
+  async setParentName(codes, name) {
+    await setDoc(doc(db, "parents", uid), { name }, { merge: true });
+    await Promise.all(codes.map(c => updateDoc(doc(db, "kids", c), { ["parents." + uid]: name }).catch(() => {})));
+  },
   // live list of this teacher's classes; cb(classes, hasLocalPendingWrites)
   listen(cb, onErr) {
     if (unsub) unsub();

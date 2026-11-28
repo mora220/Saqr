@@ -2,6 +2,32 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // صفحة الطالب kids/{code}: صاحبها المعلم، وأولياء الأمور المربوطين في parents
+    function kidDoc(code) { return get(/databases/$(database)/documents/kids/$(code)); }
+    function kidExists(code) { return exists(/databases/$(database)/documents/kids/$(code)); }
+    function isKidOwner(code) { return request.auth != null && kidExists(code) && kidDoc(code).data.owner == request.auth.uid; }
+    function isKidParent(code) { return request.auth != null && kidExists(code) && request.auth.uid in kidDoc(code).data.get('parents', {}); }
+    function isMember(code) { return isKidOwner(code) || isKidParent(code); }
+
+    // الرسائل بين المعلم وأولياء الأمور: محادثة لكل طالب
+    match /threads/{code} {
+      allow get: if isMember(code);
+      allow list: if request.auth != null && resource.data.owner == request.auth.uid;
+      allow create: if isMember(code) && request.resource.data.owner == kidDoc(code).data.owner;
+      allow update: if isMember(code) && request.resource.data.owner == resource.data.owner;
+      allow delete: if isKidOwner(code);
+      match /msgs/{id} {
+        allow read: if isMember(code);
+        allow create: if request.auth != null
+          && request.resource.data.uid == request.auth.uid
+          && request.resource.data.text is string
+          && request.resource.data.text.size() > 0 && request.resource.data.text.size() <= 1000
+          && request.resource.data.at is int
+          && ((request.resource.data.by == 't' && isKidOwner(code)) || (request.resource.data.by == 'p' && isKidParent(code)));
+        allow delete: if isKidOwner(code);
+      }
+    }
+
     // فصول المعلم: يشوفها ويعدّلها صاحبها بس
     match /classes/{classId} {
       allow read, delete: if request.auth != null && resource.data.owner == request.auth.uid;
