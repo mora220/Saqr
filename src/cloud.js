@@ -48,6 +48,7 @@ const Cloud = {
   // ---- teacher's own doc (question banks) ----
   listenMe(cb) { return onSnapshot(doc(db, "users", uid), d => cb(d.exists() ? d.data() : {}, d.metadata.hasPendingWrites), () => {}); },
   saveBanks: banks => setDoc(doc(db, "users", uid), { banks }, { merge: true }),
+  saveMe: obj => setDoc(doc(db, "users", uid), obj, { merge: true }),
   // ---- parent side ----
   listenParent(cb) {
     if (unsubParent) unsubParent();

@@ -459,6 +459,19 @@ body.board .x{width:52px;height:52px;font-size:1.6rem;top:18px;left:18px}
 .bd b{font-size:.88rem}.bd small{color:var(--muted);font-size:.7rem;line-height:1.4}.bd .when{color:#c27c00;font-weight:800}.bd .lock{font-size:.7rem}
 .bdg.sm{grid-template-columns:repeat(auto-fill,minmax(86px,1fr))}.bdg.sm .bi .fe{width:32px;height:32px}
 .bstrip{background:#fff6dc;color:#8a5a00}.bstrip .fe{width:1.1em;height:1.1em}
+/* ---------- AI book import ---------- */
+.aibtn{width:100%;display:flex;align-items:center;gap:12px;text-align:right;border-radius:22px;padding:14px;margin-bottom:12px;color:#fff;
+  background:linear-gradient(135deg,#7b5cd6,#3d8be0);box-shadow:0 10px 24px rgba(123,92,214,.3)}
+.aibtn .aiic{width:48px;height:48px;border-radius:16px;background:rgba(255,255,255,.2);display:grid;place-items:center;font-size:1.6rem;flex:0 0 auto}
+.aibtn b{display:block;font-size:1.1rem}.aibtn small{opacity:.9;font-weight:600;line-height:1.5;display:block}.aibtn .chev{color:#fff;opacity:.7;font-size:1.3rem}
+.drop{border:3px dashed #c9d3ea;border-radius:22px;padding:22px 12px;text-align:center;background:#fafbff;cursor:pointer;display:block}
+.drop.has{border-color:#22b573;background:#f1fbf6}.drop b{display:block;font-size:1.1rem;margin-top:6px}
+.aistep{display:flex;align-items:center;gap:10px;padding:8px 4px;font-weight:700;color:var(--muted)}
+.aistep.on{color:var(--ink)}.aistep.done{color:#14935b}
+.aistep i{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#eef1f8;font-style:normal;font-size:.85rem;flex:0 0 auto}
+.aistep.on i{background:#7b5cd6;color:#fff;animation:pulse 1s ease-in-out infinite}.aistep.done i{background:#22b573;color:#fff}
+@keyframes pulse{50%{transform:scale(1.15)}}
+.aifal{width:120px;height:120px;margin:0 auto}
 /* ---------- fx ---------- */
 #fx{position:fixed;inset:0;pointer-events:none;z-index:80}
 .float{direction:ltr;position:fixed;font-weight:800;font-size:2.2rem;z-index:90;pointer-events:none;text-shadow:0 3px 0 rgba(0,0,0,.12)}
@@ -1143,6 +1156,8 @@ const ICONS={
   gift:'<rect x="3" y="8" width="18" height="5" rx="1.5"/><path d="M5 13v7h14v-7M12 8v12"/><path d="M12 8c-2-3-6-4-6-1.5S9 8 12 8zm0 0c2-3 6-4 6-1.5S15 8 12 8z"/>',
   seat:'<path d="M6 10V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5"/><rect x="4" y="10" width="16" height="5" rx="1.5"/><path d="M6 15v6M18 15v6"/>',
   megaphone:'<path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 8.5a4 4 0 0 1 0 7"/><path d="M18 6a8 8 0 0 1 0 12"/>',
+  sparkle:'<path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2 2.2.8-2.2.8L19 21l-.8-2.2-2.2-.8 2.2-.8z"/>',
+  chat:'<path d="M4 20l1.4-4A8 8 0 1 1 8 18.6z"/><path d="M9 10.5h.01M12 10.5h.01M15 10.5h.01"/>',
   key:'<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3M15 8l2 2"/>',
 };
 const icon=n=>`<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]||""}</svg>`;
@@ -1330,6 +1345,130 @@ function openAnn(){
   document.querySelectorAll("[data-dn]").forEach(b=>b.onclick=()=>ask("حذف الإعلان؟",()=>{ c.anns.splice(+b.dataset.dn,1); save(); openAnn(); }));
 }
 
+/* ---------- AI (Gemini) book → question bank ---------- */
+const AI_KEY="saqr.gemini";
+const aiKey=()=>lsGet(AI_KEY)||S.geminiKey||"";
+function openAIKey(){
+  openSheet(`<h2>✨ الذكاء الاصطناعي</h2>
+    <p class="hint">صقر بيستخدم Gemini من جوجل عشان يحوّل كتاب المنهج لبنك أسئلة مرتّب. محتاج <b>مفتاح API مجاني</b> مرة واحدة:</p>
+    <ol class="hint" style="line-height:2;padding-inline-start:20px;margin:6px 0"><li>افتح <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> وسجّل بحساب جوجل</li><li>دوس <b>Create API key</b> وانسخ المفتاح</li><li>الصقه هنا ودوس حفظ</li></ol>
+    <input class="field" id="akIn" dir="ltr" placeholder="AIza..." value="${esc(aiKey())}" autocomplete="off">
+    <div class="row" style="margin-top:10px"><button class="btn pri" id="akSave">حفظ واختبار</button>${aiKey()?`<button class="btn red" id="akDel">مسح المفتاح</button>`:""}</div>
+    <p class="hint" id="akMsg"></p>
+    <p class="hint" style="font-size:.8rem">🔒 المفتاح بيتحفظ في حسابك بس، ومحدش غيرك بيشوفه.</p>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  $("#akSave").onclick=async()=>{ const k=$("#akIn").value.trim(); if(!/^[\w-]{20,}$/.test(k)){ $("#akMsg").textContent="المفتاح شكله مش صح"; return; }
+    $("#akSave").disabled=true; $("#akMsg").textContent="جاري الاختبار…";
+    try{ const m=await aiPickModel(k); lsSet(AI_KEY,k); S.geminiKey=k; if(MODE==="cloud"&&window.Cloud) Cloud.saveMe({geminiKey:k}).catch(()=>{}); else save();
+      $("#akMsg").textContent="✅ المفتاح شغّال ("+m.replace("models/","")+")"; SFX.pos(); }
+    catch(e){ $("#akMsg").textContent="❌ "+(e.message||"المفتاح مش شغّال"); }
+    finally{ const b=$("#akSave"); if(b) b.disabled=false; } };
+  if($("#akDel")) $("#akDel").onclick=()=>{ lsSet(AI_KEY,null); S.geminiKey=""; if(MODE==="cloud"&&window.Cloud) Cloud.saveMe({geminiKey:""}).catch(()=>{}); else save(); openAIKey(); };
+}
+const GAPI="https://generativelanguage.googleapis.com";
+let AIMODEL=null;
+async function aiPickModel(key){
+  const r=await fetch(`${GAPI}/v1beta/models?pageSize=200&key=${encodeURIComponent(key)}`);
+  const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error((j.error&&j.error.message)||"المفتاح مش شغّال");
+  const ok=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")).map(m=>m.name)
+    .filter(n=>/gemini/.test(n)&&!/(image|live|tts|audio|embed|vision|banana|robotics|computer|thinking-exp|learnlm|nano)/.test(n));
+  const ver=n=>{ const m=n.match(/gemini-(\d+(?:\.\d+)?)/); return m?parseFloat(m[1]):0; };
+  const score=n=>ver(n)*10 + (/flash/.test(n)?3:0) + (/lite/.test(n)?-2:0) + (/pro/.test(n)?1:0) + (/preview|exp/.test(n)?-1.5:0) + (/latest/.test(n)?.5:0);
+  ok.sort((a,b)=>score(b)-score(a)); if(!ok.length) throw new Error("مفيش نموذج متاح بالمفتاح ده");
+  AIMODEL=ok[0]; return AIMODEL;
+}
+async function aiUpload(file,key,onStep){
+  if(file.size<=18*1024*1024){ const b64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]); r.onerror=rej; r.readAsDataURL(file); });
+    return {inline_data:{mime_type:"application/pdf",data:b64}}; }
+  const st=await fetch(`${GAPI}/upload/v1beta/files?key=${encodeURIComponent(key)}`,{method:"POST",headers:{"X-Goog-Upload-Protocol":"resumable","X-Goog-Upload-Command":"start",
+    "X-Goog-Upload-Header-Content-Length":String(file.size),"X-Goog-Upload-Header-Content-Type":"application/pdf","Content-Type":"application/json"},body:JSON.stringify({file:{display_name:file.name.slice(0,60)}})});
+  const url=st.headers.get("x-goog-upload-url"); if(!st.ok||!url) throw new Error("تعذّر بدء رفع الملف");
+  const up=await fetch(url,{method:"POST",headers:{"X-Goog-Upload-Command":"upload, finalize","X-Goog-Upload-Offset":"0"},body:file});
+  const j=await up.json(); let f=j.file; if(!f) throw new Error("تعذّر رفع الملف");
+  for(let i=0;i<60&&f.state==="PROCESSING";i++){ onStep&&onStep(); await new Promise(r=>setTimeout(r,3000)); f=await (await fetch(`${GAPI}/v1beta/${f.name}?key=${encodeURIComponent(key)}`)).json(); }
+  if(f.state==="FAILED") throw new Error("جوجل مقدرش يقرا الملف");
+  return {file_data:{mime_type:"application/pdf",file_uri:f.uri}};
+}
+async function aiBuildBank(part,key,opt){
+  const schema={type:"OBJECT",properties:{title:{type:"STRING"},units:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},lessons:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},
+    qs:{type:"ARRAY",items:{type:"OBJECT",properties:{q:{type:"STRING"},a:{type:"STRING"},wrong:{type:"ARRAY",items:{type:"STRING"}}},required:["q","a"]}}},required:["name","qs"]}}},required:["name","lessons"]}}},required:["units"]};
+  const prompt=`أنت معلم خبير في المنهج السعودي. الملف المرفق كتاب مدرسي.
+المطلوب: استخرج فهرس الكتاب بالوحدات والدروس بنفس عناوين الكتاب بالظبط وبنفس الترتيب${opt.range?`، وركّز فقط على الصفحات ${opt.range}`:""}.
+لكل درس اكتب ${opt.n} أسئلة متنوعة من محتوى الدرس نفسه (فهم وتطبيق ومسائل)، بالعربية الفصحى المبسطة المناسبة لمستوى الطلاب.
+${opt.mcq?"اجعل أغلب الأسئلة اختيار من متعدد: ضع الإجابة الصحيحة في a وثلاث إجابات خاطئة معقولة في wrong.":"اجعل الأسئلة قصيرة الإجابة: الإجابة الصحيحة في a واترك wrong فارغة."}
+الإجابات قصيرة ودقيقة. استخدم الأرقام الإنجليزية في المسائل. لا تكرر الأسئلة. اكتب في title اسم الكتاب والصف والفصل الدراسي.`;
+  const body={contents:[{role:"user",parts:[part,{text:prompt}]}],generationConfig:{responseMimeType:"application/json",responseSchema:schema,temperature:.4,maxOutputTokens:65536}};
+  const r=await fetch(`${GAPI}/v1beta/${AIMODEL}:generateContent?key=${encodeURIComponent(key)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
+  const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error((j.error&&j.error.message)||"حصل خطأ من Gemini");
+  const txt=((j.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||"").join("");
+  let d; try{ d=JSON.parse(txt); }catch(e){ const m=txt.lastIndexOf("}]}"); try{ d=JSON.parse(txt.slice(0,m+3)+"]}"); }catch(e2){ throw new Error("الرد اتقطع — جرّب عدد أسئلة أقل أو حدد صفحات"); } }
+  const units=(d.units||[]).map(u=>({name:String(u.name||"وحدة").slice(0,80),lessons:(u.lessons||[]).map(l=>({name:String(l.name||"درس").slice(0,80),
+    qs:(l.qs||[]).filter(q=>q&&q.q&&q.a).map(q=>{ const w=(q.wrong||[]).map(String).filter(x=>x&&x!==q.a).slice(0,3); return w.length?{q:String(q.q).slice(0,300),a:String(q.a).slice(0,120),ch:[String(q.a),...w]}:{q:String(q.q).slice(0,300),a:String(q.a).slice(0,120)}; })})).filter(l=>l.qs.length)})).filter(u=>u.lessons.length);
+  return {title:String(d.title||"").slice(0,60),units};
+}
+function openAIBook(){
+  if(!aiKey()){ toast("أضف مفتاح Gemini الأول ✨"); openAIKey(); return; }
+  let file=null, n=5, mcq=true;
+  const draw=()=>{ openSheet(`<h2>✨ تحويل الكتاب لبنك أسئلة</h2>
+    <label class="drop ${file?"has":""}">${emo(file?"✅":"📚")}<b>${file?esc(file.name):"اختار ملف الكتاب (PDF)"}</b><small class="hint">${file?(file.size/1048576).toFixed(1)+" MB":"لحد 50 MB"}</small><input type="file" id="aiF" accept="application/pdf,.pdf" hidden></label>
+    <b style="display:block;margin-top:12px">عدد الأسئلة لكل درس</b><div class="seg2">${[3,5,8,10].map(k=>`<button data-n="${k}" class="${k===n?"on":""}">${k}</button>`).join("")}</div>
+    <b>نوع الأسئلة</b><div class="seg2"><button data-m="1" class="${mcq?"on":""}">اختيار من متعدد</button><button data-m="0" class="${!mcq?"on":""}">إجابة قصيرة</button></div>
+    <b>الصفحات (اختياري)</b><input class="field" id="aiR" placeholder="مثلاً: 10-85 — سيبها فاضية للكتاب كله" dir="rtl">
+    <p class="hint">💡 لو الكتاب كبير، حوّله على أجزاء (وحدة أو وحدتين كل مرة) عشان النتيجة تبقى أدق.</p>
+    <div class="row" style="justify-content:center;margin-top:8px"><button class="btn pri" id="aiGo" ${file?"":"disabled style='opacity:.5'"}>✨ ابدأ التحويل</button></div>`, ()=>setTab("home"));
+    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    $("#aiF").onchange=e=>{ const f=e.target.files[0]; if(!f) return; if(f.size>50*1048576){ toast("الملف أكبر من 50 MB — قسّمه"); return; } file=f; draw(); };
+    document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{ n=+b.dataset.n; draw(); });
+    document.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{ mcq=b.dataset.m==="1"; draw(); });
+    $("#aiGo").onclick=()=>{ if(file) runAI(file,{n,mcq,range:$("#aiR").value.trim()}); };
+  };
+  draw();
+}
+async function runAI(file,opt){
+  const steps=["تجهيز الذكاء الاصطناعي","رفع الكتاب","قراءة الكتاب واستخراج الوحدات والدروس","كتابة الأسئلة","ترتيب البنك"];
+  let cur=0;
+  const paint=()=>{ const el=$("#aiSteps"); if(el) el.innerHTML=steps.map((t,i)=>`<div class="aistep ${i<cur?"done":i===cur?"on":""}"><i>${i<cur?"✓":i+1}</i>${t}</div>`).join(""); };
+  openSheet(`<h2>✨ جاري التحويل…</h2><div class="aifal" id="aiFal">${falconSVG({level:1,body:"#7b5cd6",acc:"grad",mood:"happy"})}</div><div id="aiSteps"></div>
+    <p class="hint" style="text-align:center">ممكن ياخد من دقيقة لـ 3 دقايق حسب حجم الكتاب — سيب الصفحة مفتوحة 🦅</p>`);
+  $("#aiFal .fal").classList.add("flap"); gsap.to("#aiFal",{y:-12,duration:.8,yoyo:true,repeat:-1,ease:"sine.inOut"}); paint();
+  const key=aiKey();
+  try{
+    if(!AIMODEL) await aiPickModel(key); cur=1; paint();
+    const part=await aiUpload(file,key); cur=2; paint();
+    const t=setTimeout(()=>{ cur=3; paint(); },25000);
+    const res=await aiBuildBank(part,key,opt); clearTimeout(t); cur=4; paint();
+    if(!res.units.length) throw new Error("مالقيتش دروس في الملف — اتأكد إنه كتاب فيه نص");
+    aiPreview(res, file.name.replace(/\.pdf$/i,""));
+  }catch(e){ openSheet(`<h2>❌ التحويل ماكملش</h2><p class="hint" style="font-size:1rem">${esc(e.message||"حصل خطأ")}</p>
+    <div class="row"><button class="btn pri" id="aiRetry">جرّب تاني</button><button class="btn" id="aiKeyB">المفتاح</button></div>`);
+    $("#aiRetry").onclick=openAIBook; $("#aiKeyB").onclick=openAIKey; }
+}
+function aiPreview(res,fname){
+  const total=res.units.reduce((a,u)=>a+u.lessons.reduce((x,l)=>x+l.qs.length,0),0), B=S.banks=S.banks||[];
+  openSheet(`<h2>🎉 البنك جاهز!</h2><p class="hint">${res.units.length} وحدة · ${res.units.reduce((a,u)=>a+u.lessons.length,0)} درس · ${total} سؤال</p>
+    ${res.units.map(u=>`<div class="unit"><h3>${esc(u.name)}</h3>${u.lessons.map(l=>`<div class="lrow2"><span class="grow">${esc(l.name)}</span><span class="cnt">${l.qs.length}</span></div>`).join("")}</div>`).join("")}
+    <b>احفظه في:</b><select class="bsel" id="apB"><option value="__new">بنك جديد: ${esc(res.title||fname)}</option>${B.map(b=>`<option value="${b.id}">${esc(b.title)}</option>`).join("")}</select>
+    <div class="row" style="margin-top:10px"><button class="btn pri" id="apSave">💾 حفظ البنك</button></div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); SFX.level(); confetti(innerWidth/2,innerHeight/3,120);
+  $("#apSave").onclick=()=>{ const v=$("#apB").value; let b=B.find(x=>x.id===v); if(!b){ b={id:uid(),title:(res.title||fname).slice(0,60),units:[]}; B.push(b); }
+    const n=mergeInto(b,res.units); saveBanks(); toast(`✅ اتحفظ ${n} سؤال`); openBankEd(b.id); };
+}
+
+/* ---------- contact developer ---------- */
+const DEV_WA="";   // رقم واتساب المطور بالصيغة الدولية بدون + (مثال: 9665XXXXXXXX)
+function contactDev(){
+  const msg=`السلام عليكم أ. محمد، أنا ${(USER&&USER.displayName)||"معلم"} من مستخدمي تطبيق صقر 🦅\n`;
+  openSheet(`<h2>💬 تواصل مع المطور</h2>
+    <div class="who"><div class="av">${falconSVG({level:2,body:"#f2b01e",acc:"grad",mood:"happy"})}</div><div class="info"><b>أ. محمد رجب</b><span>مطوّر تطبيق صقر</span></div></div>
+    <p class="hint">عندك اقتراح، أو لقيت مشكلة، أو عايز ميزة جديدة؟ ابعتلي على الواتساب وهرد عليك في أقرب وقت.</p>
+    <div class="tpls">${["💡 عندي اقتراح","🐞 لقيت مشكلة","⭐ عايز ميزة جديدة","🙏 شكر وتقدير"].map(t=>`<button data-t="${t}">${t}</button>`).join("")}</div>
+    <textarea class="field" id="dvT" style="min-height:90px">${esc(msg)}</textarea>
+    <div class="row" style="margin-top:10px"><button class="btn" id="dvGo" style="background:#25d366;color:#fff">💬 إرسال على الواتساب</button></div>`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{ $("#dvT").value=msg+b.dataset.t+": "; $("#dvT").focus(); });
+  $("#dvGo").onclick=()=>{ if(!DEV_WA){ toast("رقم التواصل هيتضاف قريباً"); return; } const u=`https://wa.me/${DEV_WA}?text=${encodeURIComponent($("#dvT").value)}`; location.href=u; };
+}
+
 /* ---------- settings ---------- */
 function openSettings(){
   const cloud=MODE==="cloud"&&USER, nm=cloud?(USER.displayName||USER.email||"معلم"):"وضع التجربة";
@@ -1353,7 +1492,11 @@ function openSettings(){
     </div>
     <div class="sgh">عام</div><div class="sgrp">
       ${row("sound",S.sound?"sound":"mute","#2e9c9a","الأصوات",S.sound?"شغالة":"مقفولة",`<span class="sw2 ${S.sound?"on":""}"></span>`)}
-      ${row("about","info","#97a0b8","عن صقر","الإصدار 1.5 · صُمّم للمعلم السعودي 🦅")}
+      ${row("ai","sparkle","#7b5cd6","الذكاء الاصطناعي (Gemini)",aiKey()?"مفعّل ✅ — لتحويل الكتب لبنوك أسئلة":"أضف مفتاح Gemini المجاني")}
+      ${row("about","info","#97a0b8","عن صقر","الإصدار 1.6 · صُمّم للمعلم السعودي 🦅")}
+    </div>
+    <div class="sgrp">
+      ${row("dev","chat","#25d366","تواصل مع المطور","اقتراح، مشكلة، أو طلب ميزة جديدة")}
     </div>`, ()=>setTab("home"));
   setTab("settings");
   gsap.from(".sgrp,.prof",{y:16,opacity:0,stagger:.05,duration:.35});
@@ -1362,6 +1505,7 @@ function openSettings(){
     if(k==="classes") openClassMenu(); else if(k==="add") openAdd(); else if(k==="skills") openSkills(); else if(k==="codes") cloudOnly(openCodes);
     else if(k==="print") cloudOnly(openPrintCards); else if(k==="ann") openAnn(); else if(k==="banks") openBanks();
     else if(k==="sound"){ S.sound=!S.sound; save(); if(S.sound) SFX.pos(); openSettings(); }
+    else if(k==="ai") openAIKey(); else if(k==="dev") contactDev();
     else if(k==="about") toast("🦅 صقر — إدارة الفصل بروح الصقور، من تصميم أ. محمد رجب"); });
 }
 function cloudOnly(fn){ if(MODE==="cloud") fn(); else toast("سجّل دخول عشان كل طالب ياخد كود 🔑"); }
@@ -1426,11 +1570,12 @@ function readFile(input){ return new Promise((res,rej)=>{ const f=input.files&&i
 function openBanks(){
   migrateQs(); const B=S.banks=S.banks||[];
   openSheet(`<h2>📚 بنوك الأسئلة والمنهج</h2>
-    <div class="kcard" style="background:linear-gradient(135deg,#fff3e6,#fff);box-shadow:none;border:2px solid #ffe0c2;margin:0 0 12px"><b>📖 عايز بنك أسئلة من كتاب المنهج؟</b><p class="hint" style="margin:4px 0 0">ابعت ملف الكتاب (PDF) لـ Claude في المحادثة، وهيرجعلك ملف أسئلة مقسّم بالوحدات والدروس، تستورده هنا بضغطة.</p></div>
+    <button class="aibtn" id="aiBook"><span class="aiic">✨</span><span class="grow"><b>حوّل كتاب المنهج لبنك أسئلة</b><small>ارفع ملف الكتاب PDF، والذكاء الاصطناعي يرتّبه وحدات ودروس ويطلّع أسئلة لكل درس</small></span><span class="chev">‹</span></button>
     <div class="list">${B.map(b=>`<button class="li" data-b="${b.id}" style="width:100%;text-align:right"><span class="big-e">${emo("📚")}</span><div class="grow"><b>${esc(b.title)}</b><small>${b.units.length} وحدة · ${bankCount(b)} سؤال</small></div><span class="chev" style="color:#b6bfd3">‹</span></button>`).join("")||"<p class='hint'>لسه مفيش بنوك</p>"}</div>
     <div class="row" style="margin-top:12px"><input class="field" id="nbT" placeholder="اسم البنك — مثلاً: رياضيات خامس ف1" style="flex:1"><button class="btn pri" id="nbGo">➕ إنشاء</button></div>`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
   document.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>openBankEd(b.dataset.b));
+  $("#aiBook").onclick=openAIBook;
   $("#nbGo").onclick=()=>{ const t=$("#nbT").value.trim(); if(!t){ toast("اكتب اسم البنك"); return; } const b={id:uid(),title:t.slice(0,60),units:[]}; B.push(b); saveBanks(); openBankEd(b.id); };
 }
 function openBankEd(id){
@@ -2011,7 +2156,7 @@ function startCloud(user){
         L.classes.forEach(c=>{ if(carry.includes(c)) c.migrated=true }); store.save(L); }
       if(!list.length) list=[{id:uid(),name:"فصلي الأول",created:Date.now(),students:[],log:[]}];
       S.classes=list; fixCur(); save(); firstRender();
-      Cloud.listenMe((d,local)=>{ if(local) return; S.banks=d.banks||[]; migrateQs(); });
+      Cloud.listenMe((d,local)=>{ if(local) return; S.banks=d.banks||[]; if(d.geminiKey!==undefined){ S.geminiKey=d.geminiKey; if(d.geminiKey) lsSet(AI_KEY,d.geminiKey); } migrateQs(); });
       Cloud.listenKids(kl=>{ kidsReady=true; let changed=false; KIDMETA={}; kl.forEach(k=>KIDMETA[k.code]=k);
         kl.forEach(k=>{ for(const c of S.classes){ const st=c.students.find(x=>x.code===k.code);
           if(st && k.look && (k.lookAt||0)>(st.lookAt||0)){ st.look=k.look; st.lookAt=k.lookAt; changed=true; } } });
