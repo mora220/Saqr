@@ -1823,7 +1823,7 @@ async function runAI(file,opt){
 }
 /* ---------- AI questions without a book: from subject, grade, unit and lesson ---------- */
 // «صقر AI»: وكيل الأسئلة على Cloudflare (ai-worker/worker.js). لما الرابط يتحط هنا، المعلم المسجّل مش محتاج مفتاح خاص
-const SAQR_AI_URL="";
+const SAQR_AI_URL="https://saqr-ai.as01000as.workers.dev";
 const useSaqrAI=()=>!!SAQR_AI_URL && MODE==="cloud" && !!USER && !USER.isAnonymous;
 async function saqrAI(opt){
   const tok=await Cloud.idToken(); if(!tok) throw new Error("سجّل دخولك الأول");

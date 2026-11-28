@@ -1,4 +1,4 @@
-# needs test/site/index.html patched with SAQR_AI_URL="https://saqr-ai.test.workers.dev"
+# needs test/site/index.html patched with SAQR_AI_URL="https://saqr-ai.as01000as.workers.dev"
 from helpers import *
 import json
 r = Run()
@@ -9,7 +9,7 @@ def handle(route, req):
     route.fulfill(json={"units":[{"name":"الوحدة الثانية","lessons":[{"name":"حالات المادة","qs":[{"q":"المادة التي لها شكل ثابت","a":"الصلبة","ch":["الصلبة","السائلة","الغازية"]}]}]}],"used":3,"limit":40},
                   headers={"Access-Control-Allow-Origin":"*"})
 t = teacher(r)
-t.route("**/saqr-ai.test.workers.dev/**", handle)
+t.route("**/saqr-ai.as01000as.workers.dev/**", handle)
 t.evaluate("""()=>{ lsSet(AI_KEY,null); S.banks=[{id:"b1",title:"علوم خامس ابتدائي ف2",subject:"علوم",grade:"الخامس الابتدائي",term:"الفصل الثاني",units:[]}]; saveBanks(); openAIGen({bank:"b1"}); }""")
 t.wait_for_timeout(600)
 r.shot(t, "sa1_form")
