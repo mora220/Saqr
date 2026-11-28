@@ -1,0 +1,16 @@
+from helpers import *
+r = Run()
+d = r.br.new_context(viewport={"width":1366,"height":800}, locale="ar-SA")
+p = d.new_page(); p.on("pageerror", lambda e: r.errors.append(str(e)))
+p.goto(URL); p.wait_for_timeout(900); p.evaluate("localStorage.clear()"); p.reload(); p.wait_for_timeout(900)
+p.click("#guestBtn"); p.wait_for_selector("#grid .card"); p.wait_for_timeout(600)
+for t in ["att","kit","games","report","settings","report","home"]:
+    p.click(f'.tb[data-tab="{t}"]'); p.wait_for_timeout(110); p.screenshot(path=f"shots/n_mid_{t}.png"); p.wait_for_timeout(500)
+    st = p.evaluate("[document.querySelector('#ov').classList.contains('show'), getComputedStyle(document.querySelector('#sheet')).opacity, document.querySelector('.tb.on').dataset.tab]")
+    print(t, st)
+p.screenshot(path="shots/n_end.png")
+# in-page redraw still works (homework chips etc.)
+p.click('.tb[data-tab="settings"]'); p.wait_for_timeout(500); p.click('[data-s="sound"]'); p.wait_for_timeout(400)
+print("after redraw opacity:", p.evaluate("getComputedStyle(document.querySelector('#sheet')).opacity"))
+p.click('#sheet .x'); p.wait_for_timeout(500); print("closed:", not p.evaluate("document.querySelector('#ov').classList.contains('show')"))
+r.close()

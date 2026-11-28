@@ -827,10 +827,11 @@ body.board .wscene{min-height:72vh}
 /* ---------- every page opens full screen (not a small popup); content stays a readable width ---------- */
 #ov{align-items:stretch!important;justify-content:stretch;background:var(--bg);backdrop-filter:none}
 #ov .sheet{width:100%;max-width:none;height:100%;max-height:none!important;border-radius:0;box-shadow:none;
-  padding:16px max(16px,calc((100% - 960px)/2)) 32px;overscroll-behavior:contain}
+  padding:16px 16px 32px;overscroll-behavior:contain}
 #ov .sheet>.x{position:sticky;top:0;float:left;margin:0 0 -38px;z-index:5;box-shadow:0 4px 12px rgba(27,42,74,.12)}
-#ov .sheet>.bbtn{z-index:5;left:calc(max(16px,(100% - 960px)/2) + 48px);top:16px}
-@media(min-width:700px){#ov .sheet{padding-top:24px}#ov .sheet h2{font-size:1.75rem}}
+#ov .sheet>.bbtn{z-index:5;left:64px;top:16px}
+@media(min-width:900px){#ov .sheet{padding:24px 24px 36px}#ov .sheet h2{font-size:1.75rem}}
+#ov{transition:none}#ov .sheet{will-change:transform,opacity}
 body.board #ov .sheet{padding:24px 4vw 30px}
 </style>
 </head>
@@ -1229,9 +1230,19 @@ function refreshCard(id){ const s=stu(id), el=document.querySelector(`.card[data
 
 /* ---------- modal helpers ---------- */
 const BOARDABLE=/id="(spT|qzAv|rcQ|rf0|tTxt|nFace|spAv|agrid|rwAv|luAv|cgame|wheel|cdown|rwL|ceL|cgGo|rcGo|tugA|tgGo|eggB|chB|memG|mgGo|jepB|jpGo|wdS|wdGo|lbPod)"|class="groups"/;
-function openSheet(html, onClose){ $("#toast").classList.remove("show"); const pf=$("#ov")._close; if(pf && $("#ov").classList.contains("show")){ const ct=(document.querySelector(".tb.on")||{dataset:{}}).dataset.tab; $("#ov")._close=null; try{ pf(); }catch(e){} if(ct) setTab(ct); } $("#sheet").innerHTML = `<button class="x" onclick="closeSheet()">✕</button>` + (BOARDABLE.test(html)&&!BOARD?`<button class="bbtn" onclick="setBoard(true)">${icon("tv")} السبورة</button>`:"") + html; $("#ov").classList.add("show"); $("#ov")._close=onClose;
-  gsap.fromTo("#sheet",{y:60,opacity:0},{y:0,opacity:1,duration:.35,ease:"back.out(1.4)"}); }
-function closeSheet(){ setTab("home"); const f=$("#ov")._close; $("#ov")._close=null; if(f) f(); $("#ov").classList.remove("show"); }
+function openSheet(html, onClose){ $("#toast").classList.remove("show"); const pf=$("#ov")._close; if(pf && $("#ov").classList.contains("show")){ const ct=(document.querySelector(".tb.on")||{dataset:{}}).dataset.tab; $("#ov")._close=null; try{ pf(); }catch(e){} if(ct) setTab(ct); } $("#sheet").innerHTML = `<button class="x" onclick="closeSheet()">✕</button>` + (BOARDABLE.test(html)&&!BOARD?`<button class="bbtn" onclick="setBoard(true)">${icon("tv")} السبورة</button>`:"") + html; const was=$("#ov").classList.contains("show"); SHEET_TOKEN++; $("#ov").classList.add("show"); $("#ov")._close=onClose;
+  gsap.killTweensOf("#sheet"); gsap.set("#ov",{opacity:1});
+  if(NAVDIR!==null || !was){ const d=NAVDIR||0; NAVDIR=null; NAVANIM=true; $("#sheet").scrollTop=0;      // page change: slide in from the side of the tapped tab
+    gsap.fromTo("#sheet",{x:d*48,opacity:0},{x:0,opacity:1,duration:.32,ease:"power3.out",clearProps:"transform",onComplete:()=>{ NAVANIM=false; }}); }
+  else { NAVANIM=false; $("#sheet").scrollTop=0; gsap.fromTo("#sheet",{opacity:.4},{opacity:1,duration:.18,ease:"power1.out"}); } }
+let NAVDIR=null, NAVANIM=false, SHEET_TOKEN=0;
+// redraw in place (same page): stop the small fade, but never cut a page transition
+function sheetStill(){ if(NAVANIM) return; gsap.killTweensOf("#sheet"); gsap.set("#sheet",{x:0,y:0,opacity:1}); }
+function closeSheet(){ setTab("home"); const f=$("#ov")._close; $("#ov")._close=null; if(f) f();
+  if(!$("#ov").classList.contains("show")) return;
+  const tok=SHEET_TOKEN, d=NAVDIR!==null?NAVDIR:0; NAVDIR=null; NAVANIM=false; gsap.killTweensOf("#sheet");
+  gsap.to("#sheet",{x:-d*48,opacity:0,duration:.22,ease:"power2.in",onComplete:()=>{ if(tok!==SHEET_TOKEN) return; $("#ov").classList.remove("show"); gsap.set("#sheet",{x:0,opacity:1}); }});
+  gsap.fromTo("main,.top",{opacity:.3},{opacity:1,duration:.3,delay:.12}); }
 $("#ov").addEventListener("click", e=>{ if(e.target.id==="ov") closeSheet(); });
 addEventListener("keydown", e=>{ if(e.key==="Escape") closeSheet(); });
 
@@ -1316,7 +1327,7 @@ function openEdit(id){
     ${MODE==="cloud"?`<b style="display:block;margin-top:12px">📝 رسالة لولي الأمر</b><textarea class="field" id="eNote" style="min-height:70px" placeholder="مثلاً: عبدالله شارك بتميّز النهارده 👏" maxlength="500">${esc(s.note||"")}</textarea>`:""}
     ${MODE==="cloud"&&s.code?`<div class="li" style="margin-top:10px"><div class="grow"><b>🎒 كود دخول الطالب</b><small>يدخل بيه من «أنا طالب»</small></div><b dir="ltr" style="font-size:1.3rem;letter-spacing:2px">${s.code}</b><button class="btn" id="eCopy">نسخ الرابط</button></div>`:""}
     <div class="row" style="margin-top:12px"><button class="btn pri" id="eSave">حفظ</button><button class="btn" id="eReset">تصفير النقاط</button><span class="spacer"></span><button class="btn red" id="eDel">حذف الطالب</button></div>`);
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     $("#eName").oninput=e=>name=e.target.value;
     if($("#eCopy")) $("#eCopy").onclick=()=>copyText(kidMsg(s),"📋 اتنسخ — ابعته لولي الأمر");
     document.querySelectorAll(".sw").forEach(b=>b.onclick=()=>{look.body=b.dataset.c; draw()});
@@ -1436,7 +1447,7 @@ function openGroups(){
   const draw=()=>{ const arr=c.students.filter(s=>!isOut(s.id)).sort(()=>Math.random()-.5), g=Array.from({length:n},()=>[]); arr.forEach((s,i)=>g[i%n].push(s));
     openSheet(`<h2>🪶 تقسيم الأسراب</h2><div class="row"><span>عدد الأسراب:</span>${[2,3,4,5,6].map(k=>`<button class="btn ${k===n?"vio":""}" data-n="${k}">${k}</button>`).join("")}<button class="btn pri" id="gShuffle">🔀 خلط</button></div>
       <div class="groups">${g.map((m,i)=>`<div class="grp" style="border-top:6px solid ${colors[i%8]}"><h3>${names[i%8]}</h3>${m.map(s=>`<div class="m"><span class="av">${avatar(s)}</span>${esc(s.name)}</div>`).join("")}</div>`).join("")}</div>`);
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     gsap.from(".grp",{y:30,opacity:0,stagger:.08,duration:.4,ease:"back.out(1.6)"}); SFX.whoosh();
     document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{ n=+b.dataset.n; draw() }); $("#gShuffle").onclick=draw; };
   if(c.students.length<2){ toast("ضيف طالبين على الأقل"); return; } draw();
@@ -1523,7 +1534,10 @@ function openKit(){
     else if(k==="all") openStudent("__all"); else if(k==="select"){ closeSheet(); toggleSel(true); toast("دوس على الطلاب اللي عايز تحددهم"); }
     else if(k==="skills") openSkills(); else if(k==="add") openAdd(); else if(k==="board"){ closeSheet(); setBoard(!BOARD); } else if(k==="shop") openShop(); else if(k==="seat") openSeating(); else if(k==="ann") openAnn(); else if(k==="hw") openHomework(); else if(k==="lb") openLeaderboard(); });
 }
+const TABS=["home","att","kit","games","report","settings"];
 document.querySelectorAll(".tb").forEach(b=>b.onclick=()=>{ ac(); const t=b.dataset.tab;
+  const cur=(document.querySelector(".tb.on")||{dataset:{tab:"home"}}).dataset.tab; if(cur===t && t!=="home" && $("#ov").classList.contains("show")) return;
+  NAVDIR=TABS.indexOf(t)>TABS.indexOf(cur)?-1:1;
   if(t==="home"){ closeSheet(); window.scrollTo({top:0,behavior:"smooth"}); }
   else if(t==="att") openAttendance(); else if(t==="kit") openKit(); else if(t==="games") openGames(); else if(t==="report") openPeriod(); else if(t==="settings") openSettings();
   setTab(t); });
@@ -1546,7 +1560,7 @@ function openSkills(){
         <b style="display:block;margin-top:10px">عدد النقاط</b><div class="stepper"><button id="vMinus">−</button><b id="vVal">${Math.abs(f.v)}</b><button id="vPlus">+</button><span class="hint">من 1 لـ 5</span></div>
         <div class="row" style="margin-top:12px"><button class="btn pri" id="skSave">${ed&&ed.k?"حفظ التعديل":"إضافة"}</button>${ed&&ed.k?`<button class="btn" id="skCancel">إلغاء</button><span class="spacer"></span><button class="btn red" id="skDel">حذف</button>`:""}</div></div>
       <div class="row" style="margin-top:14px"><button class="btn vio" id="skAll">نسخ المهارات لكل فصولي</button><button class="btn" id="skReset">رجوع للافتراضي</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     let cur={...f, v:f.v||1};
     const commit=()=>{ c.skills=list; save(); };
     document.querySelectorAll("[data-ed]").forEach(b=>b.onclick=()=>{ ed={...list.find(x=>x.k===b.dataset.ed)}; const sc=$("#sheet").scrollTop; draw(); $("#skForm").scrollIntoView({behavior:"smooth"}); });
@@ -1609,7 +1623,7 @@ function openShop(sid){
   if(!s){ openSheet(`<h2>🎁 متجر المكافآت</h2><p class="hint">اختار الطالب اللي عايز يصرف نقاطه. الصرف مش بيقلّل مستوى الصقر.</p>
       <div class="pickg">${[...c.students].sort((a,b)=>balance(b)-balance(a)).map(x=>`<button class="pk" data-p="${x.id}"><span class="av">${avatar(x)}</span><b>${esc(x.name)}</b><small>⭐ ${balance(x)}</small></button>`).join("")}</div>
       <div class="row" style="margin-top:12px"><button class="btn" id="shEdit">✏️ تعديل المكافآت</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     document.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>openShop(b.dataset.p)); $("#shEdit").onclick=editRewards; return; }
   const bal=balance(s), list=rewardsOf(c);
   const bought=c.log.filter(l=>l.sid===s.id&&l.k==="shop").slice(-5).reverse();
@@ -1620,7 +1634,7 @@ function openShop(sid){
     <div class="shopg">${list.map(r=>`<button class="rw ${bal>=r.c?"can":"no"}" data-r="${r.id}">${emo(r.e)}<span>${esc(r.t)}</span><span class="cost">${r.c} ⭐</span></button>`).join("")}</div>
     ${bought.length?`<div class="rsec"><h3>🧾 آخر المشتريات</h3>${bought.map(l=>`<div class="li"><span class="big-e">${emo(l.e)}</span><div class="grow"><b>${esc(l.nm)}</b><small>${(()=>{ try{ return new Date(l.t).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"short"}) }catch(e){ return "" } })()}</small></div><span class="chip n">−${l.cost}</span></div>`).join("")}</div>`:""}
     <div class="row" style="margin-top:12px"><button class="btn" id="shBack">↩ كل الطلاب</button><button class="btn" id="shEdit">✏️ تعديل المكافآت</button></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   $("#shBack").onclick=()=>openShop(); $("#shEdit").onclick=editRewards;
   if($("#rqNo")) $("#rqNo").onclick=()=>{ Cloud.clearReq(s.code).catch(()=>{}); delete KIDMETA[s.code].req; toast("اترفض الطلب"); openShop(s.id); render(); };
   if($("#rqOk")) $("#rqOk").onclick=()=>{ const b=document.querySelector(`[data-r="${rqR.id}"]`); if(b) b.click(); };
@@ -1636,7 +1650,7 @@ function editRewards(){
     ${list.map((r,i)=>`<div class="skrow"><input class="field" data-i="${i}" data-f="e" value="${esc(r.e)}" maxlength="4" style="width:58px;text-align:center;font-size:1.3rem;padding:8px"><input class="field" data-i="${i}" data-f="t" value="${esc(r.t)}" maxlength="30" style="flex:1;padding:8px">
       <div class="stepper"><button data-i="${i}" data-d="-1">−</button><b>${r.c}</b><button data-i="${i}" data-d="1">+</button></div><button class="btn red" data-del="${i}" style="padding:8px 10px">🗑️</button></div>`).join("")}
     <div class="row" style="margin-top:10px"><button class="btn pri" id="rwAdd">➕ مكافأة جديدة</button><button class="btn vio" id="rwAll">نسخ لكل فصولي</button><button class="btn" id="rwBack">↩ المتجر</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     const commit=()=>{ c.rewards=list; save(); };
     document.querySelectorAll("input[data-f]").forEach(inp=>inp.onchange=()=>{ const r=list[+inp.dataset.i]; r[inp.dataset.f]=inp.value.trim()||(inp.dataset.f==="e"?"🎁":r.t); commit(); });
     document.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{ const r=list[+b.dataset.i]; r.c=Math.max(1,Math.min(500,r.c+(+b.dataset.d)*(r.c>=20?5:1))); commit(); draw(); });
@@ -1681,7 +1695,7 @@ function openAnn(){
     <textarea class="field" id="anT" maxlength="400" placeholder="اكتب الإعلان هنا…"></textarea>
     <div class="row" style="margin-top:10px"><button class="btn pri" id="anGo">📢 إرسال الإعلان</button></div>
     ${c.anns.length?`<div class="rsec"><h3>الإعلانات السابقة</h3>${c.anns.map((a,i)=>`<div class="ann"><p>${esc(a.text)}</p><small>${(()=>{ try{ return new Date(a.at).toLocaleString("ar-EG",{weekday:"long",day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}) }catch(e){ return "" } })()}</small> <button class="btn red" data-dn="${i}" style="padding:4px 10px;float:left">حذف</button></div>`).join("")}</div>`:""}`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   document.querySelectorAll("[data-tp]").forEach(b=>b.onclick=()=>{ $("#anT").value=ANN_TPL[+b.dataset.tp][2]; $("#anT").focus(); });
   $("#anGo").onclick=()=>{ const t=$("#anT").value.trim(); if(!t){ toast("اكتب الإعلان الأول"); return; }
     c.anns.unshift({id:uid(),text:t.slice(0,400),at:Date.now()}); c.anns=c.anns.slice(0,20); save(); SFX.level(); toast("📢 اتبعت الإعلان لأولياء الأمور"); openAnn(); };
@@ -1701,7 +1715,7 @@ function openAIKey(){
     <div class="row" style="margin-top:10px"><button class="btn pri" id="akSave">حفظ واختبار</button>${aiKey()?`<button class="btn red" id="akDel">مسح المفتاح</button>`:""}</div>
     <p class="hint" id="akMsg"></p>
     <p class="hint" style="font-size:.8rem">🔒 المفتاح بيتحفظ في حسابك بس، ومحدش غيرك بيشوفه.</p>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   $("#akSave").onclick=async()=>{ const k=cleanKey($("#akIn").value); $("#akIn").value=k; if(k.length<20){ $("#akMsg").textContent="المفتاح قصير — اتأكد إنك نسخته كله"; return; }
     $("#akSave").disabled=true; $("#akMsg").textContent="جاري الاختبار…";
     try{ const m=await aiPickModel(k); lsSet(AI_KEY,k); S.geminiKey=k; if(MODE==="cloud"&&window.Cloud) Cloud.saveMe({geminiKey:k}).catch(()=>{}); else save();
@@ -1804,7 +1818,7 @@ function openAIBook(){
     <b style="display:block;margin-top:10px">الصفحات (اختياري)</b><input class="field" id="aiR" placeholder="مثلاً: 10-85 — سيبها فاضية للكتاب كله" dir="rtl">
     <p class="hint">💡 لو الكتاب كبير، حوّله على أجزاء (وحدة أو وحدتين كل مرة) عشان النتيجة تبقى أدق.</p>
     <div class="row" style="justify-content:center;margin-top:8px"><button class="btn pri" id="aiGo" ${file?"":"disabled style='opacity:.5'"}>✨ ابدأ التحويل</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     bindMetaForm(m); $("#aiS").oninput=e=>{ scope=openAIBook.scope=e.target.value; };
     $("#aiF").onchange=e=>{ const f=e.target.files[0]; if(!f) return; if(f.size>50*1048576){ toast("الملف أكبر من 50 MB — قسّمه"); return; } file=f; draw(); };
     document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{ n=+b.dataset.n; draw(); });
@@ -1876,7 +1890,7 @@ function openAIGen(pre){ pre=pre||{};
       <b>نوع الأسئلة</b><div class="seg2" id="agM"><button data-m="1" class="${st.mcq?"on":""}">اختيار من متعدد</button><button data-m="0" class="${!st.mcq?"on":""}">إجابة قصيرة</button></div>
       <b>ملاحظات (اختياري)</b><input class="field" id="agX" maxlength="150" placeholder="مثلاً: ركّز على المسائل الكلامية — أو: مستوى سهل" value="${esc(st.notes)}">
       <div class="row" style="justify-content:center;margin-top:12px"><button class="btn pri" id="agGo">✨ جهّز الأسئلة</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     bindMetaForm(m);
     const grab=()=>{ st.unit=$("#agU").value.trim(); st.lesson=$("#agL").value.trim(); st.notes=$("#agX").value.trim(); };
     $("#agN").onclick=e=>{ const b=e.target.closest("[data-n]"); if(!b) return; grab(); st.n=+b.dataset.n; draw(); };
@@ -1909,7 +1923,7 @@ function aiPreview(res,fname,bid){
     ${res.units.map(u=>`<div class="unit"><h3>${esc(u.name)}</h3>${u.lessons.map(l=>`<div class="lrow2"><span class="grow">${esc(l.name)}</span><span class="cnt">${l.qs.length}</span></div>`).join("")}</div>`).join("")}
     <b>احفظه في:</b><select class="bsel" id="apB"><option value="__new">بنك جديد: ${esc(res.meta&&res.meta.subject?autoBankTitle(res.meta):(res.title||fname))}</option>${B.map(b=>{ const same=bid?b.id===bid:(res.meta&&res.meta.subject&&b.subject===res.meta.subject&&b.grade===res.meta.grade); return `<option value="${b.id}" ${same?"selected":""}>${esc(b.title)}</option>`; }).join("")}</select>
     <div class="row" style="margin-top:10px"><button class="btn pri" id="apSave">💾 حفظ البنك</button></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); SFX.level(); confetti(innerWidth/2,innerHeight/3,120);
+  sheetStill(); SFX.level(); confetti(innerWidth/2,innerHeight/3,120);
   $("#apSave").onclick=()=>{ const v=$("#apB").value; let b=B.find(x=>x.id===v); if(!b){ const M=res.meta||{}; b={id:uid(),title:(M.subject?autoBankTitle(M):(res.title||fname)).slice(0,60),subject:M.subject||"",grade:M.grade||"",term:M.term||"",units:[]}; B.push(b); }
     const n=mergeInto(b,res.units); saveBanks(); toast(`✅ اتحفظ ${n} سؤال`); openBankEd(b.id); };
 }
@@ -1924,7 +1938,7 @@ function contactDev(){
     <div class="tpls">${["💡 عندي اقتراح","🐞 لقيت مشكلة","⭐ عايز ميزة جديدة","🙏 شكر وتقدير"].map(t=>`<button data-t="${t}">${t}</button>`).join("")}</div>
     <textarea class="field" id="dvT" style="min-height:90px">${esc(msg)}</textarea>
     <div class="row" style="margin-top:10px"><button class="btn" id="dvGo" style="background:#25d366;color:#fff">💬 إرسال على الواتساب</button></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   document.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{ $("#dvT").value=msg+b.dataset.t+": "; $("#dvT").focus(); });
   $("#dvGo").onclick=()=>{ if(!DEV_WA){ toast("رقم التواصل هيتضاف قريباً"); return; } const u=`https://wa.me/${DEV_WA}?text=${encodeURIComponent($("#dvT").value)}`; location.href=u; };
 }
@@ -1991,7 +2005,7 @@ function openPrintCards(){
       <div class="pprev">${c.students.slice(0,2).map(s=>cardHTML2(c,s)).join("")}</div>
       ${c.students.length>2?`<p class="hint" style="text-align:center">+ ${c.students.length-2} بطاقة كمان</p>`:""}
       <div class="row" style="justify-content:center"><button class="btn pri" id="pcGo">🖨️ طباعة ${c.students.length} بطاقة</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     $("#pcCls").onchange=e=>{ S.cur=e.target.value; save(); render(); openPrintCards(); };
     $("#pcGo").onclick=()=>{ if(!c.students.length){ toast("مفيش طلاب في الفصل"); return; }
       $("#printArea").innerHTML=c.students.map(s=>cardHTML2(c,s)).join("");
@@ -2052,7 +2066,7 @@ function openNewBank(){ const m={subject:"",grade:"",term:""}; let touched=false
     ${metaFormHTML(m)}
     <b style="display:block;margin-top:10px">🏷️ اسم البنك</b><input class="field" id="bmN" maxlength="60" placeholder="بيتكتب لوحده من المادة والصف">
     <div class="row" style="margin-top:12px"><button class="btn pri" id="bmGo">➕ إنشاء البنك</button><button class="btn" id="bmBack">↩ رجوع</button></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   $("#bmN").oninput=()=>touched=!!$("#bmN").value.trim();
   bindMetaForm(m,()=>{ if(!touched) $("#bmN").value=autoBankTitle(m)==="بنك أسئلة"?"":autoBankTitle(m); });
   $("#bmBack").onclick=openBanks;
@@ -2063,7 +2077,7 @@ function openNewBank(){ const m={subject:"",grade:"",term:""}; let touched=false
 function openBankMeta(id){ const b=(S.banks||[]).find(x=>x.id===id); if(!b) return; const m={subject:b.subject||"",grade:b.grade||"",term:b.term||""};
   openSheet(`<h2>✏️ بيانات البنك</h2><b>🏷️ اسم البنك</b><input class="field" id="bmN" maxlength="60" value="${esc(b.title)}" style="margin-bottom:10px">${metaFormHTML(m)}
     <div class="row" style="margin-top:12px"><button class="btn pri" id="bmGo">حفظ</button><button class="btn" id="bmBack">↩ رجوع</button></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); bindMetaForm(m);
+  sheetStill(); bindMetaForm(m);
   $("#bmBack").onclick=()=>openBankEd(id);
   $("#bmGo").onclick=()=>{ b.title=$("#bmN").value.trim().slice(0,60)||b.title; Object.assign(b,m); saveBanks(); toast("✅ اتحفظت البيانات"); openBankEd(id); };
 }
@@ -2083,7 +2097,7 @@ function openAddQ(bid, ui, li, keep){ const b=(S.banks||[]).find(x=>x.id===bid);
     ${st.mcq?`<b style="display:block;margin-top:8px">❌ اختيارات غلط</b><div class="aqw">${[0,1,2].map(i=>`<input class="field" id="aqW${i}" maxlength="120" placeholder="اختيار غلط ${i+1}">`).join("")}</div>`:""}
     <div class="row" style="margin-top:12px"><button class="btn pri" id="aqGo">💾 حفظ وإضافة سؤال تاني</button><button class="btn" id="aqDone">✔ خلصت</button></div>
     <button class="aibtn ai2" id="aqAI" style="margin-top:12px"><span class="aiic">✨</span><span class="grow"><b>خلّي صقر يجهّز أسئلة الدرس ده</b><small>بالمادة والصف والوحدة والدرس اللي اخترتهم — من غير كتاب</small></span><span class="chev">‹</span></button>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   const grab=()=>{ if($("#aqNU")) st.newU=$("#aqNU").value; if($("#aqNL")) st.newL=$("#aqNL").value; };
   $("#aqU").onchange=e=>{ grab(); st.ui=e.target.value; st.li=""; openAddQ(bid,null,null,st); };
   $("#aqL").onchange=e=>{ grab(); st.li=e.target.value; openAddQ(bid,null,null,st); };
@@ -2111,7 +2125,7 @@ function openBanks(){
     <button class="aibtn ai2" id="aiGen"><span class="aiic">🪄</span><span class="grow"><b>صقر يجهّزلك الأسئلة من غير كتاب</b><small>اختار المادة والصف واكتب الوحدة أو الدرس، وصقر يجهّزلك الأسئلة من المنهج</small></span><span class="chev">‹</span></button>
     <div class="list">${B.map(b=>`<button class="li" data-b="${b.id}" style="width:100%;text-align:right"><span class="big-e">${emo("📚")}</span><div class="grow"><b>${esc(b.title)}</b>${bankLabel(b)?`<span class="bmeta">${esc(bankLabel(b))}</span>`:""}<small>${b.units.length} وحدة · ${bankCount(b)} سؤال</small></div><span class="chev" style="color:#b6bfd3">‹</span></button>`).join("")||"<p class='hint'>لسه مفيش بنوك</p>"}</div>
     <div class="row" style="margin-top:12px"><button class="btn pri" id="nbGo">➕ بنك جديد (مادة وصف)</button></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   document.querySelectorAll("[data-b]").forEach(b=>b.onclick=()=>openBankEd(b.dataset.b));
   $("#aiBook").onclick=openAIBook; $("#aiGen").onclick=()=>openAIGen();
   $("#nbGo").onclick=openNewBank;
@@ -2127,7 +2141,7 @@ function openBankEd(id){
       <div class="row" style="margin-top:8px"><button class="btn pri" id="bkAdd">➕ إضافة</button><label class="btn" style="cursor:pointer">📄 من ملف<input type="file" id="bkFile" accept=".txt,.json,text/plain,application/json" hidden></label></div></div>
     <div class="row" style="margin-top:12px"><button class="btn" id="bkCopy">📋 نسخ البنك كنص</button><button class="btn" id="bkRen">✏️ البيانات (الاسم، المادة، الصف)</button><span class="spacer"></span><button class="btn red" id="bkDel">حذف البنك</button></div>
     <div class="row" style="margin-top:8px"><button class="btn" id="bkBack">↩ كل البنوك</button></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   const imp=txt=>{ const units=parseBank(txt); if(units===null){ toast("ملف JSON غير صالح"); return; } if(!units.length){ toast("مالقيتش أسئلة — اتأكد من الشكل: السؤال = الإجابة"); return; }
     const n=mergeInto(b,units); saveBanks(); SFX.pos(); toast(`✅ اتضاف ${n} سؤال في ${units.length} وحدة`); openBankEd(id); };
   $("#bkAdd").onclick=()=>imp($("#bkIn").value);
@@ -2145,7 +2159,7 @@ function openLessonEd(bid,ui,li){
     <div class="list">${l.qs.map((q,i)=>`<div class="li"><div class="grow"><b>${esc(q.q)}</b><small>✅ ${esc(q.a)}${q.ch?" · اختيارات: "+q.ch.length:""}</small></div><button class="btn" data-dq="${i}">🗑️</button></div>`).join("")}</div>
     <div class="row" style="margin-top:12px"><button class="btn pri" id="lsAdd">➕ سؤال في الدرس ده</button></div>
     <div class="row" style="margin-top:8px"><button class="btn" id="lsBack">↩ ${esc(b.title)}</button><span class="spacer"></span><button class="btn red" id="lsDel">حذف الدرس</button></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   document.querySelectorAll("[data-dq]").forEach(x=>x.onclick=()=>{ l.qs.splice(+x.dataset.dq,1); saveBanks(); openLessonEd(bid,ui,li); });
   $("#lsBack").onclick=()=>openBankEd(bid); $("#lsAdd").onclick=()=>openAddQ(bid,ui,li);
   $("#lsDel").onclick=()=>ask("حذف درس «"+l.name+"»؟",()=>{ u.lessons=u.lessons.filter(x=>x.id!==li); if(!u.lessons.length) b.units=b.units.filter(x=>x.id!==ui); saveBanks(); openBankEd(bid); });
@@ -2250,7 +2264,7 @@ function quizGame(){
     ${q.ch?`<div class="ktiles">${q.ch.map((o,i)=>`<button class="kt2" data-o="${esc(o)}" style="background:${KCOL[i].c}"><span>${KCOL[i].s}</span>${esc(o)}</button>`).join("")}</div>`
       :`<div class="qans" id="qzA"></div><div class="tbtns"><button style="background:#22b573" id="qzOk">✅ صح</button><button style="background:#e8384f" id="qzNo">❌ غلط</button></div>${q.oral?"":`<div class="row" style="justify-content:center;margin-top:8px"><button class="btn vio" id="qzShow">👀 الإجابة</button></div>`}`}
     <div class="row" style="justify-content:space-between;margin-top:10px"><button class="btn" id="qzSkip">🔄 طالب تاني</button><span class="hint" style="margin:0">صح ${right} من ${asked}</span></div>`, stop);
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     bindSrc(()=>{ q=withChoices(nextQ()); done=false; left=sec; draw(); run(); });
     document.querySelectorAll("[data-pts]").forEach(b=>b.onclick=()=>{ GSET.pts=+b.dataset.pts; draw(); run(); });
     document.querySelectorAll("[data-sec]").forEach(b=>b.onclick=()=>{ sec=+b.dataset.sec; left=sec; draw(); run(); });
@@ -2295,7 +2309,7 @@ function raceSetup(){
     <b>خط النهاية</b><div class="seg2">${[5,10,15].map(k=>`<button data-gl="${k}" class="${k===goal?"on":""}">${k} إجابات</button>`).join("")}</div>
     <b>الأسئلة</b>${srcPicker()}
     <div class="row" style="margin-top:12px;justify-content:center"><button class="btn pri big" id="rcGo">🏁 يلا نبدأ السباق</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); document.querySelectorAll(".gprev .fal").forEach(f=>f.classList.add("flap"));
+    sheetStill(); document.querySelectorAll(".gprev .fal").forEach(f=>f.classList.add("flap"));
     document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{ n=+b.dataset.n; draw(); });
     document.querySelectorAll("[data-gl]").forEach(b=>b.onclick=()=>{ goal=+b.dataset.gl; draw(); });
     bindSrc(draw);
@@ -2316,7 +2330,7 @@ function raceView(countdown){
     <p class="hint" style="text-align:center;margin:4px 0 8px">مين جاوب صح؟ دوس على السرب 👇</p>
     <div class="tbtns">${R.teams.map((t,i)=>`<button style="background:${t.color}" data-tm="${i}">${t.name}</button>`).join("")}</div>
     <div class="row" style="justify-content:center;margin-top:10px">${R.q.oral?"":`<button class="btn vio" id="rcShow">👀 الإجابة</button><button class="btn" id="rcNext">سؤال تاني ⬅</button>`}<button class="btn" id="rcMem">👥 الأعضاء</button></div>`}`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   document.querySelectorAll(".rbird .fal").forEach(f=>f.classList.add("flap"));
   document.querySelectorAll(".rbird").forEach((b,i)=>gsap.to(b,{y:-6,duration:.7+i*.13,yoyo:true,repeat:-1,ease:"sine.inOut"}));
   if(countdown){ const el=$("#cdown"); const seq=["3","2","1","انطلق!"]; let k=0;
@@ -2343,7 +2357,7 @@ function raceWin(t){
     <div class="big" style="color:${t.color};text-align:center;font-size:1.8rem;font-weight:800;margin-top:8px">🎉 ${t.name} كسب!</div>
     <p class="hint" style="text-align:center">${t.members.map(id=>stu(id)).filter(Boolean).map(s=>esc(s.name)).join("، ")}</p>
     <div class="row" style="justify-content:center"><button class="btn pri" id="rwGive">⭐ ${sgn(1)} نقطة لكل أعضاء السرب</button><button class="btn" id="rwAgain">🔁 سباق جديد</button></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   document.querySelectorAll(".pd .fal").forEach(f=>f.classList.add("flap"));
   gsap.from(".pdk",{scaleY:0,transformOrigin:"bottom",stagger:.2,duration:.7,ease:"back.out(1.6)"}); gsap.from(".pdb",{y:-80,opacity:0,stagger:.2,delay:.4,duration:.8,ease:"bounce.out"});
   playLottie($("#rwL"),"trophy",{loop:true});
@@ -2364,7 +2378,7 @@ function cloudSetup(){
     <b>النقاط في الآخر</b><div class="seg2"><button data-w="class" class="${who==="class"?"on":""}">للفصل كله</button><button data-w="none" class="${who==="none"?"on":""}">بدون نقاط</button></div>
     <b>الأسئلة من</b>${cloudSrc()}
     <div class="row" style="margin-top:12px;justify-content:center"><button class="btn pri big" id="cgGo">☁️ ابدأ اللعب</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     document.querySelectorAll("[data-r]").forEach(b=>b.onclick=()=>{ rounds=+b.dataset.r; draw(); });
     document.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{ who=b.dataset.w; draw(); });
     bindSrc(draw); if($("#cgBank")) $("#cgBank").onclick=openBanks;
@@ -2383,7 +2397,7 @@ function cloudRound(){
       ${q.ch.map((o,i)=>`<button class="cloud" data-o="${esc(o)}" style="--x:${[27,73,30,68][i]}%;--y:${[34,30,58,56][i]}%;--d:${i*.6}s"><svg viewBox="0 0 200 110"><g fill="#fff"><ellipse cx="100" cy="62" rx="88" ry="38"/><ellipse cx="62" cy="48" rx="44" ry="36"/><ellipse cx="128" cy="40" rx="50" ry="40"/></g><ellipse cx="100" cy="86" rx="80" ry="12" fill="#dbeeff"/></svg><b>${esc(o)}</b></button>`).join("")}
       <span class="cbird" id="cbird">${falconSVG({level:1,body:"#9a6235",mood:"idle"})}</span>
     </div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   gsap.from(".cloud",{scale:0,opacity:0,stagger:.12,duration:.6,ease:"back.out(1.8)"}); gsap.from(".cq",{y:-40,opacity:0,duration:.5});
   document.querySelectorAll(".cloud").forEach(b=>b.onclick=()=>{ if(locked) return; locked=true; const ok=b.dataset.o===q.a, box=$("#cgame").getBoundingClientRect(), r=b.getBoundingClientRect(), bird=$("#cbird");
     if(ok){ G.score++; G.streak++; SFX.whoosh(); bird.innerHTML=falconSVG({level:1,body:"#9a6235",mood:"happy"}); bird.querySelector(".fal").classList.add("flap");
@@ -2406,7 +2420,7 @@ function cloudEnd(){
     <div style="text-align:center;font-size:2rem;font-weight:800">${G.score} / ${G.rounds}</div>
     <p class="hint" style="text-align:center">${["محتاجين نراجع شوية 💪","بداية حلوة 👍","شغل ممتاز 👏","أبطال! الصقر فخور بيكم 🦅"][stars]}</p>
     <div class="row" style="justify-content:center">${G.who==="class"&&stars?`<button class="btn pri" id="ceGive">⭐ ${sgn(stars)} للفصل كله</button>`:""}<button class="btn" id="ceAgain">🔁 العب تاني</button></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); const f=$(".cfal .fal"); if(f) f.classList.add("flap");
+  sheetStill(); const f=$(".cfal .fal"); if(f) f.classList.add("flap");
   gsap.from(".cs",{scale:0,rotate:-90,stagger:.25,duration:.6,ease:"back.out(2)",delay:.2,onStart:()=>SFX.pick()});
   if(stars>=2){ playLottie($("#ceL"),"fireworks",{loop:true}); SFX.level(); }
   if($("#ceGive")) $("#ceGive").onclick=()=>{ const ids=cls().students.filter(s=>!isOut(s.id)).map(s=>s.id); awardQuiet(ids,{...GAME_OK,v:stars}); toast(`⭐ اتسجّل ${stars} لكل الحاضرين`); $("#ceGive").disabled=true; };
@@ -2429,7 +2443,7 @@ function wheelGame(){
       <circle cx="200" cy="200" r="194" fill="none" stroke="#1b2a4a" stroke-width="8"/>${Array.from({length:N},(_,i)=>{ const a=(i*A-90)*Math.PI/180; return `<circle cx="${200+194*Math.cos(a)}" cy="${200+194*Math.sin(a)}" r="6" fill="#ffd84d"/>`; }).join("")}</svg>
       <div class="whub">${falconSVG({level:2,body:"#f2b01e",mood:"happy"})}</div><div class="wptr"></div></div></div>
     <div class="row" style="justify-content:center"><button class="btn pri big" id="wSpin">🎡 لفّ العجلة</button></div><div id="wRes"></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   bindSrc(wheelGame);
   $("#wSpin").onclick=()=>{ const b=$("#wSpin"); b.disabled=true; $("#wRes").innerHTML=""; const k=rnd(0,N-1);
     const target=WROT+360*rnd(5,7)+(360-(k*A+A/2))-(WROT%360); let lastSeg=-1; const o={r:WROT};
@@ -2463,7 +2477,7 @@ function winScreen(t,again,extra=""){
     <div style="color:${t.color};text-align:center;font-size:1.8rem;font-weight:800;margin-top:8px">🎉 ${esc(t.name)} كسب!</div>${extra}
     <p class="hint" style="text-align:center">${t.members.map(id=>stu(id)).filter(Boolean).map(s=>esc(s.name)).join("، ")}</p>
     <div class="row" style="justify-content:center"><button class="btn pri" id="wsGive">⭐ ${sgn(1)} نقطة لكل أعضاء الفريق</button><button class="btn" id="wsAgain">🔁 العب تاني</button></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); document.querySelectorAll(".pd .fal").forEach(f=>f.classList.add("flap"));
+  sheetStill(); document.querySelectorAll(".pd .fal").forEach(f=>f.classList.add("flap"));
   gsap.from(".pdk",{scaleY:0,transformOrigin:"bottom",duration:.7,ease:"back.out(1.6)"}); gsap.from(".pdb",{y:-80,opacity:0,delay:.3,duration:.8,ease:"bounce.out"});
   playLottie($("#rwL"),"trophy",{loop:true});
   $("#wsGive").onclick=()=>{ awardQuiet(t.members,{...GAME_OK,v:1}); SFX.pos(); toast(`⭐ اتسجّلت نقطة لـ ${t.members.length} طالب`); $("#wsGive").disabled=true; };
@@ -2481,7 +2495,7 @@ function tugSetup(){
     <b>قوة الحبل</b><div class="seg2">${[[3,"قصير"],[5,"متوسط"],[7,"طويل"]].map(([k,t])=>`<button data-gl="${k}" class="${k===goal?"on":""}">${t} (${k})</button>`).join("")}</div>
     <b>الأسئلة</b>${srcPicker()}
     <div class="row" style="margin-top:12px;justify-content:center"><button class="btn pri big" id="tgGo">🪢 يلا نشد!</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); document.querySelectorAll(".gprev .fal").forEach(f=>f.classList.add("flap"));
+    sheetStill(); document.querySelectorAll(".gprev .fal").forEach(f=>f.classList.add("flap"));
     document.querySelectorAll("[data-gl]").forEach(b=>b.onclick=()=>{ goal=+b.dataset.gl; draw(); });
     bindSrc(draw);
     $("#tgGo").onclick=()=>{ TUG={teams:teamsOf(2),goal,pos:0,q:withChoices(nextQ()),lock:false}; tugView(true); };
@@ -2501,7 +2515,7 @@ function tugView(intro){
     <p class="hint" style="text-align:center;margin:4px 0 8px">مين جاوب صح؟ 👇</p>
     <div class="tbtns"><button style="background:${A.color}" data-tt="0">💪 ${esc(A.name)}</button><button style="background:${B.color}" data-tt="1">💪 ${esc(B.name)}</button></div>
     <div class="row" style="justify-content:center;margin-top:10px">${T.q.oral?"":`<button class="btn vio" id="tgShow">👀 الإجابة</button>`}<button class="btn" id="tgNext">سؤال تاني ⬅</button><button class="btn" id="tgMem">👥 الفريقين</button></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   const place=(anim)=>{ const x=(T.pos/T.goal)*26; gsap.to("#tugM",{xPercent:x,duration:anim?.8:0,ease:"elastic.out(1,.5)"}); };
   place(false);
   document.querySelectorAll(".tf .fal").forEach(f=>f.classList.add("flap"));
@@ -2532,7 +2546,7 @@ function eggGame(){
       <button class="egg" id="eggB">${eggSVG()}</button><div class="hatch" id="eggH"><div class="av">${avatar(s,"happy")}</div><div class="stg-nm">${esc(s.name)}</div></div>
       <div class="eggtip" id="eggT">👆 دوس على البيضة</div></div>
     <div id="eggR"></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   gsap.to("#eggB",{rotate:4,duration:.9,yoyo:true,repeat:-1,ease:"sine.inOut",transformOrigin:"50% 90%"});
   let taps=0;
   $("#eggB").onclick=()=>{ taps++; SFX.tick(); gsap.killTweensOf("#eggB");
@@ -2567,7 +2581,7 @@ function chestGame(pre){
   const pickView=()=>{ openSheet(`<h2>💎 كنز الصحراء</h2><p class="hint">مين جاوب صح أو عمل حاجة تستاهل؟ اختاره يفتح صندوق كنز 👇</p>
     <div class="row" style="justify-content:center;margin-bottom:10px"><button class="btn pri" id="chRnd">🎲 اختيار عشوائي</button></div>
     <div class="chpick">${here.map(s=>`<button data-st="${s.id}"><span class="av">${avatar(s)}</span>${esc(s.name)}</button>`).join("")}</div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     $("#chRnd").onclick=()=>{ who=here[rnd(0,here.length-1)].id; board(); };
     document.querySelectorAll("[data-st]").forEach(b=>b.onclick=()=>{ who=b.dataset.st; board(); }); };
   const board=()=>{ const s=stu(who), prizes=[...CHEST].sort(()=>Math.random()-.5).slice(0,6);
@@ -2575,7 +2589,7 @@ function chestGame(pre){
       <div class="trs" id="chB">${sceneSVG()}<div class="trwho"><span class="av">${avatar(s,"happy")}</span><b>${esc(s.name)}</b> اختار صندوق!</div>
         <div class="chests">${prizes.map((p,i)=>`<button class="chest" data-i="${i}"><span class="sand"></span>${chestSVG()}<span class="prize">${emo(p.e)}<b>${p.t}</b></span></button>`).join("")}</div></div>
       <div class="row" style="justify-content:center;margin-top:10px"><button class="btn" id="chOther">👤 طالب تاني</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     gsap.from(".chest",{y:60,opacity:0,stagger:.08,duration:.5,ease:"back.out(1.7)"}); gsap.to(".chest svg",{y:-4,duration:.8,yoyo:true,repeat:-1,stagger:.15,ease:"sine.inOut"});
     $("#chOther").onclick=pickView; let opened=false;
     document.querySelectorAll(".chest").forEach(b=>b.onclick=()=>{ if(opened) return; opened=true; const p=prizes[+b.dataset.i]; SFX.tick();
@@ -2602,7 +2616,7 @@ function memSetup(){
     ${mode==="bank"?srcPicker().replace(/<div class="seg2">[\s\S]*?<\/div>/,""):""}
     <b>عدد الأزواج</b><div class="seg2">${[4,6,8].map(k=>`<button data-pr="${k}" class="${k===pairs?"on":""}">${k}</button>`).join("")}</div>
     <div class="row" style="margin-top:12px;justify-content:center"><button class="btn pri big" id="mgGo">🃏 ابدأ</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     document.querySelectorAll("[data-md]").forEach(b=>b.onclick=()=>{ if(b.dataset.md==="bank"&&!hasBankQs()){ toast("ضيف أسئلة في بنك الأسئلة الأول"); openBanks(); return; } mode=b.dataset.md; if(mode==="bank") GSET.src="bank"; draw(); });
     document.querySelectorAll("[data-pr]").forEach(b=>b.onclick=()=>{ pairs=+b.dataset.pr; draw(); });
     bindSrc(draw);
@@ -2622,7 +2636,7 @@ function memView(){
   openSheet(`<h2>🃏 صقر الذاكرة</h2>
     <div class="memhud">${M.teams.map((t,i)=>`<div class="mt ${M.turn===i?"on":""}" style="--c:${t.color}"><b>${esc(t.name)}</b><span id="ms${i}">${t.score}</span></div>`).join("")}</div>
     <div class="memg" id="memG" style="grid-template-columns:repeat(${cols},1fr)">${M.cards.map((c,i)=>`<button class="mc ${c.done?"done up":""}" data-i="${i}"><span class="mfront">${falconSVG({level:1,body:"#ffd84d",mood:"happy"})}</span><span class="mback ${c.k||""}">${c.e?emo(c.e):`<b>${esc(c.t)}</b>`}</span></button>`).join("")}</div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   gsap.from(".mc:not(.done)",{scale:0,rotate:-20,stagger:.03,duration:.4,ease:"back.out(1.8)"});
   const hud=()=>document.querySelectorAll(".mt").forEach((e,i)=>e.classList.toggle("on",i===M.turn));
   document.querySelectorAll(".mc").forEach(b=>b.onclick=()=>{ const i=+b.dataset.i, c=M.cards[i]; if(M.lock||c.done||c.up) return;
@@ -2656,7 +2670,7 @@ function jepSetup(){
     ${bank?`<p class="hint" style="margin-top:6px">الفئات: ${groups.map(g=>`<span class="chip p">${esc(g.name)}</span>`).join(" ")||"—"}</p>`
       :`<b>أسماء الفئات</b><div class="jcats">${c.jcats.map((t,i)=>`<input class="field" data-jc="${i}" value="${esc(t)}" maxlength="22">`).join("")}</div>`}
     <div class="row" style="margin-top:12px;justify-content:center"><button class="btn pri big" id="jpGo">🧱 ابدأ التحدي</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{ n=+b.dataset.n; draw(); });
     document.querySelectorAll("[data-jc]").forEach(i=>i.onchange=()=>{ c.jcats[+i.dataset.jc]=i.value.trim()||JDEF[+i.dataset.jc]; save(); });
     bindSrc(draw);
@@ -2679,7 +2693,7 @@ function jepBoard(intro){
       ${[0,1,2,3,4].map(r=>J.cats.map((k,ci)=>{ const c=k.cells[r]; return `<button class="jc ${c.used?"used":""}" data-c="${ci}" data-r="${r}" ${c.used?"disabled":""}>${c.used?(c.got!=null?`<span class="jgot" style="background:${J.teams[c.got].color}"></span>`:""):c.v}</button>`; }).join("")).join("")}
     </div>
     <p class="hint" style="text-align:center">الدور على <b style="color:${J.teams[J.turn].color}">${esc(J.teams[J.turn].name)}</b> — اختاروا خانة 👆</p>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   if(intro) gsap.from(".jc",{scale:0,opacity:0,stagger:{each:.025,from:"random"},duration:.4,ease:"back.out(2)"});
   document.querySelectorAll(".jc:not(.used)").forEach(b=>b.onclick=()=>jepCell(+b.dataset.c,+b.dataset.r,b));
 }
@@ -2696,7 +2710,7 @@ function jepCell(ci,ri,btn){
       <p class="hint" style="text-align:center;margin:4px 0">مين جاوب صح؟</p>
       <div class="tbtns">${J.teams.map((t,i)=>`<button style="background:${t.color}" data-jt="${i}">${esc(t.name)} ${sgn(val)}</button>`).join("")}</div>
       <div class="row" style="justify-content:center;margin-top:8px"><button class="btn" id="jNone">😶 محدش جاوب</button></div></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     gsap.from("#jcard",{scale:.2,rotateY:180,opacity:0,duration:.6,ease:"back.out(1.4)"});
     if(c.dd){ SFX.level(); confetti(innerWidth/2,innerHeight/3,120,["#ffd84d","#fff","#f2b01e"]); const f=$(".jdd .fal"); if(f) f.classList.add("flap"); } else SFX.pick();
     const reveal=()=>{ if(q.a){ $("#jA").textContent=q.a; document.querySelectorAll("#jcard .kt2").forEach(t=>t.dataset.o===q.a?t.classList.add("win"):t.classList.add("dim")); } };
@@ -2724,7 +2738,7 @@ function wordSetup(){
     ${hasBankQs()?`<button class="btn" id="wdBank" style="margin-top:6px">📚 هات كلمات من إجابات البنك</button>`:""}
     <b>الفرق</b><div class="seg2">${[[0,"الفصل كله"],[2,"فريقين"],[3,"٣ فرق"]].map(([k,t])=>`<button data-tn="${k}" class="${k===teams?"on":""}">${t}</button>`).join("")}</div>
     <div class="row" style="margin-top:12px;justify-content:center"><button class="btn pri big" id="wdGo">🔤 ابدأ</button></div>`, ()=>setTab("home"));
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     gsap.from(".wprev .wt",{y:-60,opacity:0,stagger:.12,ease:"bounce.out",duration:.8});
     const keep=()=>{ c.words=$("#wdL").value; save(); };
     $("#wdL").onchange=keep;
@@ -2753,7 +2767,7 @@ function wordRound(){
     </div>
     <div class="row" style="justify-content:center;margin-top:8px"><button class="btn" id="wdH">💡 حرف مساعدة</button><button class="btn" id="wdX">🔀 خلط</button><button class="btn" id="wdSk">⏭ اكشف الكلمة</button></div>
     <div id="wdWin"></div>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   gsap.from(".wt2",{y:-120,rotate:()=>rnd(-40,40),opacity:0,stagger:.06,duration:.7,ease:"bounce.out"});
   gsap.to(".wt2",{y:-3,duration:1.2,yoyo:true,repeat:-1,ease:"sine.inOut",stagger:.1,delay:1});
   const tb=k=>$(`.wt2[data-k="${k}"]`), sb=i=>$(`.ws[data-s="${i}"]`);
@@ -2817,7 +2831,7 @@ function openAttendance(day){
       <div class="agrid" id="agrid">${c.students.map(s=>{ const st=attOf(c,day,s.id)||"p";
         return `<button class="at" data-id="${s.id}" style="border-color:${rec&&st!=="p"?ATT[st].c:"transparent"}"><span class="av">${avatar(s, st==="a"?"sad":"idle")}</span><b>${esc(s.name)}</b><span class="s" style="background:${rec?ATT[st].c:"#c3c9d8"}">${rec?ATT[st].t:"لم يُحضَّر"}</span></button>`; }).join("")}</div>
       <div class="row" style="margin-top:14px;justify-content:center"><button class="btn vio" onclick="closeSheet()">تم ✔</button></div>`);
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     const ensure=()=>{ if(!c.att[day]) c.att[day]={s:{},t:Date.now()}; return c.att[day]; };
     const commit=()=>{ c.students.forEach(x=>checkBadges(x,c,true)); save(); render(); const sc=$("#sheet").scrollTop; draw(); $("#sheet").scrollTop=sc; };
     $("#agrid").onclick=e=>{ const b=e.target.closest(".at"); if(!b) return; const r=ensure(), cur=r.s[b.dataset.id]||"p";
@@ -2845,7 +2859,7 @@ function attReport(month){
     ${days.length?`<table class="rep"><thead><tr><th>الطالب</th><th>❌ غياب</th><th>⏰ تأخير</th><th>📝 استئذان</th><th>الحضور</th></tr></thead><tbody>
       ${rows.map(r=>`<tr><td><b>${esc(r.s.name)}</b></td><td style="color:${r.a?"#d63e3e":""};font-weight:800">${r.a}</td><td>${r.l}</td><td>${r.x}</td><td><b style="color:${r.pct<80?"#d63e3e":r.pct<95?"#c27c00":"#14935b"}">${r.pct}%</b></td></tr>`).join("")}</tbody></table>`
       :`<p class="hint" style="text-align:center;padding:20px">مفيش تحضير مسجّل في الشهر ده</p>`}`);
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   $("#backAtt").onclick=()=>openAttendance();
   $("#mPrev").onclick=()=>attReport(shift(-1)); $("#mNext").onclick=()=>attReport(shift(1));
   const matrix=()=>[["الطالب",...days.map(d=>d.slice(5)),"غياب","تأخير","استئذان","نسبة الحضور"]]
@@ -2917,7 +2931,7 @@ function openPeriod(){
       ${[...st.rows].sort((a,b)=>(b.pos-b.neg)-(a.pos-a.neg)).map(r=>`<tr data-sr="${r.s.id}" style="cursor:pointer"><td><b>${esc(r.s.name)}</b></td><td style="color:#14935b;font-weight:800">${r.pos}</td><td style="color:#d63e3e;font-weight:800">${r.neg}</td><td><b>${r.pos-r.neg}</b></td><td>${r.ab}</td><td>${r.late}</td></tr>`).join("")}</tbody></table></div>`
     :`<p class="hint" style="text-align:center;padding:24px">مفيش نقاط ولا تحضير في الفترة دي</p>`}
     <div class="row" style="margin-top:14px"><button class="btn pri" id="pPdf">📄 تقارير PDF لكل الطلاب</button><button class="btn" id="pCopy">📋 نسخ ملخص (واتساب)</button><button class="btn" id="pCsv">⬇️ Excel</button></div>`);
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); bindRepTabs();
+  sheetStill(); bindRepTabs();
   gsap.from(".day i",{scaleY:0,transformOrigin:"bottom",stagger:.03,duration:.5,ease:"back.out(1.5)"});
   document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{ RP={kind:b.dataset.k,off:0}; openPeriod(); });
   $("#pPdf").onclick=printClassReports;
@@ -2962,7 +2976,7 @@ function openStuRep(sid){
     <div class="rsec"><h3>✉️ رسالة لولي الأمر</h3><textarea class="field" id="srMsg" style="min-height:110px">${esc(draft)}</textarea>
       <div class="row" style="margin-top:8px"><button class="btn pri" id="srPdf">📄 تقرير PDF</button><button class="btn" id="srCert">🏅 شهادة</button><button class="btn" id="srCopy">📋 نسخ</button>${MODE==="cloud"?`<button class="btn pri" id="srSend">📝 ابعتها في صقر</button>`:""}</div>
       ${MODE==="cloud"?`<p class="hint">«ابعتها في صقر» بتظهر لولي الأمر في صفحته كرسالة من المعلم</p>`:""}</div>`);
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); bindRepTabs();
+  sheetStill(); bindRepTabs();
   gsap.from(".day i",{scaleY:0,transformOrigin:"bottom",stagger:.03,duration:.5,ease:"back.out(1.5)"});
   $("#srSel").onchange=e=>openStuRep(e.target.value);
   $("#sPrev").onclick=()=>{ RP.off--; openStuRep(s.id); }; $("#sNext").onclick=()=>{ if(RP.off<0){ RP.off++; openStuRep(s.id); } };
@@ -2979,7 +2993,7 @@ function openReport(){
     <div class="row" style="margin-bottom:10px"><button class="btn pri" id="rCsv">⬇️ تصدير Excel (CSV)</button><button class="btn" id="rCopy">📋 نسخ الجدول</button><button class="btn" id="rPrint">🖨️ طباعة</button></div>
     <div class="list">${arr.map((s,i)=>`<div class="li"><span class="rk">${medal(i)}</span><span class="av">${avatar(s)}</span><div class="grow"><b>${esc(s.name)}</b><small>${levelOf(s.points).name}</small></div>
       <span class="chip p">+${s.pos}</span><span class="chip n">−${s.neg}</span><b style="min-width:34px;text-align:center;font-size:1.2rem">${s.points}</b></div>`).join("")||"<p class='hint'>لا يوجد طلاب</p>"}</div>`);
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); bindRepTabs();
+  sheetStill(); bindRepTabs();
   gsap.from(".li",{x:40,opacity:0,stagger:.04,duration:.35});
   $("#rCsv").onclick=()=>{ const rows=[["الترتيب","الاسم","النقاط","إيجابي","سلبي","المستوى"]].concat(arr.map((s,i)=>[i+1,s.name,s.points,s.pos,s.neg,levelOf(s.points).name]));
     const csv="﻿"+rows.map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\r\n");
@@ -3053,7 +3067,7 @@ function openNewHw(){ migrateQs(); const B=S.banks||[];
       <b style="display:block;margin-top:10px">العنوان</b><input class="field" id="nhT" maxlength="60" value="${esc(st.title||autoTitle())}">
       <p class="hint" style="margin-top:10px">📝 ${Math.min(st.count||P,P)} سؤال ${st.count&&P>st.count?"عشوائي من "+P:""} — كل طالب بيحل مرة واحدة، وبيشوف الإجابة الصح بعد كل سؤال</p>
       <div class="row"><button class="btn pri" id="nhGo" ${P?"":"disabled"}>📤 إرسال الواجب للفصل</button></div>`);
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     $("#nhB").onchange=e=>{ st.bank=e.target.value; st.unit=st.lesson="*"; st.title=""; draw(); };
     $("#nhU").onchange=e=>{ st.unit=e.target.value; st.lesson="*"; st.title=""; draw(); };
     $("#nhL").onchange=e=>{ st.lesson=e.target.value; st.title=""; draw(); };
@@ -3089,7 +3103,7 @@ function openHwResults(hid){ const c=cls(), h=(c.hw||[]).find(x=>x.id===hid); if
     $("#hwDel").onclick=()=>ask(`حذف واجب «${h.title}»؟ الحلول كمان هتتمسح.`,async()=>{ c.hw=c.hw.filter(x=>x.id!==hid); save(); Cloud.delHw(hid).catch(()=>{}); openHomework(); });
   };
   openSheet(`<h2>📘 ${esc(h.title)}</h2><div id="hwR"><p class="hint">…</p></div>`, ()=>{ if(un) un(); setTab("home"); });
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   if(!HWQ[hid]) Cloud.getHw(hid).then(q=>{ if(q){ HWQ[hid]=q; draw(); } }).catch(()=>{});
   un=Cloud.listenHwSubs(hid,l=>{ subs=l; draw(); });
   draw();
@@ -3155,7 +3169,7 @@ async function solveHw(hid){
         :`<form id="hwF" class="hwfree"><input class="field" id="hwIn" ${answered?"disabled":""} value="${answered?esc(st.ans[i]):""}" placeholder="اكتب إجابتك هنا" autocomplete="off"><button class="btn pri" ${answered?"disabled":""}>تأكيد</button></form>`}
       ${answered?`<div class="hwfb ${ok?"ok":"no"}">${ok?"👏 إجابة صحيحة!":`الإجابة الصح: <b>${esc(q.a)}</b>`}</div>
         <div class="row" style="justify-content:center;margin-top:12px"><button class="btn pri hwnext" id="hwNext">${i+1<n?"السؤال التالي ←":"🏁 تسليم الواجب"}</button></div>`:""}</div>`);
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     if(!answered) gsap.from(".hwq,.hwopt,.hwfree",{y:14,opacity:0,stagger:.05,duration:.3});
     const pick=a=>{ st.ans[i]=a; lsSet(key,JSON.stringify(st)); const good=hwRight(q,a); good?SFX.pos():SFX.neg(); draw();
       if(good){ const r=$(".hwfb").getBoundingClientRect(); confetti(r.left+r.width/2,r.top,40); } else gsap.fromTo(".hwfb",{x:-8},{x:0,duration:.5,ease:"elastic.out(1,.3)"}); };
@@ -3200,7 +3214,7 @@ function openLeaderboard(kind){ kind=kind||"week"; const c=cls(); if(!c||c.stude
     <div class="tg" style="margin-top:12px">👀 الترتيب يظهر للطلاب وأولياء الأمور (بالاسم الأول)<button class="sw2 ${c.lbOff?"":"on"}" id="lbVis" aria-label="إظهار الترتيب"></button></div>
     ${kind==="week"&&rows[0].p?`<div class="row" style="margin-top:6px"><button class="btn" id="lbCert">🏅 شهادات أبطال المنصة</button></div>`:""}
     <p class="hint">بيتحسب من النقاط الإيجابية بس${kind==="week"?"، والأسبوع بيبدأ من الأحد":""}.</p>`, ()=>setTab("home"));
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   gsap.from(".pod .pblock",{scaleY:0,transformOrigin:"50% 100%",stagger:.15,duration:.6,ease:"back.out(1.6)"}); gsap.from(".pod .pav",{y:-40,opacity:0,stagger:.15,delay:.3,duration:.5,ease:"bounce.out"});
   if(rows[0].p){ setTimeout(()=>{ const el=document.querySelector(".pod.p1"); if(el){ const r=el.getBoundingClientRect(); burstAt(r.left+r.width/2,r.top+40,"stars",200); } SFX.level(); },700); }
   document.querySelectorAll(".seg2 [data-k]").forEach(b=>b.onclick=()=>openLeaderboard(b.dataset.k));
@@ -3293,7 +3307,7 @@ function openPdfReport(sid){ const c=cls(); const s=stu(sid)||c.students[0]; if(
     <textarea class="field" id="rpN" style="min-height:90px">${esc(D.note)}</textarea>
     <div id="rpPv">${pagePreview(reportPageHTML(c,s,P))}</div>
     <div class="row" style="justify-content:center;margin-top:10px"><button class="btn pri" id="rpGo">⬇️ حفظ PDF / طباعة</button><button class="btn" id="rpCert">🏅 شهادة تميّز</button><button class="btn" id="rpBack">↩ التقرير</button></div>`);
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); requestAnimationFrame(fitPreviews);
+  sheetStill(); requestAnimationFrame(fitPreviews);
   let t=null; $("#rpN").oninput=()=>{ clearTimeout(t); t=setTimeout(()=>{ $("#rpPv").innerHTML=pagePreview(reportPageHTML(c,s,P,$("#rpN").value)); fitPreviews(); },300); };
   $("#rpGo").onclick=()=>printDoc(reportPageHTML(c,s,P,$("#rpN").value));
   $("#rpCert").onclick=()=>openCert(s.id); $("#rpBack").onclick=()=>openStuRep(s.id);
@@ -3317,7 +3331,7 @@ function openCert(sid, preset){ const c=cls(); const s=stu(sid)||c.students[0]; 
       <input class="field" id="ceT" maxlength="80" placeholder="أو اكتب سبب الشهادة" value="${CERT_R.some(r=>r[1]===reason)?"":esc(reason)}" style="margin-top:6px">
       ${pagePreview(certHTML(s,c,reason),true)}
       <div class="row" style="justify-content:center;margin-top:10px"><button class="btn pri" id="ceGo">⬇️ حفظ PDF / طباعة</button></div>`);
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); requestAnimationFrame(fitPreviews);
+    sheetStill(); requestAnimationFrame(fitPreviews);
     $("#ceS").onchange=e=>openCert(e.target.value,reason);
     document.querySelectorAll("[data-ci]").forEach(b=>b.onclick=()=>{ reason=CERT_R[+b.dataset.ci][1]; draw(); });
     let t=null; $("#ceT").oninput=e=>{ clearTimeout(t); t=setTimeout(()=>{ if(e.target.value.trim()){ reason=e.target.value.trim(); const v=$(".rpv"); if(v){ v.outerHTML=pagePreview(certHTML(s,c,reason),true); fitPreviews(); } } },350); };
@@ -3346,7 +3360,7 @@ function parentReportHTML(k){ const L=levelOf(k.points), s={points:k.points,look
 function openParentReport(){ const k=PKIDS[PVIEW]; if(!k) return;
   openSheet(`<h2>📄 تقرير ${esc(k.name)}</h2><p class="hint">اضغط «حفظ PDF» واختار «حفظ كـ PDF» من نافذة الطباعة</p>${pagePreview(parentReportHTML(k))}
     <div class="row" style="justify-content:center;margin-top:10px"><button class="btn pri" id="prGo">⬇️ حفظ PDF / طباعة</button></div>`);
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1}); requestAnimationFrame(fitPreviews);
+  sheetStill(); requestAnimationFrame(fitPreviews);
   $("#prGo").onclick=()=>printDoc(parentReportHTML(k)); }
 addEventListener("resize",()=>fitPreviews());
 
@@ -3428,7 +3442,7 @@ function openSchoolDash(){ const sc=SCHOOL, code=sc.code;
   openSheet(`<div class="schv"><h2>🏫 ${esc(sc.name)}</h2>
     <div class="schcode"><div class="grow"><small>كود المدرسة للمعلمين</small><b dir="ltr">${esc(code)}</b></div><button class="btn pri" id="scInv">📋 دعوة المعلمين</button></div>
     <div id="scD"><p class="hint">…</p></div></div>`, ()=>{ if(unStats) unStats(); unStats=null; setTab("home"); });
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   $("#scInv").onclick=()=>copyText(`🏫 انضم لمدرسة «${sc.name}» على صقر\n1) ادخل ${location.origin+location.pathname} بحسابك\n2) الإعدادات ← المدرسة ← اكتب الكود: ${code}`,"📋 اتنسخت الدعوة — ابعتها للمعلمين");
   if(unStats) unStats(); unStats=Cloud.listenStats(code,l=>{ STATS=l; draw(); });
   syncSchoolStats(); draw();
@@ -3507,7 +3521,7 @@ function openChat(code){
     <div class="qr" id="cQr">${(T?QR_T:QR_P).map((q,i)=>`<button type="button" data-q="${i}">${esc(q)}</button>`).join("")}</div>
     <form class="cin" id="cForm"><textarea id="cTxt" rows="1" maxlength="1000" placeholder="اكتب رسالتك…"></textarea><button class="csend" id="cSend" aria-label="إرسال">${icon("send")}</button></form>`,
     ()=>{ if(unM) unM(); if(unT) unT(); CHAT=null; if(!T && PVIEW) drawKidChat(); });
-  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  sheetStill();
   const paint=()=>{ const box=$("#cBox"); if(!box||!CHAT) return; const th=CHAT.th||{};
     const other=T?Math.max(0,...Object.values(th.pSeen||{})):(th.tSeen||0); let last="";
     box.innerHTML=CHAT.msgs.length?CHAT.msgs.map(m=>{ const mine=m.by===me, d=msgDay(m.at), sep=d!==last?(last=d,`<div class="cday">${esc(d)}</div>`):"";
@@ -3607,7 +3621,7 @@ function openNotifSettings(){
   const draw=()=>{ openSheet(`<h2>🔔 الإشعارات</h2><p class="hint">اختار التنبيهات اللي عايزها توصلك</p>
     ${NTYPES.map(([k,t])=>`<div class="tg">${t}<button class="sw2 ${pr[k]?"on":""}" data-k="${k}" aria-label="${t}"></button></div>`).join("")}
     <div class="row" style="margin-top:14px"><button class="btn red" id="nOff">إيقاف الإشعارات على الجهاز ده</button></div>`);
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     document.querySelectorAll(".sw2").forEach(b=>b.onclick=async()=>{ pr[b.dataset.k]=!pr[b.dataset.k]; draw(); try{ await Cloud.setNotif(pr); }catch(e){ toast("تعذّر الحفظ"); } });
     $("#nOff").onclick=async()=>{ try{ await Cloud.disablePush(lsGet("saqr.push")); }catch(e){} lsSet("saqr.push",null); closeSheet(); toast("🔕 اتقفلت الإشعارات على الجهاز ده"); drawBell(); };
   };
@@ -3859,7 +3873,7 @@ function kidStyle(){
     <b>الإكسسوار</b> <small class="hint">— اجمع نقاط عشان تفتح الباقي 🔒</small><div class="accs">${ACCS.map(a=>{ const lock=pts<UNLOCK[a];
       return `<button class="acc ${a===look.acc?"on":""} ${lock?"lock":""}" data-a="${a}" ${lock?`data-need="🔒 ${UNLOCK[a]} نقطة"`:""}>${falconSVG({level:1,body:look.body,acc:a})}</button>`; }).join("")}</div>
     <div class="row" style="justify-content:center;margin-top:10px"><button class="btn pri" id="ksSave">حفظ ✔</button></div>`);
-    gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+    sheetStill();
     document.querySelectorAll(".sw").forEach(b=>b.onclick=()=>{ look.body=b.dataset.c; draw(); });
     document.querySelectorAll(".acc").forEach(b=>b.onclick=()=>{ if(b.classList.contains("lock")){ SFX.neg(); toast(`محتاج ${UNLOCK[b.dataset.a]} نقطة عشان تفتحه 💪`); return; } look.acc=b.dataset.a; draw(); });
     $("#ksSave").onclick=async()=>{ try{ await Cloud.setKidLook(KCODE,look); SFX.pos(); closeSheet(); toast("✨ صقرك اتغيّر!"); }catch(e){ toast("تعذّر الحفظ — جرّب تاني"); } };
