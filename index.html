@@ -1679,14 +1679,14 @@ function openAnn(){
   document.querySelectorAll("[data-dn]").forEach(b=>b.onclick=()=>ask("حذف الإعلان؟",()=>{ c.anns.splice(+b.dataset.dn,1); save(); openAnn(); }));
 }
 
-/* ---------- AI (Gemini) book → question bank ---------- */
+/* ---------- AI book → question bank ---------- */
 const AI_KEY="saqr.gemini";
 // remove spaces, line breaks and invisible direction marks that phones add when pasting into Arabic fields
 const cleanKey=v=>String(v||"").replace(/[\s\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff"'`]/g,"");
 const aiKey=()=>cleanKey(lsGet(AI_KEY)||S.geminiKey||"");
 function openAIKey(){
   openSheet(`<h2>✨ الذكاء الاصطناعي</h2>
-    <p class="hint">صقر بيستخدم Gemini من جوجل عشان يحوّل كتاب المنهج لبنك أسئلة مرتّب. محتاج <b>مفتاح API مجاني</b> مرة واحدة:</p>
+    <p class="hint">عشان صقر يجهّزلك الأسئلة ويحوّل كتاب المنهج لبنك أسئلة، محتاج <b>مفتاح مجاني من جوجل</b> مرة واحدة:</p>
     <ol class="hint" style="line-height:2;padding-inline-start:20px;margin:6px 0"><li>افتح <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">aistudio.google.com/apikey</a> وسجّل بحساب جوجل</li><li>دوس <b>Create API key</b> وانسخ المفتاح</li><li>الصقه هنا ودوس حفظ</li></ol>
     <input class="field" id="akIn" dir="ltr" placeholder="AIza..." value="${esc(aiKey())}" autocomplete="off">
     <div class="row" style="margin-top:10px"><button class="btn pri" id="akSave">حفظ واختبار</button>${aiKey()?`<button class="btn red" id="akDel">مسح المفتاح</button>`:""}</div>
@@ -1705,20 +1705,23 @@ const GAPI="https://generativelanguage.googleapis.com";
 let AIMODEL=null, AIMODELS=[];
 async function aiPickModel(key){
   let r; try{ r=await fetch(`${GAPI}/v1beta/models?pageSize=200&key=${encodeURIComponent(key)}`); }
-  catch(e){ throw new Error("مفيش اتصال بخدمة Gemini — اتأكد من الإنترنت وجرّب تاني"); }
+  catch(e){ throw new Error("مفيش اتصال بخدمة الذكاء الاصطناعي — اتأكد من الإنترنت وجرّب تاني"); }
   const j=await r.json().catch(()=>({}));
   if(!r.ok){ const m=(j.error&&j.error.message)||"";
     if(/API key not valid|API_KEY_INVALID/i.test(m)) throw new Error("جوجل رفض المفتاح — انسخه تاني من aistudio.google.com/apikey");
-    if(/not been used|disabled|SERVICE_DISABLED/i.test(m)) throw new Error("خدمة Gemini مش مفعّلة للمفتاح ده — اعمل مفتاح جديد من AI Studio");
-    if(/location|region|not supported/i.test(m)) throw new Error("Gemini مش متاح في المنطقة دي للمفتاح ده");
+    if(/not been used|disabled|SERVICE_DISABLED/i.test(m)) throw new Error("المفتاح ده مش مفعّل — اعمل مفتاح جديد من AI Studio");
+    if(/location|region|not supported/i.test(m)) throw new Error("الخدمة مش متاحة في المنطقة دي للمفتاح ده");
     if(r.status===429) throw new Error("طلبات كتير — استنى دقيقة وجرّب تاني");
     throw new Error(m||"المفتاح مش شغّال"); }
   const ok=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")).map(m=>m.name)
     .filter(n=>/gemini/.test(n)&&!/(image|live|tts|audio|embed|vision|banana|robotics|computer|thinking-exp|learnlm|nano)/.test(n));
   const ver=n=>{ const m=n.match(/gemini-(\d+(?:\.\d+)?)/); return m?parseFloat(m[1]):0; };
-  const score=n=>ver(n)*10 + (/flash/.test(n)?3:0) + (/lite/.test(n)?-2:0) + (/pro/.test(n)?1:0) + (/preview|exp/.test(n)?-1.5:0) + (/latest/.test(n)?.5:0);
+  // free keys: stable flash models have the biggest quota; previews and pro often have little or none
+  const PREF=["gemini-2.5-flash","gemini-flash-latest","gemini-2.5-flash-lite","gemini-flash-lite-latest","gemini-2.0-flash","gemini-2.0-flash-lite"];
+  const base=n=>n.replace("models/","");
+  const score=n=>{ const i=PREF.indexOf(base(n)); if(i>=0) return 100-i; return ver(n)*2 + (/flash/.test(n)?5:0) + (/pro/.test(n)?-20:0) + (/preview|exp/.test(n)?-30:0); };
   ok.sort((a,b)=>score(b)-score(a)); if(!ok.length) throw new Error("مفيش نموذج متاح بالمفتاح ده");
-  AIMODELS=ok.slice(0,6); AIMODEL=ok[0]; return AIMODEL;
+  AIMODELS=ok.slice(0,5); AIMODEL=ok[0]; return AIMODEL;
 }
 async function aiUpload(file,key,onStep){
   if(file.size<=18*1024*1024){ const b64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]); r.onerror=rej; r.readAsDataURL(file); });
@@ -1739,24 +1742,30 @@ function aiUnitsFrom(j){
     qs:(l.qs||[]).filter(q=>q&&q.q&&q.a).map(q=>{ const w=(q.wrong||[]).map(String).filter(x=>x&&x!==q.a).slice(0,3); return w.length?{q:String(q.q).slice(0,300),a:String(q.a).slice(0,120),ch:[String(q.a),...w]}:{q:String(q.q).slice(0,300),a:String(q.a).slice(0,120)}; })})).filter(l=>l.qs.length)})).filter(u=>u.lessons.length);
   return {title:String(d.title||"").slice(0,60),units};
 }
+const AIBAD=new Set();   // models that ran out of quota this session
 async function aiRequest(body,key,onStatus){
-// try the best model first; if it is busy/overloaded, wait and retry, then fall back to the next models
-  const busy=(st,m)=>st===503||st===429||st===500||/overloaded|high demand|UNAVAILABLE|RESOURCE_EXHAUSTED|try again/i.test(m||"");
-  const models=(AIMODELS.length?AIMODELS:[AIMODEL]); let j=null, lastErr="";
-  outer: for(let mi=0; mi<models.length; mi++){
+  const quota=(st,m)=>st===429||/RESOURCE_EXHAUSTED|quota/i.test(m||"");
+  const busy=(st,m)=>st===503||st===500||st===504||/overloaded|high demand|UNAVAILABLE|try again|deadline/i.test(m||"");
+  const all=(AIMODELS.length?AIMODELS:[AIMODEL]), models=[...all.filter(m=>!AIBAD.has(m)),...all.filter(m=>AIBAD.has(m))];
+  let lastErr="", sawQuota=false, sawBusy=false;
+  for(let mi=0; mi<models.length; mi++){
+    const md=models[mi], b=/2\.5-flash/.test(md)?{...body,generationConfig:{...body.generationConfig,thinkingConfig:{thinkingBudget:0}}}:body;
     for(let attempt=0; attempt<2; attempt++){
-      if(mi||attempt) onStatus&&onStatus(mi?`النموذج مشغول — بجرّب نموذج تاني (${models[mi].replace("models/","")})…`:"النموذج مشغول — بعيد المحاولة…");
-      let r; try{ r=await fetch(`${GAPI}/v1beta/${models[mi]}:generateContent?key=${encodeURIComponent(key)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); }
-      catch(e){ lastErr="مفيش اتصال بالإنترنت"; await new Promise(z=>setTimeout(z,3000)); continue; }
+      if(mi||attempt) onStatus&&onStatus(attempt?"لحظة… بعيد المحاولة":"بجرّب طريقة تانية…");
+      let r; try{ r=await fetch(`${GAPI}/v1beta/${md}:generateContent?key=${encodeURIComponent(key)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}); }
+      catch(e){ lastErr="مفيش اتصال بالإنترنت"; await new Promise(z=>setTimeout(z,1500)); continue; }
       const jj=await r.json().catch(()=>({}));
-      if(r.ok){ j=jj; AIMODEL=models[mi]; break outer; }
+      if(r.ok){ AIMODEL=md; AIBAD.delete(md); return jj; }
       lastErr=(jj.error&&jj.error.message)||("HTTP "+r.status);
-      if(!busy(r.status,lastErr)) throw new Error(lastErr);
-      await new Promise(z=>setTimeout(z,attempt?8000:4000));
+      if(quota(r.status,lastErr)){ sawQuota=true; AIBAD.add(md); break; }        // this model's free quota is used up → next model now
+      if(busy(r.status,lastErr)){ sawBusy=true; if(attempt) break; await new Promise(z=>setTimeout(z,2000)); continue; }
+      if(r.status===400 && /thinking/i.test(lastErr) && b!==body){ AIBAD.add(md); break; }
+      throw new Error(lastErr);
     }
   }
-  if(!j) throw new Error("خدمة Gemini عليها ضغط كبير دلوقتي — جرّب كمان شوية دقايق");
-  return j;
+  if(lastErr==="مفيش اتصال بالإنترنت" && !sawQuota && !sawBusy) throw new Error(lastErr);
+  if(sawQuota && !sawBusy) throw new Error("خلصت الطلبات المجانية لمفتاحك النهارده — جرّب بكرة، أو اعمل مفتاح جديد من حساب جوجل تاني");
+  throw new Error("الخدمة عليها ضغط دلوقتي — جرّب كمان دقيقة");
 }
 async function aiBuildBank(part,key,opt){
   const schema={type:"OBJECT",properties:{title:{type:"STRING"},units:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},lessons:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},
@@ -1772,7 +1781,7 @@ ${opt.mcq?"اجعل أغلب الأسئلة اختيار من متعدد: ضع �
   return aiUnitsFrom(j);
 }
 function openAIBook(){
-  if(!aiKey()){ toast("أضف مفتاح Gemini الأول ✨"); openAIKey(); return; }
+  if(!aiKey()){ toast("أضف مفتاح الذكاء الاصطناعي الأول ✨"); openAIKey(); return; }
   let file=null, n=5, mcq=true; const m=openAIBook.m=openAIBook.m||{subject:"",grade:"",term:""}; let scope=openAIBook.scope||"";
   const draw=()=>{ openSheet(`<h2>✨ تحويل الكتاب لبنك أسئلة</h2>
     <label class="drop ${file?"has":""}">${emo(file?"✅":"📚")}<b>${file?esc(file.name):"اختار ملف الكتاب (PDF)"}</b><small class="hint">${file?(file.size/1048576).toFixed(1)+" MB":"لحد 50 MB"}</small><input type="file" id="aiF" accept="application/pdf,.pdf" hidden></label>
@@ -1831,11 +1840,11 @@ ${opt.mcq?"اجعل الأسئلة اختيار من متعدد: الإجابة 
   return aiUnitsFrom(j);
 }
 function openAIGen(pre){ pre=pre||{};
-  if(!aiKey()){ toast("أضف مفتاح Gemini الأول ✨"); openAIKey(); return; }
+  if(!aiKey()){ toast("أضف مفتاح الذكاء الاصطناعي الأول ✨"); openAIKey(); return; }
   const B=S.banks||[], bk=pre.bank&&B.find(x=>x.id===pre.bank);
   const m=bk&&bk.subject?{subject:bk.subject,grade:bk.grade||"",term:bk.term||""}:(openAIBook.m=openAIBook.m||{subject:"",grade:"",term:""});
   const st={unit:pre.unit||"",lesson:pre.lesson||"",n:pre.n||5,mcq:pre.mcq!==undefined?pre.mcq:true,notes:""};
-  const draw=()=>{ openSheet(`<h2>✨ أسئلة بالذكاء الاصطناعي</h2><p class="hint">من غير ما ترفع كتاب — حدّد المادة والصف والوحدة أو الدرس، وجيميني يكتب الأسئلة من المنهج</p>
+  const draw=()=>{ openSheet(`<h2>✨ صقر يجهّزلك الأسئلة</h2><p class="hint">من غير ما ترفع كتاب — حدّد المادة والصف والوحدة أو الدرس، وصقر يجهّزلك الأسئلة من المنهج</p>
       ${bk?`<p class="hint">📚 هتتحفظ في: <b>${esc(bk.title)}</b></p>`:""}
       ${metaFormHTML(m)}
       <b style="display:block;margin-top:10px">📂 الوحدة</b><input class="field" id="agU" maxlength="80" placeholder="مثلاً: الوحدة الثانية: المادة وتغيراتها" value="${esc(st.unit)}">
@@ -1843,7 +1852,7 @@ function openAIGen(pre){ pre=pre||{};
       <b style="display:block;margin-top:10px">عدد الأسئلة ${st.lesson?"":"لكل درس"}</b><div class="seg2" id="agN">${[3,5,8,10,15].map(k=>`<button data-n="${k}" class="${k===st.n?"on":""}">${k}</button>`).join("")}</div>
       <b>نوع الأسئلة</b><div class="seg2" id="agM"><button data-m="1" class="${st.mcq?"on":""}">اختيار من متعدد</button><button data-m="0" class="${!st.mcq?"on":""}">إجابة قصيرة</button></div>
       <b>ملاحظات (اختياري)</b><input class="field" id="agX" maxlength="150" placeholder="مثلاً: ركّز على المسائل الكلامية — أو: مستوى سهل" value="${esc(st.notes)}">
-      <div class="row" style="justify-content:center;margin-top:12px"><button class="btn pri" id="agGo">✨ اكتب الأسئلة</button></div>`, ()=>setTab("home"));
+      <div class="row" style="justify-content:center;margin-top:12px"><button class="btn pri" id="agGo">✨ جهّز الأسئلة</button></div>`, ()=>setTab("home"));
     gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
     bindMetaForm(m);
     const grab=()=>{ st.unit=$("#agU").value.trim(); st.lesson=$("#agL").value.trim(); st.notes=$("#agX").value.trim(); };
@@ -1856,7 +1865,7 @@ function openAIGen(pre){ pre=pre||{};
   draw();
 }
 async function runAIGen(opt,bid){
-  openSheet(`<h2>✨ جيميني بيكتب الأسئلة…</h2><div class="aifal" id="aiFal">${falconSVG({level:1,body:"#7b5cd6",acc:"grad",mood:"happy"})}</div>
+  openSheet(`<h2>✨ صقر بيجهّزلك الأسئلة…</h2><div class="aifal" id="aiFal">${falconSVG({level:1,body:"#7b5cd6",acc:"grad",mood:"happy"})}</div>
     <p class="hint" style="text-align:center;font-weight:700">${esc(opt.meta.subject)} · ${esc(opt.meta.grade)}<br>${esc([opt.unit,opt.lesson].filter(Boolean).join(" — "))}</p>
     <p class="hint" id="aiStat" style="text-align:center;color:#7b5cd6;font-weight:700;min-height:1.4em"></p><p class="hint" style="text-align:center">بياخد من ١٠ ثواني لدقيقة 🦅</p>`);
   const f=$("#aiFal .fal"); if(f) f.classList.add("flap"); gsap.to("#aiFal",{y:-12,duration:.8,yoyo:true,repeat:-1,ease:"sine.inOut"});
@@ -1865,7 +1874,7 @@ async function runAIGen(opt,bid){
     const res=await aiGenQs(key,{...opt,onStatus:t=>{ const el=$("#aiStat"); if(el) el.textContent=t; }});
     if(!res.units.length) throw new Error("ماطلعتش أسئلة — جرّب تكتب اسم الوحدة أو الدرس بشكل أوضح");
     res.meta=opt.meta; res.title=autoBankTitle(opt.meta); aiPreview(res,res.title,bid);
-  }catch(e){ openSheet(`<h2>❌ ماقدرتش أكتب الأسئلة</h2><p class="hint" style="font-size:1rem">${esc(e.message||"حصل خطأ")}</p>
+  }catch(e){ openSheet(`<h2>❌ ماقدرتش أجهّز الأسئلة</h2><p class="hint" style="font-size:1rem">${esc(e.message||"حصل خطأ")}</p>
     <div class="row"><button class="btn pri" id="agRetry">جرّب تاني</button><button class="btn" id="agKey">المفتاح</button></div>`);
     $("#agRetry").onclick=()=>openAIGen({bank:bid,unit:opt.unit,lesson:opt.lesson,n:opt.n,mcq:opt.mcq}); $("#agKey").onclick=openAIKey; }
 }
@@ -1921,7 +1930,7 @@ function openSettings(){
     </div>
     <div class="sgh">عام</div><div class="sgrp">
       ${row("sound",S.sound?"sound":"mute","#2e9c9a","الأصوات",S.sound?"شغالة":"مقفولة",`<span class="sw2 ${S.sound?"on":""}"></span>`)}
-      ${row("ai","sparkle","#7b5cd6","الذكاء الاصطناعي (Gemini)",aiKey()?"مفعّل ✅ — لتحويل الكتب لبنوك أسئلة":"أضف مفتاح Gemini المجاني")}
+      ${row("ai","sparkle","#7b5cd6","الذكاء الاصطناعي",aiKey()?"مفعّل ✅ — لتحويل الكتب لبنوك أسئلة":"أضف المفتاح المجاني")}
       ${row("about","info","#97a0b8","عن صقر","الإصدار 2.0 · صُمّم للمعلم السعودي 🦅")}
     </div>
     <div class="sgrp">
@@ -1999,9 +2008,9 @@ function readFile(input){ return new Promise((res,rej)=>{ const f=input.files&&i
 /* ---------- bank details: subject, grade, term + adding a single question by unit/lesson ---------- */
 const SUBJECTS=["لغتي","رياضيات","علوم","لغة إنجليزية","دراسات إسلامية","قرآن كريم","دراسات اجتماعية","حاسب وتقنية رقمية","مهارات حياتية","تربية فنية","فيزياء","كيمياء","أحياء"];
 const GRADES=["الأول الابتدائي","الثاني الابتدائي","الثالث الابتدائي","الرابع الابتدائي","الخامس الابتدائي","السادس الابتدائي","الأول المتوسط","الثاني المتوسط","الثالث المتوسط","الأول الثانوي","الثاني الثانوي","الثالث الثانوي"];
-const TERMS=["الفصل الأول","الفصل الثاني","الفصل الثالث"];
+const TERMS=["الفصل الأول","الفصل الثاني"];
 const bankLabel=b=>[b.subject,b.grade,b.term].filter(Boolean).join(" · ");
-const autoBankTitle=m=>[m.subject,m.grade&&m.grade.replace(/^ال/,"").replace(" الابتدائي"," ابتدائي").replace(" المتوسط"," متوسط").replace(" الثانوي"," ثانوي"),m.term&&m.term.replace("الفصل ","ف").replace("الأول","1").replace("الثاني","2").replace("الثالث","3")].filter(Boolean).join(" ")||"بنك أسئلة";
+const autoBankTitle=m=>[m.subject,m.grade&&m.grade.replace(/^ال/,"").replace(" الابتدائي"," ابتدائي").replace(" المتوسط"," متوسط").replace(" الثانوي"," ثانوي"),m.term&&m.term.replace("الفصل ","ف").replace("الأول","1").replace("الثاني","2")].filter(Boolean).join(" ")||"بنك أسئلة";
 function metaFormHTML(m){
   return `<b>📖 المادة</b><div class="chips2" id="bmS">${SUBJECTS.map(x=>`<button type="button" data-v="${esc(x)}" class="${m.subject===x?"on":""}">${esc(x)}</button>`).join("")}</div>
     <input class="field" id="bmSx" maxlength="30" placeholder="مادة تانية؟ اكتبها هنا" value="${m.subject&&!SUBJECTS.includes(m.subject)?esc(m.subject):""}" style="margin-top:4px">
@@ -2048,7 +2057,7 @@ function openAddQ(bid, ui, li, keep){ const b=(S.banks||[]).find(x=>x.id===bid);
     <b style="display:block;margin-top:8px">✅ الإجابة الصحيحة</b><input class="field" id="aqA" maxlength="120" placeholder="الإجابة الصحيحة">
     ${st.mcq?`<b style="display:block;margin-top:8px">❌ اختيارات غلط</b><div class="aqw">${[0,1,2].map(i=>`<input class="field" id="aqW${i}" maxlength="120" placeholder="اختيار غلط ${i+1}">`).join("")}</div>`:""}
     <div class="row" style="margin-top:12px"><button class="btn pri" id="aqGo">💾 حفظ وإضافة سؤال تاني</button><button class="btn" id="aqDone">✔ خلصت</button></div>
-    <button class="aibtn ai2" id="aqAI" style="margin-top:12px"><span class="aiic">✨</span><span class="grow"><b>خلّي جيميني يكتب أسئلة الدرس ده</b><small>بالمادة والصف والوحدة والدرس اللي اخترتهم — من غير كتاب</small></span><span class="chev">‹</span></button>`, ()=>setTab("home"));
+    <button class="aibtn ai2" id="aqAI" style="margin-top:12px"><span class="aiic">✨</span><span class="grow"><b>خلّي صقر يجهّز أسئلة الدرس ده</b><small>بالمادة والصف والوحدة والدرس اللي اخترتهم — من غير كتاب</small></span><span class="chev">‹</span></button>`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
   const grab=()=>{ if($("#aqNU")) st.newU=$("#aqNU").value; if($("#aqNL")) st.newL=$("#aqNL").value; };
   $("#aqU").onchange=e=>{ grab(); st.ui=e.target.value; st.li=""; openAddQ(bid,null,null,st); };
@@ -2074,7 +2083,7 @@ function openBanks(){
   migrateQs(); const B=S.banks=S.banks||[];
   openSheet(`<h2>📚 بنوك الأسئلة والمنهج</h2>
     <button class="aibtn" id="aiBook"><span class="aiic">✨</span><span class="grow"><b>حوّل كتاب المنهج لبنك أسئلة</b><small>ارفع ملف الكتاب PDF، والذكاء الاصطناعي يرتّبه وحدات ودروس ويطلّع أسئلة لكل درس</small></span><span class="chev">‹</span></button>
-    <button class="aibtn ai2" id="aiGen"><span class="aiic">🪄</span><span class="grow"><b>أسئلة بالذكاء الاصطناعي من غير كتاب</b><small>اختار المادة والصف واكتب الوحدة أو الدرس، وجيميني يكتب الأسئلة من المنهج</small></span><span class="chev">‹</span></button>
+    <button class="aibtn ai2" id="aiGen"><span class="aiic">🪄</span><span class="grow"><b>صقر يجهّزلك الأسئلة من غير كتاب</b><small>اختار المادة والصف واكتب الوحدة أو الدرس، وصقر يجهّزلك الأسئلة من المنهج</small></span><span class="chev">‹</span></button>
     <div class="list">${B.map(b=>`<button class="li" data-b="${b.id}" style="width:100%;text-align:right"><span class="big-e">${emo("📚")}</span><div class="grow"><b>${esc(b.title)}</b>${bankLabel(b)?`<span class="bmeta">${esc(bankLabel(b))}</span>`:""}<small>${b.units.length} وحدة · ${bankCount(b)} سؤال</small></div><span class="chev" style="color:#b6bfd3">‹</span></button>`).join("")||"<p class='hint'>لسه مفيش بنوك</p>"}</div>
     <div class="row" style="margin-top:12px"><button class="btn pri" id="nbGo">➕ بنك جديد (مادة وصف)</button></div>`, ()=>setTab("home"));
   gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
@@ -2085,7 +2094,7 @@ function openBanks(){
 function openBankEd(id){
   const b=(S.banks||[]).find(x=>x.id===id); if(!b) return openBanks();
   openSheet(`<h2>📚 ${esc(b.title)}</h2>${bankLabel(b)?`<span class="bmeta">${esc(bankLabel(b))}</span>`:`<button class="btn" id="bkMeta0" style="margin-bottom:6px">🎒 حدّد المادة والصف</button>`}<p class="hint">${b.units.length} وحدة · ${bankCount(b)} سؤال</p>
-    <div class="row" style="margin-bottom:10px"><button class="btn pri" id="bkQ">➕ إضافة سؤال (بالوحدة والدرس)</button><button class="btn vio" id="bkAI">✨ أسئلة بجيميني</button></div>
+    <div class="row" style="margin-bottom:10px"><button class="btn pri" id="bkQ">➕ إضافة سؤال (بالوحدة والدرس)</button><button class="btn vio" id="bkAI">✨ صقر يجهّز أسئلة</button></div>
     ${b.units.map(u=>`<div class="unit"><h3>${esc(u.name)} <span class="cnt">${unitCount(u)}</span></h3>${u.lessons.map(l=>`<button class="lrow2" data-l="${u.id}|${l.id}"><span class="grow">${esc(l.name)}</span><span class="cnt">${l.qs.length}</span><span class="chev" style="color:#b6bfd3">‹</span></button>`).join("")}</div>`).join("")||"<p class='hint'>البنك فاضي — استورد أسئلة من تحت 👇</p>"}
     <div class="kcard" style="background:#f6f8fd;box-shadow:none"><h3>📥 إضافة أسئلة كتير مرة واحدة</h3>
       <p class="hint" style="margin-top:0">الصق بالشكل ده، أو اختار ملف .txt / .json:<br><span class="codeb"># الوحدة الأولى: الماء<br>## الدرس 1: حالات الماء<br>كم حالة للماء؟ = 3<br>تحول الماء من سائل إلى غاز يسمى = التبخر | التكثف | التجمد | الانصهار</span><br>الخيارات بعد | معناها سؤال اختيار من متعدد.</p>
