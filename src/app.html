@@ -1351,7 +1351,7 @@ function openAIKey(){
   if($("#akDel")) $("#akDel").onclick=()=>{ lsSet(AI_KEY,null); S.geminiKey=""; if(MODE==="cloud"&&window.Cloud) Cloud.saveMe({geminiKey:""}).catch(()=>{}); else save(); openAIKey(); };
 }
 const GAPI="https://generativelanguage.googleapis.com";
-let AIMODEL=null;
+let AIMODEL=null, AIMODELS=[];
 async function aiPickModel(key){
   let r; try{ r=await fetch(`${GAPI}/v1beta/models?pageSize=200&key=${encodeURIComponent(key)}`); }
   catch(e){ throw new Error("مفيش اتصال بخدمة Gemini — اتأكد من الإنترنت وجرّب تاني"); }
@@ -1367,7 +1367,7 @@ async function aiPickModel(key){
   const ver=n=>{ const m=n.match(/gemini-(\d+(?:\.\d+)?)/); return m?parseFloat(m[1]):0; };
   const score=n=>ver(n)*10 + (/flash/.test(n)?3:0) + (/lite/.test(n)?-2:0) + (/pro/.test(n)?1:0) + (/preview|exp/.test(n)?-1.5:0) + (/latest/.test(n)?.5:0);
   ok.sort((a,b)=>score(b)-score(a)); if(!ok.length) throw new Error("مفيش نموذج متاح بالمفتاح ده");
-  AIMODEL=ok[0]; return AIMODEL;
+  AIMODELS=ok.slice(0,6); AIMODEL=ok[0]; return AIMODEL;
 }
 async function aiUpload(file,key,onStep){
   if(file.size<=18*1024*1024){ const b64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]); r.onerror=rej; r.readAsDataURL(file); });
@@ -1390,8 +1390,22 @@ async function aiBuildBank(part,key,opt){
 ${opt.mcq?"اجعل أغلب الأسئلة اختيار من متعدد: ضع الإجابة الصحيحة في a وثلاث إجابات خاطئة معقولة في wrong.":"اجعل الأسئلة قصيرة الإجابة: الإجابة الصحيحة في a واترك wrong فارغة."}
 الإجابات قصيرة ودقيقة. استخدم الأرقام الإنجليزية في المسائل. لا تكرر الأسئلة. اكتب في title اسم الكتاب والصف والفصل الدراسي.`;
   const body={contents:[{role:"user",parts:[part,{text:prompt}]}],generationConfig:{responseMimeType:"application/json",responseSchema:schema,temperature:.4,maxOutputTokens:65536}};
-  const r=await fetch(`${GAPI}/v1beta/${AIMODEL}:generateContent?key=${encodeURIComponent(key)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
-  const j=await r.json().catch(()=>({})); if(!r.ok) throw new Error((j.error&&j.error.message)||"حصل خطأ من Gemini");
+  // try the best model first; if it is busy/overloaded, wait and retry, then fall back to the next models
+  const busy=(st,m)=>st===503||st===429||st===500||/overloaded|high demand|UNAVAILABLE|RESOURCE_EXHAUSTED|try again/i.test(m||"");
+  const models=(AIMODELS.length?AIMODELS:[AIMODEL]); let j=null, lastErr="";
+  outer: for(let mi=0; mi<models.length; mi++){
+    for(let attempt=0; attempt<2; attempt++){
+      if(mi||attempt) opt.onStatus&&opt.onStatus(mi?`النموذج مشغول — بجرّب نموذج تاني (${models[mi].replace("models/","")})…`:"النموذج مشغول — بعيد المحاولة…");
+      let r; try{ r=await fetch(`${GAPI}/v1beta/${models[mi]}:generateContent?key=${encodeURIComponent(key)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)}); }
+      catch(e){ lastErr="مفيش اتصال بالإنترنت"; await new Promise(z=>setTimeout(z,3000)); continue; }
+      const jj=await r.json().catch(()=>({}));
+      if(r.ok){ j=jj; AIMODEL=models[mi]; break outer; }
+      lastErr=(jj.error&&jj.error.message)||("HTTP "+r.status);
+      if(!busy(r.status,lastErr)) throw new Error(lastErr);
+      await new Promise(z=>setTimeout(z,attempt?8000:4000));
+    }
+  }
+  if(!j) throw new Error("خدمة Gemini عليها ضغط كبير دلوقتي — جرّب كمان شوية دقايق");
   const txt=((j.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||"").join("");
   let d; try{ d=JSON.parse(txt); }catch(e){ const m=txt.lastIndexOf("}]}"); try{ d=JSON.parse(txt.slice(0,m+3)+"]}"); }catch(e2){ throw new Error("الرد اتقطع — جرّب عدد أسئلة أقل أو حدد صفحات"); } }
   const units=(d.units||[]).map(u=>({name:String(u.name||"وحدة").slice(0,80),lessons:(u.lessons||[]).map(l=>({name:String(l.name||"درس").slice(0,80),
@@ -1421,6 +1435,7 @@ async function runAI(file,opt){
   let cur=0;
   const paint=()=>{ const el=$("#aiSteps"); if(el) el.innerHTML=steps.map((t,i)=>`<div class="aistep ${i<cur?"done":i===cur?"on":""}"><i>${i<cur?"✓":i+1}</i>${t}</div>`).join(""); };
   openSheet(`<h2>✨ جاري التحويل…</h2><div class="aifal" id="aiFal">${falconSVG({level:1,body:"#7b5cd6",acc:"grad",mood:"happy"})}</div><div id="aiSteps"></div>
+    <p class="hint" id="aiStat" style="text-align:center;color:#7b5cd6;font-weight:700;min-height:1.4em"></p>
     <p class="hint" style="text-align:center">ممكن ياخد من دقيقة لـ 3 دقايق حسب حجم الكتاب — سيب الصفحة مفتوحة 🦅</p>`);
   $("#aiFal .fal").classList.add("flap"); gsap.to("#aiFal",{y:-12,duration:.8,yoyo:true,repeat:-1,ease:"sine.inOut"}); paint();
   const key=aiKey();
@@ -1428,7 +1443,7 @@ async function runAI(file,opt){
     if(!AIMODEL) await aiPickModel(key); cur=1; paint();
     const part=await aiUpload(file,key); cur=2; paint();
     const t=setTimeout(()=>{ cur=3; paint(); },25000);
-    const res=await aiBuildBank(part,key,opt); clearTimeout(t); cur=4; paint();
+    const res=await aiBuildBank(part,key,{...opt,onStatus:t=>{ const el=$("#aiStat"); if(el) el.textContent=t; }}); clearTimeout(t); cur=4; paint();
     if(!res.units.length) throw new Error("مالقيتش دروس في الملف — اتأكد إنه كتاب فيه نص");
     aiPreview(res, file.name.replace(/\.pdf$/i,""));
   }catch(e){ openSheet(`<h2>❌ التحويل ماكملش</h2><p class="hint" style="font-size:1rem">${esc(e.message||"حصل خطأ")}</p>
