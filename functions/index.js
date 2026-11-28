@@ -30,6 +30,10 @@ function buildMessages(b, a) {
     const t = { a: `❌ ${name} غائب النهارده`, l: `⏰ ${name} اتأخر النهارده`, x: `📝 ${name} مستأذن النهارده` }[a.today];
     out.push({ type: "att", title: t, body: a.className || "" });
   }
+  const an = (a.anns || [])[0], bn = (b.anns || [])[0];
+  if (an && an.at && (!bn || an.at !== bn.at)) {
+    out.push({ type: "ann", title: `📢 إعلان من ${a.teacher ? "أ. " + a.teacher : "المعلم"} — ${a.className || ""}`, body: String(an.t).slice(0, 180), tag: `ann-${a.cid}-${an.at}` });
+  }
   if (a.note && a.noteAt && a.noteAt !== b.noteAt) {
     out.push({ type: "note", title: `📝 رسالة من ${a.teacher ? "أ. " + a.teacher : "المعلم"}`, body: String(a.note).slice(0, 180) });
   }
@@ -51,7 +55,7 @@ exports.notifyParents = onDocumentUpdated("kids/{code}", async event => {
       const res = await admin.messaging().sendEachForMulticast({
         tokens,
         notification: { title: m.title, body: m.body },
-        webpush: { notification: { icon: ICON, badge: ICON, lang: "ar", dir: "rtl" }, fcmOptions: { link: SITE } }
+        webpush: { notification: { icon: ICON, badge: ICON, lang: "ar", dir: "rtl", ...(m.tag ? { tag: m.tag } : {}) }, fcmOptions: { link: SITE } }
       });
       res.responses.forEach((r, i) => {
         const c = r.error && r.error.code;

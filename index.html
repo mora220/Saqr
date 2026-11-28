@@ -445,6 +445,12 @@ body.board .x{width:52px;height:52px;font-size:1.6rem;top:18px;left:18px}
 .grid.seat .card.whole .av{width:clamp(44px,10vw,90px);height:clamp(44px,10vw,90px)}
 .grid.seat .card.whole .lv{display:none}.grid.seat .card.whole .nm{font-size:clamp(.72rem,1.6vw,1rem)}
 .grid.seat .card.add{min-height:0;padding:16px 4px;font-size:.8rem}.grid.seat .card.add .plus{font-size:1.6rem}
+/* ---------- announcements ---------- */
+.anncard{background:#fff;border-radius:22px;box-shadow:var(--shadow);padding:12px 14px;margin-bottom:14px}.anncard h3{margin:0 0 8px}
+.ann{background:#f6f8fd;border-radius:16px;padding:10px 12px;margin-bottom:8px;border-inline-start:5px solid #7b5cd6}
+.ann.new{background:#f1ecff}.ann.new::before{content:"جديد";float:left;background:#ff5d5d;color:#fff;border-radius:8px;padding:0 8px;font-size:.75rem;font-weight:800}
+.ann p{margin:0 0 4px;font-weight:700;line-height:1.7;white-space:pre-wrap}.ann small{color:var(--muted);font-weight:600}
+.tpls{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}.tpls button{background:#f1ecff;color:#5a46b8;border-radius:12px;padding:6px 10px;font-weight:700}
 /* ---------- fx ---------- */
 #fx{position:fixed;inset:0;pointer-events:none;z-index:80}
 .float{direction:ltr;position:fixed;font-weight:800;font-size:2.2rem;z-index:90;pointer-events:none;text-shadow:0 3px 0 rgba(0,0,0,.12)}
@@ -561,6 +567,7 @@ body.board .x{width:52px;height:52px;font-size:1.6rem;top:18px;left:18px}
     <div class="kcard" id="kShopCard" hidden><h3>🎁 متجر المكافآت <span class="cnt" id="kBal" style="float:left"></span></h3><div id="kShop"></div></div>
     <div class="kcard"><h3>🪜 رحلة الصقر</h3><div class="kpath" id="kPath"></div></div>
     <div class="kcard"><h3>⭐ آخر النقاط</h3><div class="list" id="kRecent"></div></div>
+    <div class="kcard" id="kAnnCard" hidden><h3>📢 إعلانات الفصل</h3><div id="kAnn"></div></div>
     <div class="kcard" id="kNoteCard" hidden><h3>📝 رسالة من المعلم</h3><p id="kNote" style="margin:0;font-size:1.1rem;line-height:1.7"></p><small class="hint" id="kNoteAt"></small></div>
     <div class="kcard"><h3>📅 آخر 7 أيام</h3><div class="asum" id="kWeek"></div></div>
     <div class="kcard"><h3 id="kAttH">📋 حضورك الشهر ده</h3><div class="asum" id="kAtt"></div></div>
@@ -568,7 +575,7 @@ body.board .x{width:52px;height:52px;font-size:1.6rem;top:18px;left:18px}
 </div>
 <div id="par">
   <header class="kh"><div class="brand"><div class="logo" id="pLogo"></div><div><h1>صقر</h1><small style="opacity:.8">ولي الأمر</small></div></div><span class="spacer"></span><button class="icon-btn" id="pAcct" style="width:auto;padding:0 14px;font-weight:700;font-size:.95rem">حسابي</button></header>
-  <div class="kbody"><h2 class="phi" id="pHi"></h2><div id="pBell"></div><div class="pgrid" id="pGrid"></div></div>
+  <div class="kbody"><h2 class="phi" id="pHi"></h2><div id="pBell"></div><div id="pAnn"></div><div class="pgrid" id="pGrid"></div></div>
 </div>
 <button id="boardExit" hidden>✕ خروج من وضع السبورة</button>
 <div id="printArea"></div>
@@ -751,7 +758,7 @@ function kidPayloads(){ const m=new Map(), teacher=(USER&&USER.displayName)||"";
   S.classes.forEach(c=>c.students.forEach(s=>{ if(!s.code) return;
     m.set(s.code,{cid:c.id,className:c.name,teacher,name:s.name,points:s.points,pos:s.pos,neg:s.neg,look:s.look,lookAt:s.lookAt||0,
       recent:c.log.filter(l=>l.sid===s.id).slice(-12).reverse().map(l=>({k:l.k,v:l.v,t:l.t,e:l.e||skillOf(l.k).e,nm:l.nm||skillOf(l.k).t})), att:monthAtt(c,s.id), today:attOf(c,todayKey(),s.id)||"",
-      week:weekOf(c,s.id), note:s.note||"", noteAt:s.noteAt||0, balance:balance(s), rewards:rewardsOf(c).map(r=>({e:r.e,t:r.t,c:r.c}))}); }));
+      week:weekOf(c,s.id), note:s.note||"", noteAt:s.noteAt||0, balance:balance(s), rewards:rewardsOf(c).map(r=>({e:r.e,t:r.t,c:r.c})), anns:(c.anns||[]).slice(0,3).map(a=>({t:a.text,at:a.at}))}); }));
   return m; }
 function fixCur(){ if(!S.cur || !S.classes.find(c=>c.id===S.cur)) S.cur = S.classes[0] && S.classes[0].id; }
 function save(){
@@ -1125,6 +1132,7 @@ const ICONS={
   tv:'<rect x="2.5" y="4" width="19" height="13" rx="2.5"/><path d="M8 21h8M12 17v4"/>',
   gift:'<rect x="3" y="8" width="18" height="5" rx="1.5"/><path d="M5 13v7h14v-7M12 8v12"/><path d="M12 8c-2-3-6-4-6-1.5S9 8 12 8zm0 0c2-3 6-4 6-1.5S15 8 12 8z"/>',
   seat:'<path d="M6 10V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v5"/><rect x="4" y="10" width="16" height="5" rx="1.5"/><path d="M6 15v6M18 15v6"/>',
+  megaphone:'<path d="M3 11v2a1 1 0 0 0 1 1h2l5 4V6L6 10H4a1 1 0 0 0-1 1z"/><path d="M15 8.5a4 4 0 0 1 0 7"/><path d="M18 6a8 8 0 0 1 0 12"/>',
   key:'<circle cx="8" cy="15" r="4"/><path d="m11 12 9-9M17 6l3 3M15 8l2 2"/>',
 };
 const icon=n=>`<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]||""}</svg>`;
@@ -1143,13 +1151,13 @@ document.addEventListener("fullscreenchange",()=>{ if(!document.fullscreenElemen
 function setTab(t){ document.querySelectorAll(".tb").forEach(b=>b.classList.toggle("on",b.dataset.tab===t)); }
 function openKit(){
   const T=[["random","dice","اختيار عشوائي","#ff8a3d"],["timer","timer","المؤقت","#3d8be0"],["groups","flock","الأسراب","#22b573"],["noise","noise","مقياس الهدوء","#2e9c9a"],
-    ["all","star","نقطة للفصل كله","#f5b301"],["select","check","تحديد عدة طلاب","#7b5cd6"],["skills","sliders","المهارات والنقاط","#e0609a"],["shop","gift","متجر المكافآت","#ff5d9a"],["seat","seat","ترتيب الجلوس","#8a5a2b"],["board","tv","وضع السبورة","#1b2a4a"]];
+    ["all","star","نقطة للفصل كله","#f5b301"],["select","check","تحديد عدة طلاب","#7b5cd6"],["skills","sliders","المهارات والنقاط","#e0609a"],["shop","gift","متجر المكافآت","#ff5d9a"],["seat","seat","ترتيب الجلوس","#8a5a2b"],["ann","megaphone","إعلان لأولياء الأمور","#7b5cd6"],["board","tv","وضع السبورة","#1b2a4a"]];
   openSheet(`<h2>🪄 أدوات الحصة</h2><div class="kit">${T.map(([k,ic,t,c])=>`<button class="kt" data-k="${k}"><span class="bx" style="background:${c}">${icon(ic)}</span>${t}</button>`).join("")}</div>`, ()=>setTab("home"));
   gsap.from(".kt",{y:20,opacity:0,scale:.9,stagger:.04,duration:.35,ease:"back.out(1.7)"});
   document.querySelectorAll(".kt").forEach(b=>b.onclick=()=>{ const k=b.dataset.k; ac();
     if(k==="random") randomPick(); else if(k==="timer") openTimer(); else if(k==="groups") openGroups(); else if(k==="noise") openNoise();
     else if(k==="all") openStudent("__all"); else if(k==="select"){ closeSheet(); toggleSel(true); toast("دوس على الطلاب اللي عايز تحددهم"); }
-    else if(k==="skills") openSkills(); else if(k==="add") openAdd(); else if(k==="board"){ closeSheet(); setBoard(!BOARD); } else if(k==="shop") openShop(); else if(k==="seat") openSeating(); });
+    else if(k==="skills") openSkills(); else if(k==="add") openAdd(); else if(k==="board"){ closeSheet(); setBoard(!BOARD); } else if(k==="shop") openShop(); else if(k==="seat") openSeating(); else if(k==="ann") openAnn(); });
 }
 document.querySelectorAll(".tb").forEach(b=>b.onclick=()=>{ ac(); const t=b.dataset.tab;
   if(t==="home"){ closeSheet(); window.scrollTo({top:0,behavior:"smooth"}); }
@@ -1263,6 +1271,24 @@ function arrTap(id, card){ const c=cls();
   [id,o[j]].forEach(x=>{ const el=document.querySelector(`.card[data-id="${x}"]`); if(el) gsap.fromTo(el,{scale:.8},{scale:1,duration:.45,ease:"back.out(2)"}); }); }
 function openSeating(){ closeSheet(); ARR=true; ARRSEL=null; render(); window.scrollTo({top:0,behavior:"smooth"}); }
 
+/* ---------- announcements (teacher) ---------- */
+const ANN_TPL=[["📝","اختبار","تذكير: فيه اختبار في درس … يوم … إن شاء الله، نتمنى المذاكرة كويس 📝"],["📚","واجب","الواجب: صفحة … في كتاب الطالب، التسليم يوم … 📚"],
+  ["🎉","تهنئة","شكراً لأبطال الفصل على التميّز والانضباط الأسبوع ده 🎉🦅"],["🏫","نشاط","عندنا نشاط … يوم … برجاء تجهيز … 🏫"],["📢","تنبيه","تنبيه مهم لأولياء الأمور: …"]];
+function openAnn(){
+  const c=cls(); c.anns=c.anns||[];
+  openSheet(`<h2>📢 إعلان لأولياء أمور «${esc(c.name)}»</h2>
+    <p class="hint">الإعلان بيظهر لكل أولياء الأمور والطلاب في الفصل${MODE==="cloud"?"، ويوصلهم إشعار لو مفعّلين الإشعارات":" — سجّل دخول عشان يوصلهم"}.</p>
+    <div class="tpls">${ANN_TPL.map((t,i)=>`<button data-tp="${i}">${t[0]} ${t[1]}</button>`).join("")}</div>
+    <textarea class="field" id="anT" maxlength="400" placeholder="اكتب الإعلان هنا…"></textarea>
+    <div class="row" style="margin-top:10px"><button class="btn pri" id="anGo">📢 إرسال الإعلان</button></div>
+    ${c.anns.length?`<div class="rsec"><h3>الإعلانات السابقة</h3>${c.anns.map((a,i)=>`<div class="ann"><p>${esc(a.text)}</p><small>${(()=>{ try{ return new Date(a.at).toLocaleString("ar-EG",{weekday:"long",day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}) }catch(e){ return "" } })()}</small> <button class="btn red" data-dn="${i}" style="padding:4px 10px;float:left">حذف</button></div>`).join("")}</div>`:""}`, ()=>setTab("home"));
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  document.querySelectorAll("[data-tp]").forEach(b=>b.onclick=()=>{ $("#anT").value=ANN_TPL[+b.dataset.tp][2]; $("#anT").focus(); });
+  $("#anGo").onclick=()=>{ const t=$("#anT").value.trim(); if(!t){ toast("اكتب الإعلان الأول"); return; }
+    c.anns.unshift({id:uid(),text:t.slice(0,400),at:Date.now()}); c.anns=c.anns.slice(0,20); save(); SFX.level(); toast("📢 اتبعت الإعلان لأولياء الأمور"); openAnn(); };
+  document.querySelectorAll("[data-dn]").forEach(b=>b.onclick=()=>ask("حذف الإعلان؟",()=>{ c.anns.splice(+b.dataset.dn,1); save(); openAnn(); }));
+}
+
 /* ---------- settings ---------- */
 function openSettings(){
   const cloud=MODE==="cloud"&&USER, nm=cloud?(USER.displayName||USER.email||"معلم"):"وضع التجربة";
@@ -1279,6 +1305,7 @@ function openSettings(){
     <div class="sgh">الطلاب وأولياء الأمور</div><div class="sgrp">
       ${row("codes","key","#7b5cd6","أكواد الدخول","كود لكل طالب يدخل بيه هو وولي أمره")}
       ${row("print","printer","#22b573","طباعة بطاقات الدخول","بطاقة لكل طالب فيها الكود وQR")}
+      ${row("ann","megaphone","#ff5d5d","إعلانات أولياء الأمور",`${(cls().anns||[]).length} إعلان في الفصل ده`)}
     </div>
     <div class="sgh">المحتوى</div><div class="sgrp">
       ${row("banks","book","#ff8a3d","بنوك الأسئلة والمنهج",`${(S.banks||[]).length} بنك · ${qn} سؤال`)}
@@ -1292,7 +1319,7 @@ function openSettings(){
   $("#stAcct").onclick=()=>{ cloud?openAcct():(closeSheet(),showLogin()); };
   document.querySelectorAll("[data-s]").forEach(b=>b.onclick=()=>{ const k=b.dataset.s; ac();
     if(k==="classes") openClassMenu(); else if(k==="add") openAdd(); else if(k==="skills") openSkills(); else if(k==="codes") cloudOnly(openCodes);
-    else if(k==="print") cloudOnly(openPrintCards); else if(k==="banks") openBanks();
+    else if(k==="print") cloudOnly(openPrintCards); else if(k==="ann") openAnn(); else if(k==="banks") openBanks();
     else if(k==="sound"){ S.sound=!S.sound; save(); if(S.sound) SFX.pos(); openSettings(); }
     else if(k==="about") toast("🦅 صقر — إدارة الفصل بروح الصقور، من تصميم أ. محمد رجب"); });
 }
@@ -1795,7 +1822,7 @@ let gotFirst=false;
 let WANT=null, PARENT=null, PKIDS={}, PCODES=[], PVIEW=null, PDATA={};
 const isIOS=/iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
 const isStandalone=()=>matchMedia("(display-mode: standalone)").matches || navigator.standalone===true;
-const NTYPES=[["pos","⭐ لما ياخد نقطة أو يترقّى"],["neg","✋ لما ياخد ملاحظة سلبية"],["att","📋 الغياب والتأخير"],["note","📝 رسائل المعلم"]];
+const NTYPES=[["ann","📢 إعلانات المعلم للفصل"],["pos","⭐ لما ياخد نقطة أو يترقّى"],["neg","✋ لما ياخد ملاحظة سلبية"],["att","📋 الغياب والتأخير"],["note","📝 رسائل المعلم"]];
 async function drawBell(){
   const el=$("#pBell"); if(!el) return;
   const myTok=lsGet("saqr.push"), on = myTok && (PDATA.tokens||[]).includes(myTok) && window.Notification && Notification.permission==="granted";
@@ -1819,7 +1846,7 @@ function enableNotif(){
     drawBell(); });
 }
 function openNotifSettings(){
-  const pr={pos:true,neg:true,att:true,note:true,...(PDATA.notif||{})};
+  const pr={ann:true,pos:true,neg:true,att:true,note:true,...(PDATA.notif||{})};
   const draw=()=>{ openSheet(`<h2>🔔 الإشعارات</h2><p class="hint">اختار التنبيهات اللي عايزها توصلك</p>
     ${NTYPES.map(([k,t])=>`<div class="tg">${t}<button class="sw2 ${pr[k]?"on":""}" data-k="${k}" aria-label="${t}"></button></div>`).join("")}
     <div class="row" style="margin-top:14px"><button class="btn red" id="nOff">إيقاف الإشعارات على الجهاز ده</button></div>`);
@@ -1849,7 +1876,12 @@ function startParent(u){
   Cloud.listenParent((codes,data)=>{ PDATA=data||{}; PCODES=codes; drawBell(); Object.keys(PKIDS).forEach(c=>{ if(!codes.includes(c)) delete PKIDS[c]; }); drawParent();
     Cloud.watchMany(codes,(code,data)=>{ const prev=PKIDS[code]; PKIDS[code]=data; if(PVIEW===code && data){ const pv=KID; KID=data; drawKid(pv); } else drawParent(code, prev); }); });
 }
-function drawParent(changed, prev){
+function drawPAnn(){ const el=$("#pAnn"); if(!el) return; const seen=+(lsGet("saqr.annseen")||0), m=new Map();
+  PCODES.forEach(c=>{ const k=PKIDS[c]; (k&&k.anns||[]).forEach(a=>{ const key=a.at+"|"+a.t; if(!m.has(key)) m.set(key,{...a,cls:k.className,teacher:k.teacher}); }); });
+  const list=[...m.values()].sort((a,b)=>b.at-a.at).slice(0,4);
+  el.innerHTML=list.length?`<div class="anncard"><h3>📢 إعلانات المعلم</h3>${list.map(a=>`<div class="ann ${a.at>seen?"new":""}"><p>${esc(a.t)}</p><small>${esc(a.cls)}${a.teacher?" · أ. "+esc(a.teacher):""} · ${(()=>{ try{ return new Date(a.at).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"short"}) }catch(e){ return "" } })()}</small></div>`).join("")}</div>`:"";
+  if(list.length) setTimeout(()=>lsSet("saqr.annseen",String(list[0].at)),4000); }
+function drawParent(changed, prev){ drawPAnn();
   const seen=(()=>{ try{ return JSON.parse(lsGet("saqr.pseen"))||{} }catch(e){ return {} } })();
   const kids=PCODES.map(c=>[c,PKIDS[c]]);
   $("#pGrid").innerHTML = kids.map(([c,k])=>{ if(!k) return `<div class="pkid"><div class="grow"><b>…</b><small dir="ltr">${esc(c)}</small></div></div>`;
@@ -2037,6 +2069,7 @@ function drawKid(prev){
     return `<div class="rwk ${ok?"ok":""}"><span class="big-e">${emo(r.e)}</span><div class="grow"><b>${esc(r.t)}</b><div class="bar" style="margin:4px 0 0"><i style="width:${pc}%"></i></div></div><span class="cnt">${r.c} ⭐</span></div>`; }).join("")
     +(rw.length?`<p class="hint" style="margin:6px 0 0">${PVIEW?"المعلم بيصرف المكافأة لما الطالب يطلبها 🎁":"اجمع النقاط واطلب المكافأة من المعلم 🎁"}</p>`:"");
   const w=k.week||{pos:0,neg:0}; $("#kWeek").innerHTML=`<span style="background:#22b573">⭐ +${w.pos} نقطة</span><span style="background:#ff5d5d">✋ −${w.neg}</span>`;
+  const an=k.anns||[]; $("#kAnnCard").hidden=!an.length; $("#kAnn").innerHTML=an.map(a=>`<div class="ann"><p>${esc(a.t)}</p><small>${(()=>{ try{ return new Date(a.at).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"short"}) }catch(e){ return "" } })()}</small></div>`).join("");
   $("#kNoteCard").hidden=!k.note; $("#kNote").textContent=k.note||""; try{ $("#kNoteAt").textContent=k.noteAt?new Date(k.noteAt).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"long"}):""; }catch(e){}
   $("#kStyle").hidden=!!PVIEW; $("#kAttH").textContent=PVIEW?"📋 الحضور الشهر ده":"📋 حضورك الشهر ده";
   $("#kOut").textContent=PVIEW?"↩ أبنائي":"خروج";
