@@ -1703,6 +1703,12 @@ function openAIKey(){
 }
 const GAPI="https://generativelanguage.googleapis.com";
 let AIMODEL=null, AIMODELS=[];
+// newest stable «flash» model first (no fixed names: Google retires old ones), then flash-lite; previews and pro last
+function aiModelScore(name){ const b=name.replace("models/",""), m=b.match(/gemini-(\d+(?:\.\d+)?)/), v=m?parseFloat(m[1]):0;
+  if(/pro|ultra/.test(b)) return -100+v; if(/preview|exp/.test(b)) return -50+v;
+  if(/^gemini-\d+(\.\d+)?-flash$/.test(b)) return 1000+v*10; if(b==="gemini-flash-latest") return 990;
+  if(/^gemini-\d+(\.\d+)?-flash-lite$/.test(b)) return 500+v*10; if(b==="gemini-flash-lite-latest") return 495;
+  return /flash/.test(b)?300+v:v; }
 async function aiPickModel(key){
   let r; try{ r=await fetch(`${GAPI}/v1beta/models?pageSize=200&key=${encodeURIComponent(key)}`); }
   catch(e){ throw new Error("مفيش اتصال بخدمة الذكاء الاصطناعي — اتأكد من الإنترنت وجرّب تاني"); }
@@ -1715,13 +1721,8 @@ async function aiPickModel(key){
     throw new Error(m||"المفتاح مش شغّال"); }
   const ok=(j.models||[]).filter(m=>(m.supportedGenerationMethods||[]).includes("generateContent")).map(m=>m.name)
     .filter(n=>/gemini/.test(n)&&!/(image|live|tts|audio|embed|vision|banana|robotics|computer|thinking-exp|learnlm|nano)/.test(n));
-  const ver=n=>{ const m=n.match(/gemini-(\d+(?:\.\d+)?)/); return m?parseFloat(m[1]):0; };
-  // free keys: stable flash models have the biggest quota; previews and pro often have little or none
-  const PREF=["gemini-2.5-flash","gemini-flash-latest","gemini-2.5-flash-lite","gemini-flash-lite-latest","gemini-2.0-flash","gemini-2.0-flash-lite"];
-  const base=n=>n.replace("models/","");
-  const score=n=>{ const i=PREF.indexOf(base(n)); if(i>=0) return 100-i; return ver(n)*2 + (/flash/.test(n)?5:0) + (/pro/.test(n)?-20:0) + (/preview|exp/.test(n)?-30:0); };
-  ok.sort((a,b)=>score(b)-score(a)); if(!ok.length) throw new Error("مفيش نموذج متاح بالمفتاح ده");
-  AIMODELS=ok.slice(0,5); AIMODEL=ok[0]; return AIMODEL;
+  ok.sort((a,b)=>aiModelScore(b)-aiModelScore(a)); if(!ok.length) throw new Error("مفيش نموذج متاح بالمفتاح ده");
+  AIMODELS=ok.slice(0,6); AIMODEL=ok[0]; return AIMODEL;
 }
 async function aiUpload(file,key,onStep){
   if(file.size<=18*1024*1024){ const b64=await new Promise((res,rej)=>{ const r=new FileReader(); r.onload=()=>res(String(r.result).split(",")[1]); r.onerror=rej; r.readAsDataURL(file); });
@@ -1747,9 +1748,9 @@ async function aiRequest(body,key,onStatus){
   const quota=(st,m)=>st===429||/RESOURCE_EXHAUSTED|quota/i.test(m||"");
   const busy=(st,m)=>st===503||st===500||st===504||/overloaded|high demand|UNAVAILABLE|try again|deadline/i.test(m||"");
   const all=(AIMODELS.length?AIMODELS:[AIMODEL]), models=[...all.filter(m=>!AIBAD.has(m)),...all.filter(m=>AIBAD.has(m))];
-  let lastErr="", sawQuota=false, sawBusy=false;
+  let lastErr="", sawQuota=false, sawBusy=false, retired=false;
   for(let mi=0; mi<models.length; mi++){
-    const md=models[mi], b=/2\.5-flash/.test(md)?{...body,generationConfig:{...body.generationConfig,thinkingConfig:{thinkingBudget:0}}}:body;
+    const md=models[mi]; let b=/2\.5-flash/.test(md)?{...body,generationConfig:{...body.generationConfig,thinkingConfig:{thinkingBudget:0}}}:body;
     for(let attempt=0; attempt<2; attempt++){
       if(mi||attempt) onStatus&&onStatus(attempt?"لحظة… بعيد المحاولة":"بجرّب طريقة تانية…");
       let r; try{ r=await fetch(`${GAPI}/v1beta/${md}:generateContent?key=${encodeURIComponent(key)}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(b)}); }
@@ -1759,12 +1760,14 @@ async function aiRequest(body,key,onStatus){
       lastErr=(jj.error&&jj.error.message)||("HTTP "+r.status);
       if(quota(r.status,lastErr)){ sawQuota=true; AIBAD.add(md); break; }        // this model's free quota is used up → next model now
       if(busy(r.status,lastErr)){ sawBusy=true; if(attempt) break; await new Promise(z=>setTimeout(z,2000)); continue; }
-      if(r.status===400 && /thinking/i.test(lastErr) && b!==body){ AIBAD.add(md); break; }
+      if(r.status===400 && /thinking/i.test(lastErr) && b!==body){ b=body; attempt--; continue; }                // model doesn't take the thinking setting
+      if(r.status===404 || /no longer available|not found|NOT_FOUND|deprecated|not supported/i.test(lastErr)){ AIBAD.add(md); retired=true; break; }   // retired model → next one
       throw new Error(lastErr);
     }
   }
   if(lastErr==="مفيش اتصال بالإنترنت" && !sawQuota && !sawBusy) throw new Error(lastErr);
   if(sawQuota && !sawBusy) throw new Error("خلصت الطلبات المجانية لمفتاحك النهارده — جرّب بكرة، أو اعمل مفتاح جديد من حساب جوجل تاني");
+  if(retired && !sawQuota && !sawBusy){ AIMODEL=null; AIMODELS=[]; throw new Error("النماذج المتاحة لمفتاحك اتغيّرت — اضغط «جرّب تاني»"); }
   throw new Error("الخدمة عليها ضغط دلوقتي — جرّب كمان دقيقة");
 }
 async function aiBuildBank(part,key,opt){

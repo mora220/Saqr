@@ -8,7 +8,29 @@
 //   SAQR_AI_KV   (KV binding) لعدّاد الطلبات اليومي
 const PROJECT = "saqr-daf86";
 const ORIGINS = ["https://mora220.github.io", "http://localhost:8765"];
-const MODELS = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-2.0-flash"];
+// النماذج بتتختار لوحدها من المتاح للمفتاح (جوجل بتوقف القديم): أحدث flash ثابت، بعده flash-lite، والتجريبي وPro في الآخر
+// تقدر تثبّت نموذج بمتغير MODEL في الإعدادات لو حبيت
+const FALLBACK = ["gemini-flash-latest", "gemini-flash-lite-latest"];
+let MODELS_CACHE = null, MODELS_AT = 0;
+function modelScore(b) { const m = b.match(/gemini-(\d+(?:\.\d+)?)/), v = m ? parseFloat(m[1]) : 0;
+  if (/pro|ultra/.test(b)) return -100 + v; if (/preview|exp/.test(b)) return -50 + v;
+  if (/^gemini-\d+(\.\d+)?-flash$/.test(b)) return 1000 + v * 10; if (b === "gemini-flash-latest") return 990;
+  if (/^gemini-\d+(\.\d+)?-flash-lite$/.test(b)) return 500 + v * 10; if (b === "gemini-flash-lite-latest") return 495;
+  return /flash/.test(b) ? 300 + v : v; }
+async function pickModels(env) {
+  if (env.MODEL) return [env.MODEL, ...FALLBACK];
+  if (MODELS_CACHE && Date.now() - MODELS_AT < 3 * 3600e3) return MODELS_CACHE;
+  try {
+    const r = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=200", { headers: { "x-goog-api-key": env.GEMINI_KEY } });
+    const j = await r.json();
+    const list = (j.models || []).filter(m => (m.supportedGenerationMethods || []).includes("generateContent")).map(m => m.name.replace("models/", ""))
+      .filter(n => /gemini/.test(n) && !/(image|live|tts|audio|embed|vision|banana|robotics|computer|thinking-exp|learnlm|nano)/.test(n))
+      .sort((a, b) => modelScore(b) - modelScore(a)).slice(0, 6);
+    if (list.length) { MODELS_CACHE = list; MODELS_AT = Date.now(); return list; }
+  } catch (e) {}
+  return FALLBACK;
+}
+const DEAD = new Set();   // models Google refused (retired) — skipped until the worker restarts
 const GRADES = ["الأول الابتدائي", "الثاني الابتدائي", "الثالث الابتدائي", "الرابع الابتدائي", "الخامس الابتدائي", "السادس الابتدائي",
   "الأول المتوسط", "الثاني المتوسط", "الثالث المتوسط", "الأول الثانوي", "الثاني الثانوي", "الثالث الثانوي"];
 const TERMS = ["", "الفصل الأول", "الفصل الثاني"];
@@ -63,19 +85,22 @@ ${notes ? `ملاحظات المعلم (عن الأسئلة فقط): ${notes}` :
     const body = { systemInstruction: { parts: [{ text: SYSTEM }] }, contents: [{ role: "user", parts: [{ text: task }] }],
       generationConfig: { responseMimeType: "application/json", responseSchema: SCHEMA, temperature: 0.6, maxOutputTokens: 24000 } };
     let data = null, last = "";
-    for (const m of MODELS) {
-      const bb = /2\.5-flash/.test(m) ? { ...body, generationConfig: { ...body.generationConfig, thinkingConfig: { thinkingBudget: 0 } } } : body;
-      for (let attempt = 0; attempt < 2 && !data; attempt++) {
+    const models = await pickModels(env), order = [...models.filter(m => !DEAD.has(m)), ...models.filter(m => DEAD.has(m))];
+    for (const m of order) {
+      let bb = /2\.5-flash/.test(m) ? { ...body, generationConfig: { ...body.generationConfig, thinkingConfig: { thinkingBudget: 0 } } } : body;
+      for (let attempt = 0; attempt < 3 && !data; attempt++) {
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent`, { method: "POST", headers: { "Content-Type": "application/json", "x-goog-api-key": env.GEMINI_KEY }, body: JSON.stringify(bb) });
         const j = await r.json().catch(() => ({}));
-        if (r.ok) { data = j; break; }
-        last = (j.error && j.error.message) || "HTTP " + r.status;
+        if (r.ok) { data = j; DEAD.delete(m); break; }
+        last = `${m}: ` + ((j.error && j.error.message) || "HTTP " + r.status);
+        if (r.status === 400 && /thinking/i.test(last) && bb !== body) { bb = body; continue; }                 // model doesn't take the thinking setting
         if (r.status === 503 || r.status === 500) { await new Promise(z => setTimeout(z, 1500)); continue; }
-        break;   // quota / other → next model
+        if (r.status === 404 || /no longer available|not found|NOT_FOUND|deprecated|not supported/i.test(last)) DEAD.add(m);
+        break;   // quota / retired / other → next model
       }
       if (data) break;
     }
-    if (!data) return out(502, { error: "busy", message: "الخدمة عليها ضغط دلوقتي — جرّب كمان دقيقة" });
+    if (!data) { console.log("saqr-ai failed:", last); return out(502, { error: "busy", message: "الخدمة عليها ضغط دلوقتي — جرّب كمان دقيقة", detail: last.slice(0, 300) }); }
 
     const units = parseUnits(data);
     if (!units.length) return out(502, { error: "empty", message: "ماطلعتش أسئلة — اكتب اسم الوحدة أو الدرس زي الكتاب" });
