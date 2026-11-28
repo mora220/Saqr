@@ -24,7 +24,7 @@ catch (e) { db = initializeFirestore(app, {}); }
 let uid = null, unsub = null, unsubKids = null, unsubKid = null, unsubParent = null;
 const kidWatch = new Map();         // parent side: code -> unsubscribe
 const thWatch = new Map();          // parent side: code -> unsubscribe (message threads)
-let unsubThreads = null, unsubSubs = null;
+let unsubThreads = null, unsubSubs = null, unsubSchool = null;
 const lastKid = new Map();          // code -> JSON last written/seen (teacher side)
 const kidLookAt = new Map();        // code -> lookAt seen from the student doc
 const last = new Map();               // class id -> JSON last written/seen
@@ -84,7 +84,7 @@ const Cloud = {
     for (const [c, u] of kidWatch) if (!codes.includes(c)) { u(); kidWatch.delete(c); }
     for (const c of codes) if (!kidWatch.has(c)) kidWatch.set(c, onSnapshot(doc(db, "kids", c), d => cb(c, d.exists() ? d.data() : null), () => cb(c, null)));
   },
-  async signOut() { if (unsubParent) unsubParent(); unsubParent = null; if (unsubThreads) unsubThreads(); unsubThreads = null; if (unsubSubs) unsubSubs(); unsubSubs = null; for (const u of thWatch.values()) u(); thWatch.clear(); for (const u of kidWatch.values()) u(); kidWatch.clear(); if (unsub) unsub(); if (unsubKids) unsubKids(); unsub = unsubKids = null; last.clear(); lastKid.clear(); kidLookAt.clear(); await signOut(auth); },
+  async signOut() { if (unsubParent) unsubParent(); unsubParent = null; if (unsubThreads) unsubThreads(); unsubThreads = null; if (unsubSubs) unsubSubs(); unsubSubs = null; if (unsubSchool) unsubSchool(); unsubSchool = null; for (const u of thWatch.values()) u(); thWatch.clear(); for (const u of kidWatch.values()) u(); kidWatch.clear(); if (unsub) unsub(); if (unsubKids) unsubKids(); unsub = unsubKids = null; last.clear(); lastKid.clear(); kidLookAt.clear(); await signOut(auth); },
   // ---- messages: one thread per student code (teacher ↔ linked parents) ----
   // threads/{code}: owner, kid, cls, lastAt, lastBy ('t'|'p'), lastText, lastName, tSeen, pSeen{uid:ms}
   // threads/{code}/msgs/{id}: by, uid, name, text, at
@@ -138,6 +138,26 @@ const Cloud = {
   // ---- student asks for a reward from the shop (teacher approves) ----
   requestReward: (code, req) => updateDoc(doc(db, "kids", code), { req }),
   clearReq: code => updateDoc(doc(db, "kids", code), { req: deleteField() }),
+  // ---- school: schools/{code} (principal = owner), teachers publish a summary to schools/{code}/stats/{uid} ----
+  async createSchool(code, name, tname) {
+    await setDoc(doc(db, "schools", code), { owner: uid, name, at: Date.now(), teachers: { [uid]: tname || "" }, anns: [] });
+    await setDoc(doc(db, "users", uid), { school: code }, { merge: true });
+  },
+  async findSchool(code) { const d = await getDoc(doc(db, "schools", code)); return d.exists() ? { code, ...d.data() } : null; },
+  async joinSchool(code, tname) {
+    await updateDoc(doc(db, "schools", code), { ["teachers." + uid]: tname || "" });
+    await setDoc(doc(db, "users", uid), { school: code }, { merge: true });
+  },
+  async leaveSchool(code) {
+    await deleteDoc(doc(db, "schools", code, "stats", uid)).catch(() => {});
+    await updateDoc(doc(db, "schools", code), { ["teachers." + uid]: deleteField() }).catch(() => {});
+    await setDoc(doc(db, "users", uid), { school: deleteField() }, { merge: true });
+  },
+  watchSchool(code, cb) { if (unsubSchool) unsubSchool(); unsubSchool = code ? onSnapshot(doc(db, "schools", code), d => cb(d.exists() ? { code, ...d.data() } : null), () => cb(null)) : null; },
+  updateSchool: (code, data) => updateDoc(doc(db, "schools", code), data),
+  removeTeacher: async (code, tid) => { await deleteDoc(doc(db, "schools", code, "stats", tid)).catch(() => {}); await updateDoc(doc(db, "schools", code), { ["teachers." + tid]: deleteField() }); },
+  publishStats: (code, data) => setDoc(doc(db, "schools", code, "stats", uid), { ...data, at: Date.now() }),
+  listenStats: (code, cb) => onSnapshot(collection(db, "schools", code, "stats"), snap => cb(snap.docs.map(d => ({ uid: d.id, ...d.data() }))), () => cb([])),
   // live list of this teacher's classes; cb(classes, hasLocalPendingWrites)
   listen(cb, onErr) {
     if (unsub) unsub();

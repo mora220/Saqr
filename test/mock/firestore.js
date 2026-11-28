@@ -2,14 +2,16 @@
 import { getAuth } from "./auth.js";
 import { check } from "./rules.js";
 
-const K = "__mockdb";
-const load = () => { try { return JSON.parse(localStorage.getItem(K)) || {}; } catch (e) { return {}; } };
+// one localStorage key per document, so tabs never overwrite each other's writes
+const K = "__mockdb:";
+const load = () => { const o = {}; for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k.startsWith(K)) try { o[k.slice(K.length)] = JSON.parse(localStorage.getItem(k)); } catch (e) {} } return o; };
 let DB = load();
 const listeners = new Set();
-const persist = () => { localStorage.setItem(K, JSON.stringify(DB)); fire(); };
-addEventListener("storage", e => { if (e.key === K) { DB = load(); fire(); } });
+let dirty = new Set();
+const persist = () => { for (const path of dirty) { if (DB[path] === undefined) localStorage.removeItem(K + path); else localStorage.setItem(K + path, JSON.stringify(DB[path])); } dirty = new Set(); fire(); };
+addEventListener("storage", e => { if (e.key === null) { DB = load(); fire(); return; } if (e.key.startsWith(K)) { const path = e.key.slice(K.length); if (e.newValue === null) delete DB[path]; else DB[path] = JSON.parse(e.newValue); fire(); } });
 window.__mockDB = () => DB;
-window.__mockReset = () => { DB = {}; persist(); };
+window.__mockReset = () => { Object.keys(DB).forEach(k => dirty.add(k)); DB = {}; persist(); };
 
 const DEL = { __op: "delete" }, TS = { __op: "ts" };
 export const deleteField = () => DEL;
@@ -71,7 +73,7 @@ export async function setDoc(ref, data, opts) {
   const next = opts && opts.merge && before ? clone(before) : {};
   mergeInto(next, data, false);
   guard(before === undefined ? "create" : "update", ref.path, before, next);
-  DB[ref.path] = next; persist();
+  DB[ref.path] = next; dirty.add(ref.path); persist();
 }
 export async function addDoc(col, data) { const ref = doc(col); await setDoc(ref, data); return ref; }
 export async function updateDoc(ref, data) {
@@ -79,9 +81,9 @@ export async function updateDoc(ref, data) {
   if (before === undefined) { const e = new Error("No document to update"); e.code = "not-found"; throw e; }
   const next = clone(before); mergeInto(next, data, true);
   guard("update", ref.path, before, next);
-  DB[ref.path] = next; persist();
+  DB[ref.path] = next; dirty.add(ref.path); persist();
 }
-export async function deleteDoc(ref) { const before = DB[ref.path]; if (before === undefined) return; guard("delete", ref.path, before, null); delete DB[ref.path]; persist(); }
+export async function deleteDoc(ref) { const before = DB[ref.path]; if (before === undefined) return; guard("delete", ref.path, before, null); delete DB[ref.path]; dirty.add(ref.path); persist(); }
 export function writeBatch() {
   const ops = [];
   return { set: (r, d, o) => ops.push(() => setDoc(r, d, o)), update: (r, d) => ops.push(() => updateDoc(r, d)), delete: r => ops.push(() => deleteDoc(r)),

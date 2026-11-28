@@ -68,6 +68,24 @@ service cloud.firestore {
       allow delete: if request.auth != null && resource.data.owner == request.auth.uid;
     }
 
+    // المدرسة: المدير صاحب المستند، والمعلم بينضم بكود المدرسة (رقم المستند)
+    function schoolDoc(code) { return get(/databases/$(database)/documents/schools/$(code)).data; }
+    match /schools/{code} {
+      allow get: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.owner == request.auth.uid;
+      allow update: if request.auth != null && (
+        (resource.data.owner == request.auth.uid && request.resource.data.owner == request.auth.uid)
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['teachers'])
+            && request.resource.data.get('teachers', {}).diff(resource.data.get('teachers', {})).affectedKeys().hasOnly([request.auth.uid])));
+      allow delete: if request.auth != null && resource.data.owner == request.auth.uid;
+      // ملخص كل معلم (أرقام بس) — المدير بيقراه
+      match /stats/{tid} {
+        allow read: if request.auth != null && (request.auth.uid == tid || schoolDoc(code).owner == request.auth.uid);
+        allow create, update: if request.auth != null && request.auth.uid == tid && request.auth.uid in schoolDoc(code).get('teachers', {});
+        allow delete: if request.auth != null && (request.auth.uid == tid || schoolDoc(code).owner == request.auth.uid);
+      }
+    }
+
     // فصول المعلم: يشوفها ويعدّلها صاحبها بس
     match /classes/{classId} {
       allow read, delete: if request.auth != null && resource.data.owner == request.auth.uid;

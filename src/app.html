@@ -686,6 +686,18 @@ body.board .wscene{min-height:72vh}
 .cfoot{margin-top:auto;width:100%;display:flex;align-items:flex-end;justify-content:space-between}
 .cfoot>div{width:70mm}.cfoot i{display:block;border-bottom:1.2px solid #b9a77a;height:8mm}.cfoot small{font-weight:700;color:#6b7590;font-size:10pt}
 .cfoot .cseal{width:30mm;display:flex;flex-direction:column;align-items:center}.cseal .fal{width:22mm;height:22mm}.cseal b{color:#c27c00}
+/* ---------- school ---------- */
+.schopt{background:#f6f8fd;border-radius:18px;padding:12px 14px;margin-top:10px}.schopt small{display:block}
+.schme{display:flex;gap:10px;align-items:center;background:#e8faf1;border-radius:16px;padding:10px 12px}.schme .grow{flex:1}.schme small{display:block;color:var(--muted);font-weight:600}
+.schcode{display:flex;align-items:center;gap:10px;background:linear-gradient(135deg,#1b2a4a,#27407a);color:#fff;border-radius:18px;padding:10px 14px}
+.schcode .grow{flex:1}.schcode small{opacity:.8;display:block;font-weight:600}.schcode b{font-size:1.7rem;letter-spacing:5px;color:#ffc93c;display:block;text-align:right}
+.schk{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.schk>div{background:linear-gradient(135deg,#f6f3ff,#eef6ff);border-radius:16px;padding:10px 6px;text-align:center}
+.schk span{font-size:1.3rem;display:block}.schk b{display:block;font-size:1.45rem;line-height:1.2}.schk small{color:var(--muted);font-weight:700;font-size:.75rem}
+.schratio{height:16px;border-radius:9px;background:#ff8f8f;overflow:hidden}.schratio i{display:block;height:100%;background:linear-gradient(90deg,#22b573,#7ee0b0);border-radius:9px}
+.schrl{display:flex;justify-content:space-between;font-weight:700;font-size:.85rem;color:var(--muted);margin-top:4px}
+.clsav{width:100%;height:100%;border-radius:50%;background:linear-gradient(135deg,#dbe9ff,#b9d3ff);display:grid;place-items:center}.clsav .fe{width:55%;height:55%}
+.tav{width:42px;height:42px;border-radius:14px;background:var(--violet);color:#fff;display:grid;place-items:center;font-weight:800;font-size:1.2rem;flex:none}
 /* ---------- leaderboard ---------- */
 .podium{display:flex;justify-content:center;align-items:flex-end;gap:8px;margin:14px 0 6px;padding-top:20px}
 .pod{flex:1;max-width:130px;text-align:center;display:flex;flex-direction:column;align-items:center}
@@ -1068,13 +1080,13 @@ function kidPayloads(){ const m=new Map(), teacher=(USER&&USER.displayName)||"";
   S.classes.forEach(c=>c.students.forEach(s=>{ if(!s.code) return;
     m.set(s.code,{cid:c.id,sid:s.id,className:c.name,teacher,name:s.name,points:s.points,pos:s.pos,neg:s.neg,look:s.look,lookAt:s.lookAt||0,
       recent:c.log.filter(l=>l.sid===s.id).slice(-12).reverse().map(l=>({k:l.k,v:l.v,t:l.t,e:l.e||skillOf(l.k).e,nm:l.nm||skillOf(l.k).t})), att:monthAtt(c,s.id), today:attOf(c,todayKey(),s.id)||"",
-      week:weekOf(c,s.id), note:s.note||"", noteAt:s.noteAt||0, balance:balance(s), rewards:rewardsOf(c).map(r=>({id:r.id,e:r.e,t:r.t,c:r.c})), anns:(c.anns||[]).slice(0,3).map(a=>({t:a.text,at:a.at})), badges:Object.keys(s.badges||{}),
+      week:weekOf(c,s.id), note:s.note||"", noteAt:s.noteAt||0, balance:balance(s), rewards:rewardsOf(c).map(r=>({id:r.id,e:r.e,t:r.t,c:r.c})), anns:[...(c.anns||[]).slice(0,3).map(a=>({t:a.text,at:a.at})),...((SCHOOL&&SCHOOL.anns)||[]).slice(0,3).map(a=>({t:"🏫 "+a.t,at:a.at}))].sort((x,y)=>y.at-x.at).slice(0,3), badges:Object.keys(s.badges||{}),
       hw:(c.hw||[]).filter(h=>h.due>Date.now()-3*DAY).slice(0,6).map(h=>({id:h.id,t:h.title,due:h.due,n:h.n,pts:h.pts,s:(s.hwd||{})[h.id]||null}))}); }));
   return m; }
 function fixCur(){ if(!S.cur || !S.classes.find(c=>c.id===S.cur)) S.cur = S.classes[0] && S.classes[0].id; }
 function save(){
   lsSet(PREF_KEY, JSON.stringify({cur:S.cur, sound:S.sound}));
-  if(MODE==="cloud"){ if(window.Cloud){ ensureCodes(); Cloud.sync(S.classes); if(kidsReady){ Cloud.syncKids(kidPayloads()); syncBoards(); } } }
+  if(MODE==="cloud"){ if(window.Cloud){ ensureCodes(); Cloud.sync(S.classes); if(kidsReady){ Cloud.syncKids(kidPayloads()); syncBoards(); syncSchoolStats(); } } }
   else store.save(S);
 }
 const cls = () => S.classes.find(c=>c.id===S.cur);
@@ -1427,8 +1439,6 @@ function stopMic(){ if(mic){ cancelAnimationFrame(mic.raf); mic.stream.getTracks
 /* ---------- icon set (hand-drawn SVG, stroke style) ---------- */
 const ICONS={
   trophy:'<path d="M8 3h8v6a4 4 0 0 1-8 0z"/><path d="M8 5H5a2.5 2.5 0 0 0 3 4M16 5h3a2.5 2.5 0 0 1-3 4"/><path d="M12 13v4M8.5 21h7M9.5 17h5v4h-5z"/>',
-  book:'<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M4 20.5A2.5 2.5 0 0 0 6.5 23H20v-5"/><path d="m9 9 2 2 4-4"/>',
-  chat:'<path d="M4 6.5A3.5 3.5 0 0 1 7.5 3h9A3.5 3.5 0 0 1 20 6.5v6a3.5 3.5 0 0 1-3.5 3.5H11l-4.6 3.8c-.4.3-.9 0-.9-.4V16A3.5 3.5 0 0 1 4 12.5z"/><path d="M8.5 8.3h7M8.5 11.2h4.4"/>',
   send:'<path d="M20.5 3.6 3.9 10.2c-.8.3-.8 1.4 0 1.7l6.4 2.1 2.1 6.4c.3.8 1.4.8 1.7 0L20.5 3.6z"/><path d="m10.3 14 4.6-4.6"/>',
   users:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5"/><path d="M16 4.6a3.5 3.5 0 0 1 0 6.8"/><path d="M18 13.8c2.1.8 3.5 2.9 3.5 5.2"/>',
   clipboard:'<rect x="5" y="4" width="14" height="17" rx="3"/><path d="M9 4.5V3.8A1.8 1.8 0 0 1 10.8 2h2.4A1.8 1.8 0 0 1 15 3.8v.7"/><path d="m8.5 13 2.5 2.5 4.5-5"/>',
@@ -1815,13 +1825,16 @@ function openSettings(){
       ${row("print","printer","#22b573","طباعة بطاقات الدخول","بطاقة لكل طالب فيها الكود وQR")}
       ${row("ann","megaphone","#ff5d5d","إعلانات أولياء الأمور",`${(cls().anns||[]).length} إعلان في الفصل ده`)}
     </div>
+    <div class="sgh">المدرسة</div><div class="sgrp">
+      ${row("school","school","#1b2a4a","المدرسة",SCHOOL?(isPrincipal()?`لوحة المدير · ${esc(SCHOOL.name)}`:esc(SCHOOL.name)):"لوحة المدير، أو انضم لمدرستك بالكود")}
+    </div>
     <div class="sgh">المحتوى</div><div class="sgrp">
       ${row("banks","book","#ff8a3d","بنوك الأسئلة والمنهج",`${(S.banks||[]).length} بنك · ${qn} سؤال`)}
     </div>
     <div class="sgh">عام</div><div class="sgrp">
       ${row("sound",S.sound?"sound":"mute","#2e9c9a","الأصوات",S.sound?"شغالة":"مقفولة",`<span class="sw2 ${S.sound?"on":""}"></span>`)}
       ${row("ai","sparkle","#7b5cd6","الذكاء الاصطناعي (Gemini)",aiKey()?"مفعّل ✅ — لتحويل الكتب لبنوك أسئلة":"أضف مفتاح Gemini المجاني")}
-      ${row("about","info","#97a0b8","عن صقر","الإصدار 1.6 · صُمّم للمعلم السعودي 🦅")}
+      ${row("about","info","#97a0b8","عن صقر","الإصدار 2.0 · صُمّم للمعلم السعودي 🦅")}
     </div>
     <div class="sgrp">
       ${row("dev","chat","#25d366","تواصل مع المطور","اقتراح، مشكلة، أو طلب ميزة جديدة")}
@@ -1833,7 +1846,7 @@ function openSettings(){
     if(k==="classes") openClassMenu(); else if(k==="add") openAdd(); else if(k==="skills") openSkills(); else if(k==="codes") cloudOnly(openCodes);
     else if(k==="print") cloudOnly(openPrintCards); else if(k==="ann") openAnn(); else if(k==="banks") openBanks();
     else if(k==="sound"){ S.sound=!S.sound; save(); if(S.sound) SFX.pos(); openSettings(); }
-    else if(k==="ai") openAIKey(); else if(k==="dev") contactDev();
+    else if(k==="ai") openAIKey(); else if(k==="dev") contactDev(); else if(k==="school") openSchool();
     else if(k==="about") toast("🦅 صقر — إدارة الفصل بروح الصقور، من تصميم أ. محمد رجب"); });
 }
 function cloudOnly(fn){ if(MODE==="cloud") fn(); else toast("سجّل دخول عشان كل طالب ياخد كود 🔑"); }
@@ -3138,6 +3151,90 @@ function openParentReport(){ const k=PKIDS[PVIEW]; if(!k) return;
   $("#prGo").onclick=()=>printDoc(parentReportHTML(k)); }
 addEventListener("resize",()=>fitPreviews());
 
+/* ---------- school / principal dashboard ---------- */
+let SCHOOL_CODE=null, SCHOOL=null, STATS=[], unStats=null;
+const isPrincipal=()=>!!(SCHOOL && USER && SCHOOL.owner===USER.uid);
+function setSchoolCode(code){ if(code===SCHOOL_CODE) return; SCHOOL_CODE=code||null; SCHOOL=null;
+  Cloud.watchSchool(SCHOOL_CODE, sc=>{ const was=SCHOOL; SCHOOL=sc;
+    if(sc && USER && !(USER.uid in (sc.teachers||{}))){ if(was) toast("🏫 اتشلت من المدرسة"); Cloud.leaveSchool(sc.code).catch(()=>{}); SCHOOL=null; }
+    if(MODE==="cloud" && kidsReady) Cloud.syncKids(kidPayloads()); syncSchoolStats();
+    if($("#sheet .schv")) openSchool(); }); }
+function teacherStats(){ const wk=weekStart(new Date()), end=new Date(Date.now()+DAY), today=new Date().toDateString();
+  return {name:(USER&&(USER.displayName||USER.email))||"معلم", classes:S.classes.map(c=>{ const T=statsFor(c,wk,end).tot, hwW=(c.hw||[]).filter(h=>h.at>=+wk);
+    return {id:c.id,name:c.name,n:c.students.length,pos:T.pos,neg:T.neg,rate:T.rate,ab:T.ab,late:T.late,
+      today:c.log.filter(l=>l.v>0&&l.k!=="shop"&&new Date(l.t).toDateString()===today).reduce((a,l)=>a+l.v,0),
+      golds:c.students.filter(s=>levelOf(s.points).lv===2).length, hw:hwW.length, hwDone:hwW.reduce((a,h)=>a+Math.min(h.done||0,c.students.length),0), hwSlots:hwW.length*c.students.length,
+      top:lbRows(c,+wk,Infinity).filter(r=>r.p>0).slice(0,3).map(r=>firstName(r.s.name))}; })}; }
+let lastStats="", statsT=null;
+function syncSchoolStats(){ clearTimeout(statsT); statsT=setTimeout(()=>{ if(MODE!=="cloud"||!SCHOOL||!USER||!(USER.uid in (SCHOOL.teachers||{}))) return;
+  const d=teacherStats(), j=JSON.stringify(d)+SCHOOL.code; if(j===lastStats) return; lastStats=j; Cloud.publishStats(SCHOOL.code,d).catch(()=>{ lastStats=""; }); },2500); }
+
+function openSchool(){
+  if(MODE!=="cloud"){ openSheet(`<h2>🏫 المدرسة</h2><div class="mempty">${emo("🏫")}<b>لوحة المدرسة للمدير</b><p class="hint">سجّل دخولك عشان تنشئ مدرستك أو تنضم لمدرستك بكود المدير.</p><button class="btn pri" id="scIn">تسجيل الدخول</button></div>`);
+    $("#scIn").onclick=()=>{ closeSheet(); showLogin(); }; return; }
+  if(SCHOOL_CODE && !SCHOOL){ openSheet(`<div class="schv"><h2>🏫 المدرسة</h2><p class="hint" style="text-align:center;padding:30px">لحظة…</p></div>`); return; }
+  if(!SCHOOL) return openSchoolJoin();
+  if(isPrincipal()) return openSchoolDash();
+  const anns=SCHOOL.anns||[];
+  openSheet(`<div class="schv"><h2>🏫 ${esc(SCHOOL.name)}</h2>
+    <div class="schme"><span class="big-e">${emo("✅")}</span><div class="grow"><b>إنت عضو في المدرسة</b><small>المدير بيشوف ملخص بالأرقام لفصولك (النقاط والحضور والواجبات، وأسماء أول ٣ في صدارة الأسبوع)</small></div></div>
+    ${anns.length?`<div class="rsec"><h3>📢 إعلانات المدرسة</h3>${anns.map(a=>`<div class="ann"><p>${esc(a.t)}</p><small>${esc(msgWhen(a.at))}</small></div>`).join("")}<p class="hint">إعلانات المدرسة بتوصل لأولياء أمور طلابك كمان</p></div>`:""}
+    <div class="row" style="margin-top:14px"><button class="btn red" id="scLeave">مغادرة المدرسة</button></div></div>`, ()=>setTab("home"));
+  $("#scLeave").onclick=()=>ask(`تغادر «${SCHOOL.name}»؟`,async()=>{ try{ await Cloud.leaveSchool(SCHOOL.code); }catch(e){} SCHOOL_CODE=null; SCHOOL=null; Cloud.watchSchool(null); closeSheet(); toast("خرجت من المدرسة"); });
+}
+function openSchoolJoin(){
+  openSheet(`<div class="schv"><h2>🏫 المدرسة</h2><p class="hint">اربط فصولك بمدرستك عشان المدير يتابع الأداء ويبعت إعلانات لكل أولياء الأمور.</p>
+    <div class="schopt"><b>👩‍🏫 أنا معلم — عندي كود المدرسة</b><div class="row" style="gap:6px;margin-top:6px"><input class="field" id="scCode" maxlength="6" dir="ltr" placeholder="ABC123" style="flex:1;letter-spacing:4px;text-align:center;text-transform:uppercase;font-size:1.2rem"><button class="btn pri" id="scJoin">انضمام</button></div></div>
+    <div class="schopt"><b>🧑‍💼 أنا المدير — إنشاء مدرسة جديدة</b><div class="row" style="gap:6px;margin-top:6px"><input class="field" id="scName" maxlength="50" placeholder="اسم المدرسة" style="flex:1"><button class="btn vio" id="scNew">إنشاء</button></div>
+      <small class="hint">هتاخد كود تبعته للمعلمين، وتشوف لوحة المدرسة كلها</small></div>
+    <p class="hint" id="scMsg"></p></div>`, ()=>setTab("home"));
+  $("#scJoin").onclick=async()=>{ const code=normCode($("#scCode").value); if(code.length!==6){ $("#scMsg").textContent="الكود 6 حروف وأرقام"; return; }
+    $("#scJoin").disabled=true;
+    try{ const sc=await Cloud.findSchool(code); if(!sc){ $("#scMsg").textContent="الكود ده مش موجود — اتأكد منه مع المدير"; return; }
+      await Cloud.joinSchool(code,USER.displayName||USER.email||"معلم"); setSchoolCode(code); SFX.level(); confetti(innerWidth/2,innerHeight/3,100); toast(`🏫 انضميت لـ «${sc.name}»`); closeSheet(); }
+    catch(e){ $("#scMsg").textContent="تعذّر الانضمام: "+(e.code||e.message); } finally{ const b=$("#scJoin"); if(b) b.disabled=false; } };
+  $("#scNew").onclick=async()=>{ const name=$("#scName").value.trim(); if(!name){ $("#scMsg").textContent="اكتب اسم المدرسة"; return; }
+    $("#scNew").disabled=true;
+    try{ let code=genCode(); for(let i=0;i<4 && await Cloud.findSchool(code);i++) code=genCode();
+      await Cloud.createSchool(code,name.slice(0,50),USER.displayName||USER.email||"المدير"); setSchoolCode(code); SFX.level(); confetti(innerWidth/2,innerHeight/3,140); toast("🏫 اتعملت المدرسة — ابعت الكود للمعلمين"); }
+    catch(e){ $("#scMsg").textContent="تعذّر الإنشاء: "+(e.code||e.message); const b=$("#scNew"); if(b) b.disabled=false; } };
+}
+function openSchoolDash(){ const sc=SCHOOL, code=sc.code;
+  const draw=()=>{ const el=$("#scD"); if(!el) return;
+    const tids=Object.keys(sc.teachers||{}), byT={}; STATS.forEach(x=>byT[x.uid]=x);
+    const classes=[]; STATS.filter(x=>tids.includes(x.uid)).forEach(x=>(x.classes||[]).forEach(c=>classes.push({...c,teacher:x.name,tid:x.uid})));
+    const sum=k=>classes.reduce((a,c)=>a+(c[k]||0),0), n=sum("n"), pos=sum("pos"), neg=sum("neg");
+    const rated=classes.filter(c=>c.rate!=null), rate=rated.length?Math.round(rated.reduce((a,c)=>a+c.rate,0)/rated.length):null;
+    const hwS=sum("hwSlots"), hwD=sum("hwDone");
+    const rank=classes.filter(c=>c.n).map(c=>({...c,score:c.pos/c.n})).sort((a,b)=>b.score-a.score);
+    el.innerHTML=`<div class="schk">
+        <div><span>👩‍🏫</span><b>${tids.length}</b><small>معلم</small></div><div><span>🏫</span><b>${classes.length}</b><small>فصل</small></div><div><span>👥</span><b>${n}</b><small>طالب</small></div>
+        <div><span>⭐</span><b>${pos}</b><small>نقطة إيجابية الأسبوع</small></div><div><span>📋</span><b>${rate==null?"—":rate+"%"}</b><small>نسبة الحضور</small></div><div><span>📘</span><b>${hwS?pct(hwD/hwS):"—"}</b><small>تسليم الواجبات</small></div></div>
+      ${pos+neg?`<div class="rsec"><h3>⚖️ السلوك في المدرسة الأسبوع ده</h3><div class="schratio"><i style="width:${100*pos/(pos+neg)}%"></i></div><div class="schrl"><span>👍 إيجابي ${pct(pos/(pos+neg))}</span><span>✋ يحتاج متابعة ${pct(neg/(pos+neg))}</span></div></div>`:""}
+      ${rank.length&&rank[0].pos?`<div class="rsec"><h3>🏆 أكتر الفصول تميّزاً الأسبوع ده</h3>${podiumHTML(rank.slice(0,3).map(c=>({n:c.name,p:c.pos,av:`<div class="clsav">${emo("🏫")}</div>`})),false)}
+        <div class="list">${rank.map((c,i)=>`<div class="li"><span class="rk">${i+1}</span><div class="grow"><b>${esc(c.name)}</b><small>أ. ${esc(c.teacher)} · ${c.n} طالب${c.top&&c.top.length?" · 🏅 "+c.top.map(esc).join("، "):""}</small></div><span class="chip p">${(c.score).toFixed(1)} ⭐/طالب</span></div>`).join("")}</div></div>`
+        :`<div class="mempty">${emo("📊")}<b>الأرقام هتظهر هنا</b><p class="hint">أول ما المعلمين ينضموا ويستخدموا صقر في فصولهم</p></div>`}
+      <div class="rsec"><h3>👩‍🏫 المعلمين</h3><div class="list">${tids.map(t=>{ const x=byT[t], nm=(x&&x.name)||sc.teachers[t]||"معلم", old=x&&Date.now()-x.at>7*DAY;
+        const cs=(x&&x.classes)||[]; return `<div class="li"><span class="tav">${esc(String(nm).trim()[0]||"؟")}</span><div class="grow"><b>${esc(nm)}${t===sc.owner?` <span class="chip p">المدير</span>`:""}</b>
+          <small>${x?`${cs.length} فصل · ${cs.reduce((a,c)=>a+c.n,0)} طالب · ⭐ ${cs.reduce((a,c)=>a+c.pos,0)} الأسبوع · ${old?"⚠️ ":""}آخر نشاط ${esc(msgWhen(x.at))}`:"لسه مافتحش صقر بعد الانضمام"}</small></div>
+          ${t!==sc.owner?`<button class="btn red" data-rt="${esc(t)}">إزالة</button>`:""}</div>`; }).join("")}</div></div>
+      <div class="rsec"><h3>📢 إعلان لكل أولياء الأمور في المدرسة</h3><textarea class="field" id="scAnn" maxlength="300" style="min-height:80px" placeholder="مثلاً: الأحد إجازة رسمية — كل عام وأنتم بخير"></textarea>
+        <div class="row" style="margin-top:8px"><button class="btn pri" id="scAnnGo">📢 إرسال للمدرسة</button></div>
+        ${(sc.anns||[]).map((a,i)=>`<div class="ann" style="margin-top:8px"><p>${esc(a.t)}</p><small>${esc(msgWhen(a.at))}</small> <button class="btn red" data-da="${i}" style="padding:4px 10px;float:left">حذف</button></div>`).join("")}</div>`;
+    el.querySelectorAll("[data-rt]").forEach(b=>b.onclick=()=>ask("إزالة المعلم من المدرسة؟",async()=>{ try{ await Cloud.removeTeacher(code,b.dataset.rt); toast("تم"); }catch(e){ toast("تعذّر الإزالة"); } }));
+    $("#scAnnGo").onclick=async()=>{ const t=$("#scAnn").value.trim(); if(!t){ toast("اكتب الإعلان الأول"); return; }
+      const anns=[{t:t.slice(0,300),at:Date.now()},...(sc.anns||[])].slice(0,10); try{ await Cloud.updateSchool(code,{anns}); SFX.level(); toast("📢 اتبعت لكل فصول المدرسة"); }catch(e){ toast("تعذّر الإرسال"); } };
+    el.querySelectorAll("[data-da]").forEach(b=>b.onclick=()=>ask("حذف الإعلان؟",()=>{ const anns=(sc.anns||[]).filter((x,i)=>i!==+b.dataset.da); Cloud.updateSchool(code,{anns}).catch(()=>toast("تعذّر الحذف")); }));
+  };
+  openSheet(`<div class="schv"><h2>🏫 ${esc(sc.name)}</h2>
+    <div class="schcode"><div class="grow"><small>كود المدرسة للمعلمين</small><b dir="ltr">${esc(code)}</b></div><button class="btn pri" id="scInv">📋 دعوة المعلمين</button></div>
+    <div id="scD"><p class="hint">…</p></div></div>`, ()=>{ if(unStats) unStats(); unStats=null; setTab("home"); });
+  gsap.killTweensOf("#sheet"); gsap.set("#sheet",{y:0,opacity:1});
+  $("#scInv").onclick=()=>copyText(`🏫 انضم لمدرسة «${sc.name}» على صقر\n1) ادخل ${location.origin+location.pathname} بحسابك\n2) الإعدادات ← المدرسة ← اكتب الكود: ${code}`,"📋 اتنسخت الدعوة — ابعتها للمعلمين");
+  if(unStats) unStats(); unStats=Cloud.listenStats(code,l=>{ STATS=l; draw(); });
+  syncSchoolStats(); draw();
+}
+
 /* ---------- messages: teacher ↔ parents (one thread per student) ---------- */
 let THREADS=[], CHAT=null, PTH={};
 const QR_T=["شكراً لمتابعتك 🌟","متميّز النهارده ما شاء الله 👏","نرجو متابعة الواجب في البيت 📘","ياريت نتواصل بخصوص مستواه 🤝","تم، وهتابع الموضوع 👍"];
@@ -3341,7 +3438,7 @@ function startParent(u){
 function drawPAnn(){ const el=$("#pAnn"); if(!el) return; const seen=+(lsGet("saqr.annseen")||0), m=new Map();
   PCODES.forEach(c=>{ const k=PKIDS[c]; (k&&k.anns||[]).forEach(a=>{ const key=a.at+"|"+a.t; if(!m.has(key)) m.set(key,{...a,cls:k.className,teacher:k.teacher}); }); });
   const list=[...m.values()].sort((a,b)=>b.at-a.at).slice(0,4);
-  el.innerHTML=list.length?`<div class="anncard"><h3>📢 إعلانات المعلم</h3>${list.map(a=>`<div class="ann ${a.at>seen?"new":""}"><p>${esc(a.t)}</p><small>${esc(a.cls)}${a.teacher?" · أ. "+esc(a.teacher):""} · ${(()=>{ try{ return new Date(a.at).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"short"}) }catch(e){ return "" } })()}</small></div>`).join("")}</div>`:"";
+  el.innerHTML=list.length?`<div class="anncard"><h3>📢 الإعلانات</h3>${list.map(a=>`<div class="ann ${a.at>seen?"new":""}"><p>${esc(a.t)}</p><small>${esc(a.cls)}${a.teacher?" · أ. "+esc(a.teacher):""} · ${(()=>{ try{ return new Date(a.at).toLocaleDateString("ar-EG",{weekday:"long",day:"numeric",month:"short"}) }catch(e){ return "" } })()}</small></div>`).join("")}</div>`:"";
   if(list.length) setTimeout(()=>lsSet("saqr.annseen",String(list[0].at)),4000); }
 function drawParent(changed, prev){ drawPAnn();
   const seen=(()=>{ try{ return JSON.parse(lsGet("saqr.pseen"))||{} }catch(e){ return {} } })();
@@ -3435,7 +3532,7 @@ function startCloud(user){
       Cloud.listenNewSubs(processSubs);
       Cloud.listenThreads(l=>{ const before=liveThreads().filter(tUnread).length; THREADS=l; drawMsgBadge();
         if(liveThreads().filter(tUnread).length>before && !CHAT) SFX.msg(); });
-      Cloud.listenMe((d,local)=>{ if(local) return; S.banks=d.banks||[]; if(d.geminiKey!==undefined){ S.geminiKey=d.geminiKey; if(d.geminiKey) lsSet(AI_KEY,d.geminiKey); } migrateQs(); });
+      Cloud.listenMe((d,local)=>{ if(local) return; setSchoolCode(d.school||null); S.banks=d.banks||[]; if(d.geminiKey!==undefined){ S.geminiKey=d.geminiKey; if(d.geminiKey) lsSet(AI_KEY,d.geminiKey); } migrateQs(); });
       Cloud.listenKids(kl=>{ kidsReady=true; let changed=false; const oldMeta=KIDMETA; KIDMETA={}; kl.forEach(k=>KIDMETA[k.code]=k);
         kl.forEach(k=>{ const o=oldMeta[k.code]; if(k.req && (!o || !o.req || o.req.at!==k.req.at) && Object.keys(oldMeta).length){ SFX.msg(); toast(`🙋 ${k.name} طالب «${k.req.t}» من المتجر`); changed=true; }
           if(!k.req && o && o.req) changed=true; });
@@ -3459,7 +3556,7 @@ function openAcct(){
     openSheet(`<h2>👤 حسابك</h2><div class="li"><div class="grow"><b>${esc(USER.displayName||"معلم صقر")}</b><small dir="ltr">${esc(USER.email||"")}</small></div><span class="chip p">☁️ متزامن</span></div>
       <p class="hint">فصولك محفوظة في السحابة، وتقدر تفتحها من أي جهاز بنفس الحساب. وبتشتغل كمان من غير نت وتتزامن لما يرجع.</p>
       <button class="btn red" id="aOut">تسجيل الخروج</button>`);
-    $("#aOut").onclick=async()=>{ closeSheet(); await Cloud.signOut(); USER=null; MODE=null; THREADS=[]; drawMsgBadge(); lsSet(MODE_KEY,null); S.classes=[]; showLogin(); };
+    $("#aOut").onclick=async()=>{ closeSheet(); await Cloud.signOut(); USER=null; MODE=null; THREADS=[]; drawMsgBadge(); SCHOOL_CODE=null; SCHOOL=null; lastStats=""; lsSet(MODE_KEY,null); S.classes=[]; showLogin(); };
   } else {
     openSheet(`<h2>👤 وضع التجربة</h2><p class="hint">البيانات محفوظة على هذا الجهاز بس. سجّل دخول عشان تتحفظ في السحابة وتفتحها من أي جهاز — وهننقل فصولك الحالية معاك (ما عدا الفصل التجريبي).</p>
       <button class="btn pri" id="aIn">تسجيل الدخول</button>`);

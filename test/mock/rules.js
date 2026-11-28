@@ -90,5 +90,22 @@ export function check(op, path, before, after, auth, get) {
     if (op === "delete") return uid && before.owner === uid ? "" : deny();
     return deny();
   }
+  if (p[0] === "schools" && p.length === 2) {
+    if (op === "get") return uid ? "" : deny();
+    if (op === "create") return uid && after.owner === uid ? "" : deny();
+    if (op === "update") {
+      if (uid && before.owner === uid && after.owner === uid) return "";
+      if (uid && onlyKeys(before, after, ["teachers"]) && onlyKeys(before.teachers, after.teachers, [uid])) return "";
+      return deny("school update");
+    }
+    if (op === "delete") return uid && before.owner === uid ? "" : deny();
+    return deny();
+  }
+  if (p[0] === "schools" && p[2] === "stats" && p.length === 4) {
+    const sc = get("schools/" + p[1]);
+    if (read) return uid && (uid === p[3] || (sc && sc.owner === uid)) ? "" : deny("stats read");
+    if (op === "create" || op === "update") return uid && uid === p[3] && sc && (sc.teachers || {})[uid] !== undefined ? "" : deny("stats write");
+    if (op === "delete") return uid && (uid === p[3] || (sc && sc.owner === uid)) ? "" : deny();
+  }
   return "no rule for " + path;
 }
