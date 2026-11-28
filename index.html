@@ -1822,6 +1822,17 @@ async function runAI(file,opt){
     $("#aiRetry").onclick=openAIBook; $("#aiKeyB").onclick=openAIKey; }
 }
 /* ---------- AI questions without a book: from subject, grade, unit and lesson ---------- */
+// «صقر AI»: وكيل الأسئلة على Cloudflare (ai-worker/worker.js). لما الرابط يتحط هنا، المعلم المسجّل مش محتاج مفتاح خاص
+const SAQR_AI_URL="";
+const useSaqrAI=()=>!!SAQR_AI_URL && MODE==="cloud" && !!USER && !USER.isAnonymous;
+async function saqrAI(opt){
+  const tok=await Cloud.idToken(); if(!tok) throw new Error("سجّل دخولك الأول");
+  let r; try{ r=await fetch(SAQR_AI_URL.replace(/\/$/,"")+"/questions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},
+    body:JSON.stringify({subject:opt.meta.subject,grade:opt.meta.grade,term:opt.meta.term||"",unit:opt.unit,lesson:opt.lesson,n:opt.n,mcq:opt.mcq,notes:opt.notes})}); }
+  catch(e){ const er=new Error("مفيش اتصال بالإنترنت"); er.net=true; throw er; }
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){ const er=new Error(j.message||"حصل خطأ — جرّب تاني"); er.status=r.status; throw er; }
+  return j; }
 async function aiGenQs(key,opt){
   const schema={type:"OBJECT",properties:{units:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},lessons:{type:"ARRAY",items:{type:"OBJECT",properties:{name:{type:"STRING"},
     qs:{type:"ARRAY",items:{type:"OBJECT",properties:{q:{type:"STRING"},a:{type:"STRING"},wrong:{type:"ARRAY",items:{type:"STRING"}}},required:["q","a"]}}},required:["name","qs"]}}},required:["name","lessons"]}}},required:["units"]};
@@ -1840,7 +1851,7 @@ ${opt.mcq?"اجعل الأسئلة اختيار من متعدد: الإجابة 
   return aiUnitsFrom(j);
 }
 function openAIGen(pre){ pre=pre||{};
-  if(!aiKey()){ toast("أضف مفتاح الذكاء الاصطناعي الأول ✨"); openAIKey(); return; }
+  if(!useSaqrAI() && !aiKey()){ toast("أضف مفتاح الذكاء الاصطناعي الأول ✨"); openAIKey(); return; }
   const B=S.banks||[], bk=pre.bank&&B.find(x=>x.id===pre.bank);
   const m=bk&&bk.subject?{subject:bk.subject,grade:bk.grade||"",term:bk.term||""}:(openAIBook.m=openAIBook.m||{subject:"",grade:"",term:""});
   const st={unit:pre.unit||"",lesson:pre.lesson||"",n:pre.n||5,mcq:pre.mcq!==undefined?pre.mcq:true,notes:""};
@@ -1869,9 +1880,11 @@ async function runAIGen(opt,bid){
     <p class="hint" style="text-align:center;font-weight:700">${esc(opt.meta.subject)} · ${esc(opt.meta.grade)}<br>${esc([opt.unit,opt.lesson].filter(Boolean).join(" — "))}</p>
     <p class="hint" id="aiStat" style="text-align:center;color:#7b5cd6;font-weight:700;min-height:1.4em"></p><p class="hint" style="text-align:center">بياخد من ١٠ ثواني لدقيقة 🦅</p>`);
   const f=$("#aiFal .fal"); if(f) f.classList.add("flap"); gsap.to("#aiFal",{y:-12,duration:.8,yoyo:true,repeat:-1,ease:"sine.inOut"});
-  const key=aiKey();
-  try{ if(!AIMODEL) await aiPickModel(key);
-    const res=await aiGenQs(key,{...opt,onStatus:t=>{ const el=$("#aiStat"); if(el) el.textContent=t; }});
+  const key=aiKey(), stat=t=>{ const el=$("#aiStat"); if(el) el.textContent=t; };
+  try{ let res=null;
+    if(useSaqrAI()){ try{ res=await saqrAI(opt); if(res.limit) setTimeout(()=>toast(`✨ باقيلك ${Math.max(0,res.limit-res.used)} طلب النهارده`),900); }
+      catch(e){ if(!key || e.status===400 || e.status===401) throw e; stat("بجرّب بمفتاحك الخاص…"); } }   // fall back to the teacher's own key if they have one
+    if(!res){ if(!AIMODEL) await aiPickModel(key); res=await aiGenQs(key,{...opt,onStatus:stat}); }
     if(!res.units.length) throw new Error("ماطلعتش أسئلة — جرّب تكتب اسم الوحدة أو الدرس بشكل أوضح");
     res.meta=opt.meta; res.title=autoBankTitle(opt.meta); aiPreview(res,res.title,bid);
   }catch(e){ openSheet(`<h2>❌ ماقدرتش أجهّز الأسئلة</h2><p class="hint" style="font-size:1rem">${esc(e.message||"حصل خطأ")}</p>

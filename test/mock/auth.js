@@ -2,8 +2,9 @@
 const K = "__mockuser";
 const subs = new Set();
 const load = () => { try { return JSON.parse(sessionStorage.getItem(K)); } catch (e) { return null; } };
-const auth = { currentUser: load(), languageCode: "ar" };
-const set = u => { auth.currentUser = u; sessionStorage.setItem(K, JSON.stringify(u)); subs.forEach(cb => cb(u)); return { user: u }; };
+const withTok = u => (u ? Object.assign(u, { getIdToken: async () => "mock-id-token-" + u.uid }) : u);
+const auth = { currentUser: withTok(load()), languageCode: "ar" };
+const set = u => { auth.currentUser = withTok(u); sessionStorage.setItem(K, JSON.stringify(u)); subs.forEach(cb => cb(u)); return { user: u }; };
 window.__mockSignIn = (uid, displayName, email) => set({ uid, displayName: displayName || "", email: email || "", isAnonymous: false });
 export const getAuth = () => auth;
 export class GoogleAuthProvider { setCustomParameters() {} }

@@ -111,6 +111,7 @@ const Cloud = {
   seenThread: (code, by, owner) => setDoc(doc(db, "threads", code), by === "t" ? { owner, tSeen: Date.now() } : { owner, pSeen: { [uid]: Date.now() } }, { merge: true }),
   removeParent: (code, puid) => updateDoc(doc(db, "kids", code), { ["parents." + puid]: deleteField() }),
   myUid: () => uid,
+  idToken: async () => (auth.currentUser ? auth.currentUser.getIdToken() : null),
   async setParentName(codes, name) {
     await setDoc(doc(db, "parents", uid), { name }, { merge: true });
     await Promise.all(codes.map(c => updateDoc(doc(db, "kids", c), { ["parents." + uid]: name }).catch(() => {})));
