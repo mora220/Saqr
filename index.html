@@ -823,6 +823,15 @@ body.board .wscene{min-height:72vh}
 .kchat .grow{flex:1;min-width:0}.kchat b{display:block;font-size:1.15rem}.kchat small{color:var(--muted);font-weight:600;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kchat .mdot{position:absolute;top:12px;left:14px}
 .kpdf{display:block;width:100%;margin:14px 0 4px;padding:14px;font-size:1.05rem}.kpdf[hidden]{display:none}
+
+/* ---------- every page opens full screen (not a small popup); content stays a readable width ---------- */
+#ov{align-items:stretch!important;justify-content:stretch;background:var(--bg);backdrop-filter:none}
+#ov .sheet{width:100%;max-width:none;height:100%;max-height:none!important;border-radius:0;box-shadow:none;
+  padding:16px max(16px,calc((100% - 960px)/2)) 32px;overscroll-behavior:contain}
+#ov .sheet>.x{position:sticky;top:0;float:left;margin:0 0 -38px;z-index:5;box-shadow:0 4px 12px rgba(27,42,74,.12)}
+#ov .sheet>.bbtn{z-index:5;left:calc(max(16px,(100% - 960px)/2) + 48px);top:16px}
+@media(min-width:700px){#ov .sheet{padding-top:24px}#ov .sheet h2{font-size:1.75rem}}
+body.board #ov .sheet{padding:24px 4vw 30px}
 </style>
 </head>
 <body>

@@ -1,0 +1,16 @@
+from helpers import *
+r = Run()
+d = r.br.new_context(viewport={"width":1366,"height":800}, locale="ar-SA")
+p = d.new_page(); p.on("pageerror", lambda e: r.errors.append(str(e)))
+p.goto(URL); p.wait_for_timeout(900); p.evaluate("localStorage.clear()"); p.reload(); p.wait_for_timeout(900)
+p.click("#guestBtn"); p.wait_for_selector("#grid .card"); p.wait_for_timeout(600)
+p.click('.tb[data-tab="settings"]'); p.wait_for_timeout(700); p.screenshot(path="shots/f1_settings.png")
+p.click('.tb[data-tab="kit"]'); p.wait_for_timeout(900); p.screenshot(path="shots/f2_kit.png")
+p.click('.kt[data-k="random"]'); p.wait_for_timeout(1500); p.screenshot(path="shots/f3_random.png")
+p.click('.tb[data-tab="report"]'); p.wait_for_timeout(900); p.screenshot(path="shots/f4_report.png")
+p.click('#sheet .x'); p.wait_for_timeout(500); p.screenshot(path="shots/f5_home.png")
+# mobile
+m = r.page("m"); m.evaluate("localStorage.clear()"); m.reload(); m.wait_for_timeout(800); m.click("#guestBtn"); m.wait_for_selector("#grid .card")
+m.click('.tb[data-tab="settings"]'); m.wait_for_timeout(700); r.shot(m, "f6_mobile")
+m.evaluate("document.querySelector('#sheet').scrollTop=600"); m.wait_for_timeout(300); r.shot(m, "f7_mobile_scrolled")
+r.close()
